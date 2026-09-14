@@ -415,6 +415,21 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+TOPOLOGY_TOOL = ROOT / "tools" / "topology_features.py"
+OPAQUE_TOOL = ROOT / "tools" / "opaque_ids.py"
+TOPOLOGY_REPORT = ROOT / "artifacts" / "reports" / "H05-FEATURES-TOPO.md"
+TOPOLOGY_TOKENS = (
+    "opaco",
+    "fit",
+    "transform",
+    "somente na fonte",
+    "permutar",
+    "não finitos",
+    "clip",
+    "proibido",
+    "reciprocidade",
+    "limitaç",
+)
 SEALED_EVALUATOR_TOOL = ROOT / "tools" / "sealed_evaluator.py"
 SEALED_EVALUATOR_REPORT = ROOT / "artifacts" / "reports" / "H04-AVALIADOR-SELADO.md"
 SEALED_EVALUATOR_TOKENS = (
@@ -2109,6 +2124,91 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_topology_features() -> tuple[list[str], int]:
+    label = "H05"
+    failures: list[str] = []
+    for path in (
+        TOPOLOGY_TOOL,
+        OPAQUE_TOOL,
+        TOPOLOGY_REPORT,
+        ROOT / "tests" / "test_topology_features.py",
+    ):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+
+    report = TOPOLOGY_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in TOPOLOGY_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+
+    spec = importlib.util.spec_from_file_location("topology_module", TOPOLOGY_TOOL)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    opaque_spec = importlib.util.spec_from_file_location("opaque_module", OPAQUE_TOOL)
+    opaque_module = importlib.util.module_from_spec(opaque_spec)
+    opaque_spec.loader.exec_module(opaque_module)
+
+    def make_graph(edges):
+        labels = sorted({label_value for edge in edges for label_value in edge[:2]})
+        return {
+            "schema_version": "1.0",
+            "provenance": {
+                "dataset": "CHECK",
+                "release": "v1",
+                "license": "CC0-1.0",
+                "source_files": [{"path": "x.csv", "sha256": "0" * 64}],
+                "adapter": {"name": "x", "version": "1", "config_sha256": "1" * 64},
+                "created_at": "2026-09-14",
+            },
+            "graph": {
+                "directed": True, "weighted": True, "weight_units": "synapse_count",
+                "allow_self_loops": True, "aggregation": "sum",
+                "threshold": {"weight_min": 0, "rule": "keep"},
+            },
+            "nodes": [
+                {"id": opaque_module.opaque_node_id("CHECK", "v1", value), "attributes": {}, "missing": []}
+                for value in labels
+            ],
+            "edges": [
+                {
+                    "source": opaque_module.opaque_node_id("CHECK", "v1", pre),
+                    "target": opaque_module.opaque_node_id("CHECK", "v1", post),
+                    "weight": weight,
+                    "attributes": {},
+                    "missing": [],
+                }
+                for pre, post, weight in edges
+            ],
+        }
+
+    small = make_graph([("a", "b", 5), ("b", "a", 2), ("a", "a", 1)])
+    ids, matrix = module.raw_features(small)
+    if len(matrix[0]) != len(module.FEATURE_NAMES):
+        failures.append(f"{label}: matriz com largura diferente das features")
+    if any(isinstance(value, str) for row in matrix for value in row):
+        failures.append(f"{label}: matriz contém valores não numéricos")
+    stats = module.fit(small)
+    _, _, report_data = module.transform(small, stats)
+    if report_data["nonfinite_replaced"] != 0:
+        failures.append(f"{label}: política de não finitos não é fixa")
+    if any(abs(value) > module.CLIP_Z for row in module.transform(small, stats)[1] for value in row):
+        failures.append(f"{label}: clipping não aplicado")
+    if opaque_module.opaque_node_id("CHECK", "v1", "a") != opaque_module.opaque_node_id("CHECK", "v1", "a"):
+        failures.append(f"{label}: mapeamento opaco não determinístico")
+
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(TOPOLOGY_TOKENS)
+
+
 def check_sealed_evaluator() -> tuple[list[str], int]:
     label = "H04"
     failures: list[str] = []
@@ -3227,6 +3327,7 @@ def main() -> int:
     adapter_source_failures, adapter_source_tokens = check_adapter_source()
     adapter_target_failures, adapter_target_tokens = check_adapter_target()
     sealed_evaluator_failures, sealed_evaluator_tokens = check_sealed_evaluator()
+    topology_failures, topology_tokens = check_topology_features()
     failures += (
         ref_failures
         + path_failures
@@ -3262,6 +3363,7 @@ def main() -> int:
         + adapter_source_failures
         + adapter_target_failures
         + sealed_evaluator_failures
+        + topology_failures
     )
 
     if failures:
@@ -3396,6 +3498,10 @@ def main() -> int:
     print(
         f"OK: avaliador selado H04 com {sealed_evaluator_tokens} tokens, label "
         f"schema validado e métricas sem IDs"
+    )
+    print(
+        f"OK: features topology-only H05 com {topology_tokens} tokens, IDs opacos "
+        f"e fit/transform separado"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

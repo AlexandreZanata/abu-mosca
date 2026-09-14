@@ -24,6 +24,7 @@ import pyarrow.feather as feather
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 import graph_contract  # noqa: E402
+import opaque_ids  # noqa: E402
 
 ADAPTER_NAME = "mcns-adapter"
 ADAPTER_VERSION = "1.0"
@@ -57,9 +58,6 @@ def file_sha256(path: Path, chunk: int = 1 << 20) -> str:
     return digest.hexdigest()
 
 
-def opaque_id(body: int) -> str:
-    digest = hashlib.sha256(f"{DATASET}|{RELEASE}|{int(body)}".encode()).hexdigest()
-    return "n" + digest[:16]
 
 
 def read_weights(path: Path) -> pa.Table:
@@ -104,7 +102,7 @@ def sample_graph(table: pa.Table, sample_rows: int, source: dict | None = None) 
         key = (index.setdefault(int(pre), len(index)), index.setdefault(int(post), len(index)))
         edges[key] = edges.get(key, 0) + value
     order = {position: body for body, position in index.items()}
-    node_ids = {position: opaque_id(order[position]) for position in order}
+    node_ids = {position: opaque_ids.opaque_node_id(DATASET, RELEASE, order[position]) for position in order}
     degree_in: dict[int, int] = {}
     degree_out: dict[int, int] = {}
     for (pre, post), weight in edges.items():

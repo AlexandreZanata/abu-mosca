@@ -19,6 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 import graph_contract  # noqa: E402
+import opaque_ids  # noqa: E402
 
 ADAPTER_NAME = "manc-adapter"
 ADAPTER_VERSION = "1.0"
@@ -51,9 +52,6 @@ def file_sha256(path: Path, chunk: int = 1 << 20) -> str:
     return digest.hexdigest()
 
 
-def opaque_id(dataset: str, release: str, body: str) -> str:
-    digest = hashlib.sha256(f"{dataset}|{release}|{body}".encode()).hexdigest()
-    return "n" + digest[:16]
 
 
 def read_connections(path: Path) -> dict:
@@ -97,7 +95,7 @@ def build_graph(path: Path) -> tuple[dict, dict]:
     data = read_connections(path)
     index, edges = data["index"], data["edges"]
     order = {position: body for body, position in index.items()}
-    node_ids = {position: opaque_id(DATASET, RELEASE, order[position]) for position in order}
+    node_ids = {position: opaque_ids.opaque_node_id(DATASET, RELEASE, order[position]) for position in order}
     if len(set(node_ids.values())) != len(node_ids):
         raise AdapterError("colisão de IDs opacos")
     degree_in: dict[int, int] = {}

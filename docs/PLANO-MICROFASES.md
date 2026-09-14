@@ -1374,7 +1374,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   recomendado antes de M08), calibração usa aproximação top-1 e a avaliação
   real única depende de H07/M08; commit 6f632932bfaa08f29f95128893ba96c1b918a745.
 
-- [ ] **H05 — Remapear IDs e produzir features topology-only.**
+- [x] **H05 — Remapear IDs e produzir features topology-only.**
   - Objetivo: gerar features comparáveis sem deixar identidade ou ordem virar
     atalho.
   - Entregas: mapeamento opaco, features permitidas, fit/transform separado,
@@ -1385,6 +1385,32 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: node ID não entra como número, categoria ou índice treinável.
   - Dependências: H02, H03.
   - Orçamento: IA baixa; CPU.
+  Evidência (2026-09-14, executor): arquivos `tools/opaque_ids.py` (mapeamento
+  canônico `n<sha256(dataset|release|body)[:16]>` usado pelos adapters
+  H02/H03, refatorados sem mudar as saídas douradas), `tools/topology_features.py`
+  (features `in_degree`, `out_degree`, `weighted_in`, `weighted_out`,
+  `reciprocity`, `self_loop_weight`; fit z-score só na fonte; transform com
+  não-finitos → 0,0 e clipping ±8 por regra fixa; IDs em array paralelo, nunca
+  na matriz), `tests/test_topology_features.py` (6 casos: valores exatos,
+  permutação de IDs/ordem preserva vetores, normalizador da fonte, política de
+  não finitos/clip, matriz sem IDs, atributo proibido falha) e
+  `artifacts/reports/H05-FEATURES-TOPO.md`; fontes/versões: contratos H01,
+  amostras H02/H03 (MANC 100k arestas e MCNS 100k arestas), Python 3.12.2 com
+  numpy do lock R02, sem GPU e sem dados selados; comandos e testes: fit na
+  amostra MANC (16.543 nodes, stats `33ed771f…`, 0,68 s) e transform na amostra
+  MCNS (38.442 nodes, 0 não-finitos, 7.069 clipados, 0,8 s),
+  `.venv/bin/python -m pytest tests/ -q` (112 passaram; 6 novos), nova
+  checagem H05 no `validate_research.py` com smoke negativo (token e ID cru),
+  `python3 tools/validate_plan.py` e `git diff --cached --check`; resultado:
+  permutar IDs e ordem mantém resultados equivalentes, normalizadores ficam
+  ajustados somente na fonte, features não carregam label/região/coordenada/nome
+  e missing/inf têm regra fixa; falha real corrigida: o relatório de transform
+  recalculava somas em laço O(n²) (174,9 s), reduzido a 0,8 s sem mudar valores;
+  recursos medidos: CPU apenas, pico 118 MiB no transform, suíte em ~41 s;
+  decisão/limitação: features de primeira ordem ficam disponíveis para baselines
+  B03/B04, assinaturas mais ricas e o fit do grafo completo ficam para
+  B04/H08, e o clipping ±8 deve ser reavaliado em H06/S06 sem alterar o
+  pré-registro; commit d589a4c35e4e623435258db6f58ac2610d8b9983.
 
 - [ ] **H06 — Fixar semântica de arestas, thresholds e variantes.**
   - Objetivo: separar decisões necessárias de ablações futuras.
