@@ -415,6 +415,18 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+B01_TOOL = ROOT / "tools" / "metrics.py"
+B01_REPORT = ROOT / "artifacts" / "reports" / "B01-METRICAS.md"
+B01_TOKENS = (
+    "recall@1",
+    "micro",
+    "macro",
+    "empates",
+    "multi-instance",
+    "sem match",
+    "orientação",
+    "sem i/o",
+)
 GATE_G4 = ROOT / "docs" / "gates" / "G4-DADOS-ANALITICOS.md"
 GATE_G4_SECTIONS = (
     "## Pacote de revisão",
@@ -2202,6 +2214,43 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_b01_metrics() -> tuple[list[str], int]:
+    label = "B01"
+    failures: list[str] = []
+    for path in (B01_TOOL, B01_REPORT, ROOT / "tests" / "test_metrics.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    report = B01_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in B01_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+    source = B01_TOOL.read_text(encoding="utf-8")
+    for token in ("open(", "read_text", "pathlib", "json.load"):
+        if token in source:
+            failures.append(f"{label}: métricas não podem fazer I/O ('{token}')")
+    spec = importlib.util.spec_from_file_location("metrics_module", B01_TOOL)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    ranked = {"q1": ["A", "B", "C"], "q2": ["A", "B", "C"], "q3": ["A", "B", "C"], "q4": ["B", "A", "C"]}
+    gold = {"q1": "A", "q2": "B", "q3": "C", "q4": "A"}
+    result = module.evaluate(ranked, gold)
+    if abs(result["recall"]["@1"]["macro"] - 0.166667) > 1e-6:
+        failures.append(f"{label}: exemplo canônico divergente em Recall@1 macro")
+    if abs(result["mrr"] - 0.583333) > 1e-6 or abs(result["macro_f1"] - 0.133333) > 1e-6:
+        failures.append(f"{label}: exemplo canônico divergente em MRR/macro-F1")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(B01_TOKENS)
+
+
 def check_gate_g4() -> tuple[list[str], int, str]:
     label = "G4-DADOS-ANALITICOS.md"
     if not GATE_G4.exists():
@@ -3775,6 +3824,7 @@ def main() -> int:
     h08_failures, h08_tokens = check_h08_snapshots()
     h09_failures, h09_tokens = check_h09_quality()
     gate_g4_failures, gate_g4_entries, gate_g4_state = check_gate_g4()
+    b01_failures, b01_tokens = check_b01_metrics()
     failures += (
         ref_failures
         + path_failures
@@ -3816,6 +3866,7 @@ def main() -> int:
         + h08_failures
         + h09_failures
         + gate_g4_failures
+        + b01_failures
     )
 
     if failures:
@@ -3973,6 +4024,10 @@ def main() -> int:
     )
     print(
         f"OK: gate G4 com {gate_g4_entries} hashes e decisão {gate_g4_state}"
+    )
+    print(
+        f"OK: métricas B01 com {b01_tokens} tokens, exemplo canônico conferido e "
+        f"sem I/O"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

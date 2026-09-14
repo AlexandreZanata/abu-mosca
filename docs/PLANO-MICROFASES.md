@@ -1602,7 +1602,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
 
 ### Avaliação e baselines obrigatórios
 
-- [ ] **B01 — Implementar retrieval/classification e testes matemáticos.**
+- [x] **B01 — Implementar retrieval/classification e testes matemáticos.**
   - Objetivo: ter uma única implementação de métricas para todos os métodos.
   - Entregas: evaluator público de predições sintéticas para Recall@1/5/10, MRR,
     MAP, top-k, macro-F1 e balanced accuracy.
@@ -1612,6 +1612,27 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: implementação não lê labels reais do alvo.
   - Dependências: G4, R06.
   - Orçamento: IA baixa; CPU.
+  Evidência (2026-09-14, executor; modo exploratório): arquivos
+  `tools/metrics.py` (implementação única e pura: Recall@1/5/10 macro e micro,
+  MRR, MAP, top-k accuracy, macro-F1, balanced accuracy, empates desfeitos por
+  rótulo, orientação de score/distância explícita, multi-instance, classes
+  ausentes no denominador macro e contagem de queries sem match; sem I/O e sem
+  dependências), `tests/test_metrics.py` (7 casos, com exemplo canônico
+  calculado à mão: Recall@1 macro 0,166667, micro 0,25; MRR/MAP 0,583333;
+  macro-F1 0,133333; balanced accuracy 0,166667) e
+  `artifacts/reports/B01-METRICAS.md`; fontes/versões: R06/SAP e G4 `GO`
+  exploratório, Python 3.12.2 (stdlib), sem GPU e sem leitura de qualquer
+  label real do alvo; comandos e testes: `.venv/bin/python -m pytest tests/ -q`
+  (155 testes; 7 novos), nova checagem B01 no `validate_research.py` (exemplo
+  canônico conferido, proibição de I/O no módulo e smoke negativo),
+  `python3 tools/validate_plan.py` e `git diff --cached --check`; resultado:
+  uma única implementação de métricas pronta para todos os métodos, com
+  orientação inequívoca e comportamento determinístico em empates; recursos
+  medidos: CPU apenas, milissegundos, sem downloads; decisão/limitação:
+  apenas métricas de retrieval/classificação; calibração, open-set e incerteza
+  ficam em B02, e a integração com predições seladas por ID opaco permanece
+  com o avaliador (H04/R06); commit
+  20ec9e040c9c93eaf5bfdd4d7c7997e0fec68311.
 
 - [ ] **B02 — Implementar calibração, open-set e incerteza.**
   - Objetivo: evitar que toda consulta seja forçada a uma classe conhecida.
