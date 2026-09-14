@@ -1,0 +1,62 @@
+schema_version: 1
+run_id: "<imutavel>"
+started_at: "<ISO-8601 com fuso>"
+finished_at: "<ISO-8601 com fuso>"
+status: "planned|running|completed|failed|aborted"
+track: "confirmatory|exploratory|smoke"
+
+code:
+  git_commit: "<hash>"
+  git_dirty: false
+  command: "<comando exato>"
+  config_sha256: "<hash>"
+
+environment:
+  lockfile_sha256: "<hash>"
+  python: "<versao>"
+  pytorch: "<versao>"
+  cuda: "<versao>"
+  os: "<versao>"
+
+hardware:
+  cpu: "<modelo>"
+  ram_bytes: 0
+  gpu: "<modelo>"
+  vram_bytes: 0
+
+data:
+  source_release: "<id>"
+  source_manifest_sha256: "<hash>"
+  target_public_release: "<id ou null>"
+  target_public_manifest_sha256: "<hash ou null>"
+  sealed_labels_sha256: "<hash ou null; nunca o conteudo>"
+  crosswalk_sha256: "<hash ou null>"
+
+model:
+  name: "<nome>"
+  parameter_count: 0
+  embedding_dim: 0
+  objective: "<nome>"
+  seed: 0
+
+budget:
+  max_wall_seconds: 0
+  max_ram_bytes: 0
+  max_vram_bytes: 0
+
+observed:
+  wall_seconds: 0
+  peak_ram_bytes: 0
+  peak_vram_bytes: 0
+  output_bytes: 0
+
+artifacts:
+  metrics_path: "<caminho>"
+  metrics_sha256: "<hash>"
+  checkpoint_path: "<caminho ou null>"
+  checkpoint_sha256: "<hash ou null>"
+
+notes:
+  deviations: []
+  failures: []
+  limitations: []

@@ -1,0 +1,59 @@
+# Contexto privado e prompts locais
+.local/
+
+# Ambientes, segredos e credenciais
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+
+# Python e ferramentas
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+.ipynb_checkpoints/
+
+# Dados volumosos ou restritos; somente manifestos e documentação entram no Git
+/data/*
+!/data/README.md
+!/data/manifests/
+!/data/manifests/**
+
+# Execuções e artefatos regeneráveis
+/runs/
+/artifacts/*
+!/artifacts/reports/
+!/artifacts/reports/**
+/checkpoints/
+/outputs/
+/wandb/
+/mlruns/
+
+# Modelos, arrays, grafos e dumps locais
+*.pt
+*.pth
+*.ckpt
+*.npy
+*.npz
+*.parquet
+*.arrow
+*.h5
+*.hdf5
+*.zarr/
+*.graphml
+*.gml
+
+# Temporários e editores
+tmp/
+*.tmp
+*.swp
+*~
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
