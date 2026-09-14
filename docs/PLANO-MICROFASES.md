@@ -55,7 +55,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   científico; linha em branco final removida de 6 documentos preexistentes para o
   diff check passar; commit 3e9863464078d80b588a55366a8ee3d8183bc13e.
 
-- [ ] **C01 — Abrir glossário, registro de claims e registro de riscos.**
+- [x] **C01 — Abrir glossário, registro de claims e registro de riscos.**
   - Objetivo: transformar termos ambíguos do briefing em vocabulário auditável.
   - Entregas: `docs/research/GLOSSARIO.md`, `CLAIMS.md` e `RISCOS.md`, com IDs
     estáveis, status e responsáveis.
@@ -66,6 +66,21 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     disponível.
   - Dependências: C00.
   - Orçamento: IA baixa; sem GPU; uma sessão.
+  Evidência (2026-09-14, executor): arquivos `docs/research/GLOSSARIO.md`,
+  `docs/research/CLAIMS.md`, `docs/research/RISCOS.md`,
+  `tools/validate_research.py` e esta linha; fontes/versões: apenas documentos
+  internos do projeto (`ESCOPO-E-HIPOTESES`, `PROTOCOLO-EXECUCAO` e plano),
+  nenhuma fonte externa consultada, Python 3.12.2 (stdlib); comandos e testes:
+  `python3 tools/validate_research.py` com smoke negativo inline (termo ausente,
+  claim confirmado sem evidência, risco mitigado sem artefato e caminho citado
+  quebrado), `python3 tools/validate_plan.py`, `git diff --cached --check` e
+  `git status --porcelain`; resultado: 14 termos (12 obrigatórios), 15 claims
+  abertos, 16 riscos abertos, 65 referências de fase e 27 caminhos citados
+  válidos, nenhum dataset declarado disponível; recursos: 13,4 MB de RAM e 0,06 s
+  no validador, sem GPU; decisão/limitação: registros abertos com IDs estáveis e
+  definições provisórias, `confirmado`/`mitigado` exigem evidência ou artefato;
+  arquivos não relacionados surgidos na árvore durante a sessão foram preservados
+  fora deste commit; commit 1d103a3c649cb58dad70324a266dbd5437b23875.
 
 - [ ] **C02 — Fixar pergunta, estimando (*estimand*) e unidade de análise provisórios.**
   - Objetivo: dizer exatamente o que será estimado e em qual população observada.
