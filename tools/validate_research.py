@@ -415,6 +415,22 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+GATE_G4 = ROOT / "docs" / "gates" / "G4-DADOS-ANALITICOS.md"
+GATE_G4_SECTIONS = (
+    "## Pacote de revisão",
+    "## Artefatos e hashes",
+    "## Critérios",
+    "## Riscos e divergências",
+    "## Condições do G4",
+    "## Escopo liberado",
+    "## Assinaturas",
+)
+GATE_G4_SIGNATURE_FIELDS = (
+    "Responsável científico",
+    "Custodiante dos dados",
+    "Revisor de método/estatística",
+)
+GATE_G4_HASH_RE = re.compile(r"^- SHA-256 `([0-9a-f]{64})` — `([^`]+)`$")
 H09_TOOL = ROOT / "tools" / "data_quality.py"
 H09_REPORT = ROOT / "artifacts" / "reports" / "DATA-QUALITY.md"
 H09_METRICS = ROOT / "artifacts" / "reports" / "DATA-QUALITY.json"
@@ -2186,6 +2202,82 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_gate_g4() -> tuple[list[str], int, str]:
+    label = "G4-DADOS-ANALITICOS.md"
+    if not GATE_G4.exists():
+        return [f"{label}: arquivo ausente"], 0, "AUSENTE"
+    text = GATE_G4.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    failures: list[str] = []
+    for section in GATE_G4_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for field in GATE_HEADER_FIELDS:
+        if field_value(lines, field) is None:
+            failures.append(f"{label}: cabeçalho sem campo '{field}'")
+    decision = field_value(lines, "Decisão")
+    if decision is None or not decision.startswith(("AGUARDAR", "GO", "NO-GO", "REFORMULAR")):
+        failures.append(f"{label}: decisão inválida")
+    pending = decision is not None and decision.startswith("AGUARDAR")
+    approved = decision is not None and decision.startswith("GO")
+    entries = 0
+    for line in lines:
+        match = GATE_G4_HASH_RE.match(line)
+        if match is None:
+            continue
+        digest, rel = match.groups()
+        path = ROOT / rel
+        if not path.exists():
+            failures.append(f"{label}: artefato ausente '{rel}'")
+            continue
+        if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+            failures.append(f"{label}: SHA-256 divergente para '{rel}'")
+        entries += 1
+    if entries < 8:
+        failures.append(f"{label}: esperados ao menos 8 artefatos com hash (achados {entries})")
+    manifest = json.loads((ROOT / "data" / "manifests" / "analitico-v1.json").read_text(encoding="utf-8"))
+    if manifest.get("analytic_sha256") not in text:
+        failures.append(f"{label}: hash analítico ausente no pacote")
+    criteria = [line for line in lines if CRITERION_RE.match(line)]
+    if len(criteria) < 8:
+        failures.append(f"{label}: esperados ao menos 8 critérios (achados {len(criteria)})")
+    if pending and not any("`NÃO VERIFICADO`" in line for line in criteria):
+        failures.append(f"{label}: nenhum critério 'NÃO VERIFICADO' com decisão pendente")
+    if approved and any("`NÃO VERIFICADO`" in line for line in criteria):
+        failures.append(f"{label}: decisão GO com critério ainda 'NÃO VERIFICADO'")
+    if approved and any("`FAIL`" in line for line in criteria):
+        failures.append(f"{label}: critério FAIL exige decisão NO-GO/REFORMULAR")
+    start = next((i for i, line in enumerate(lines) if line.startswith("## Assinaturas")), None)
+    signature_lines = lines[start:] if start is not None else []
+    for field in GATE_G4_SIGNATURE_FIELDS:
+        value = field_value(signature_lines, field)
+        if value is None:
+            failures.append(f"{label}: assinatura sem campo '{field}'")
+            continue
+        if pending and "a preencher" not in value.lower():
+            failures.append(f"{label}: assinatura '{field}' preenchida antes da revisão humana")
+        if approved and "a preencher" in value.lower():
+            failures.append(f"{label}: assinatura '{field}' ainda pendente com decisão GO")
+    if approved and "2026-" not in "\n".join(signature_lines):
+        failures.append(f"{label}: assinaturas sem data")
+    leak = PUBLIC_ID_RE.search(text)
+    if leak:
+        failures.append(f"{label}: possível ID cru ('{leak.group(0)}')")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    g4_line = next((line for line in plan_lines if "**G4 —" in line), None)
+    if g4_line is None:
+        failures.append(f"{label}: item G4 não encontrado no plano")
+    elif pending and not g4_line.startswith("- [ ]"):
+        failures.append(f"{label}: G4 marcado concluído enquanto a decisão é AGUARDAR")
+    elif approved and g4_line.startswith("- [ ]"):
+        failures.append(f"{label}: decisão GO exige G4 marcado [x] no plano")
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(text) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    state = "GO" if approved else "AGUARDAR"
+    return failures, entries, state
+
+
 def check_h09_quality() -> tuple[list[str], int]:
     label = "H09"
     failures: list[str] = []
@@ -3682,6 +3774,7 @@ def main() -> int:
     h07_failures, h07_tokens = check_h07_blocked()
     h08_failures, h08_tokens = check_h08_snapshots()
     h09_failures, h09_tokens = check_h09_quality()
+    gate_g4_failures, gate_g4_entries, gate_g4_state = check_gate_g4()
     failures += (
         ref_failures
         + path_failures
@@ -3722,6 +3815,7 @@ def main() -> int:
         + h07_failures
         + h08_failures
         + h09_failures
+        + gate_g4_failures
     )
 
     if failures:
@@ -3876,6 +3970,9 @@ def main() -> int:
     print(
         f"OK: auditoria H09 com {h09_tokens} tokens, dataset congelado em modo "
         f"exploratório e hash analítico"
+    )
+    print(
+        f"OK: gate G4 com {gate_g4_entries} hashes e decisão {gate_g4_state}"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

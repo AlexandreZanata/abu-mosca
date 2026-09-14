@@ -1584,6 +1584,14 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: dataset reprovado não é “limpo” manualmente sem nova proveniência.
   - Dependências: H01–H09.
   - Orçamento: IA baixa para pacote; revisão humana.
+  - Pacote preparado (2026-09-14, executor): `docs/gates/G4-DADOS-ANALITICOS.md`
+    com 8 artefatos hashados (manifesto analítico, DATA-QUALITY, H08, registro
+    do pré-registro, firewall), 8 critérios (6 `PASS` e 2 `NÃO VERIFICADO`
+    para custodiante e responsável científico), desvios aceitos documentados
+    (nível do alvo, 22.799 isolados, sem desfecho confirmatório, revisor único)
+    e decisão `AGUARDAR`; com `GO`, libera B01–B09 apenas em modo exploratório,
+    sem unseal, sem rótulos-alvo e sem claims confirmatórios; commit
+    90c40c20bc86967213dc8cb093bf6935ac848699.
 
 ### Avaliação e baselines obrigatórios
 
