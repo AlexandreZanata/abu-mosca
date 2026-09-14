@@ -888,7 +888,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
 
 ### Reprodutibilidade, avaliação selada e pré-registro
 
-- [ ] **R01 — Criar estrutura mínima e plano de gestão de dados.**
+- [x] **R01 — Criar estrutura mínima e plano de gestão de dados.**
   - Objetivo: separar código, manifestos, dados, runs, documentos e material
     selado antes de qualquer download integral.
   - Entregas: diretórios documentados, `data/README.md`,
@@ -899,6 +899,31 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não adicionar dados, tokens, rótulos-alvo ou checkpoints ao Git.
   - Dependências: G2.
   - Orçamento: IA baixa; sem GPU.
+  Evidência (2026-09-14, executor): arquivos `data/README.md` (zonas e regras
+  rápidas), `docs/research/DATA-MANAGEMENT.md` (10 seções: fonte de verdade,
+  layout, releases/checksums, retenção/backup/limpeza, licenças/redistribuição,
+  regeneráveis, selados/firewall, segredos, teste, limitações),
+  `tools/check_data_hygiene.py` (11 sentinelas, 3 arquivos permitidos e 10
+  diretórios) e `.gitignore` (bloco explícito `data/sealed/`, `*.token` e
+  `tokens/`); fontes/versões: G2 `GO`, D09/D10, PROTOCOLO (zonas e firewall),
+  cards D02–D07 e LIT-0001/0010/0070/0074/0076/0078/0079, acessos 2026-09-14,
+  Python 3.12.2 (stdlib); comandos e testes: `python3
+  tools/check_data_hygiene.py` (PASS: 11 sentinelas ignoradas, 0 vazamento em
+  `git status`, 3 arquivos permitidos rastreáveis, 10 diretórios presentes,
+  13.252 KB de RSS, 0,11 s), `python3 tools/validate_research.py` (nova checagem
+  R01 com smoke negativo: seção, token, link, `.gitignore`, ID cru e LIT
+  inexistente), `python3 tools/validate_plan.py` e `git diff --cached --check`;
+  resultado: layout criado (`data/raw/source`, `data/raw/target-public`,
+  `data/raw/spikes`, `data/manifests`, `data/sealed/target-labels`,
+  `artifacts/reports`, `artifacts/frozen`, `runs`, `checkpoints`, `outputs`) e
+  política separando raw, manifestos, selados e regeneráveis; falha encontrada e
+  corrigida antes do commit: o primeiro teste de higiene tratava
+  `data/README.md` como sentinela gravável e o apagava, ajustado para verificar
+  o arquivo sem sobrescrevê-lo; recursos medidos: 0 download, 0 MB, sem GPU;
+  decisão/limitação: backup externo ainda não designado e schema de manifestos
+  fica para R03; a zona `data/sealed/target-labels/` foi criada vazia e nenhum
+  dado selado foi lido ou gerado; commit
+  f92f721f0d1d73c8b7bcc1170242480011781fde.
 
 - [ ] **R02 — Fixar ambiente e capturar hardware.**
   - Objetivo: obter instalação repetível e compatível com a máquina-alvo.

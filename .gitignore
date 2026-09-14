@@ -24,6 +24,13 @@ coverage.xml
 !/data/manifests/
 !/data/manifests/**
 
+# Rótulos, crosswalk avaliativo e material selado do alvo (nunca versionar)
+data/sealed/
+
+# Tokens e credenciais de API (nunca versionar)
+*.token
+tokens/
+
 # Execuções e artefatos regeneráveis
 /runs/
 /artifacts/*

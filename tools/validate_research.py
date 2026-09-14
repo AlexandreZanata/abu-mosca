@@ -413,6 +413,58 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+DATA_README = ROOT / "data" / "README.md"
+DATA_MANAGEMENT = ROOT / "docs" / "research" / "DATA-MANAGEMENT.md"
+DATA_HYGIENE_TOOL = ROOT / "tools" / "check_data_hygiene.py"
+DATA_MANAGEMENT_SECTIONS = (
+    "## 1. Princípios e fonte de verdade",
+    "## 2. Layout de zonas e diretórios",
+    "## 3. Releases, checksums e manifestos",
+    "## 4. Retenção, backup e limpeza",
+    "## 5. Licenças e redistribuição",
+    "## 6. Dados regeneráveis e não regeneráveis",
+    "## 7. Dados selados e firewall do alvo",
+    "## 8. Segredos e credenciais",
+    "## 9. Teste automatizado de higiene",
+    "## 10. Limitações",
+)
+DATA_MANAGEMENT_TOKENS = (
+    "fonte de verdade",
+    "retenção",
+    "backup",
+    "licença",
+    "redistribuição",
+    "regeneráve",
+    "selado",
+    "limpeza",
+    "checksum",
+    "sha-256",
+    "data/raw/source",
+    "data/raw/target-public",
+    "data/raw/spikes",
+    "data/sealed",
+    "data/manifests",
+    "artifacts/reports",
+    "artifacts/frozen",
+    "runs/",
+    "checkpoints/",
+    "outputs/",
+    "executor",
+    "unseal",
+    "custodiante",
+    ".env",
+    "tokens",
+    "check_data_hygiene.py",
+)
+GITIGNORE_REQUIRED = (
+    "data/sealed/",
+    "*.token",
+    "tokens/",
+    "!/data/manifests/**",
+    "/runs/",
+    "/checkpoints/",
+    "*.ckpt",
+)
 SELECTION = ROOT / "research" / "datasets" / "SELECAO.md"
 SELECTION_SECTIONS = (
     "## 1. Estado e escopo",
@@ -1698,6 +1750,51 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_data_management() -> tuple[list[str], int]:
+    label = "DATA-MANAGEMENT.md"
+    failures: list[str] = []
+    if not DATA_README.exists():
+        failures.append("data/README.md: arquivo ausente")
+    if not DATA_MANAGEMENT.exists():
+        failures.append(f"{label}: arquivo ausente em docs/research/")
+    if not DATA_HYGIENE_TOOL.exists():
+        failures.append("tools/check_data_hygiene.py: teste de higiene ausente")
+    if not failures:
+        readme = DATA_README.read_text(encoding="utf-8")
+        text = DATA_MANAGEMENT.read_text(encoding="utf-8")
+        for section in DATA_MANAGEMENT_SECTIONS:
+            if section not in text:
+                failures.append(f"{label}: seção obrigatória ausente '{section}'")
+        for token in DATA_MANAGEMENT_TOKENS:
+            if token.lower() not in text.lower():
+                failures.append(f"{label}: token obrigatório ausente '{token}'")
+        for token in ("check_data_hygiene.py", "DATA-MANAGEMENT.md"):
+            if token not in readme:
+                failures.append(f"data/README.md: sem referência a '{token}'")
+        gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
+        for token in GITIGNORE_REQUIRED:
+            if token not in gitignore:
+                failures.append(f".gitignore: padrão obrigatório ausente '{token}'")
+        for path in (DATA_README, DATA_MANAGEMENT):
+            leak = PUBLIC_ID_RE.search(path.read_text(encoding="utf-8"))
+            if leak:
+                failures.append(f"{path.name}: possível ID cru de neurônio ('{leak.group(0)}')")
+        known_lit = set(
+            re.findall(r"^(LIT-\d{4})\t", LIT_LEDGER.read_text(encoding="utf-8"), re.M)
+        )
+        refs = sorted(set(re.findall(r"LIT-\d{4}", text)))
+        if len(refs) < 4:
+            failures.append(f"{label}: menos de 4 referências LIT-* para licenças")
+        for lit_id in refs:
+            if known_lit and lit_id not in known_lit:
+                failures.append(f"{label}: referencia ledger inexistente '{lit_id}'")
+        plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+        known = {item_id for _, item_id in parse_items(plan_lines)}
+        for ref in sorted(ref for ref in phase_refs(text) if ref not in known):
+            failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(DATA_MANAGEMENT_SECTIONS)
+
+
 def check_gate_g2() -> tuple[list[str], int, str]:
     label = "G2-DADOS.md"
     if not GATE_G2.exists():
@@ -2041,6 +2138,7 @@ def main() -> int:
     resources_failures, resource_samples = check_resource_estimates()
     selection_failures, selection_pairs = check_dataset_selection()
     gate_g2_failures, gate_g2_criteria, gate_g2_state = check_gate_g2()
+    data_management_failures, data_management_sections = check_data_management()
     failures += (
         ref_failures
         + path_failures
@@ -2063,6 +2161,7 @@ def main() -> int:
         + resources_failures
         + selection_failures
         + gate_g2_failures
+        + data_management_failures
     )
 
     if failures:
@@ -2146,6 +2245,10 @@ def main() -> int:
     print(
         f"OK: docs/gates/G2-DADOS.md com {gate_g2_criteria} critérios, cards congelados "
         f"e decisão {gate_g2_state}"
+    )
+    print(
+        f"OK: gestão de dados com {data_management_sections} seções, .gitignore "
+        f"revisado e teste de higiene de sentinelas"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
