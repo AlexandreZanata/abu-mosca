@@ -1460,20 +1460,20 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: lista por node ID não sai da zona selada.
   - Dependências: D08, H04, R07; execução pelo custodiante.
   - Orçamento: IA baixa + dupla revisão humana; sem GPU.
-  - Bloqueio (2026-09-14, executor; decisão do responsável): o rascunho
-    `draft-1.0` **não foi assinado** porque circularidade total dos 4.182 tipos
-    esvaziaria a sensibilidade obrigatória e transferiria o bloqueio para a
-    avaliação; rascunho mantido apenas como artefato provisório de engenharia.
-    Reformulação exigida (5 passos): (1) auditar a proveniência dos rótulos tipo
-    a tipo; (2) identificar subconjunto **não circular** (independente de
-    conectividade/morfologia); (3) calcular cobertura com K=10 **sem consultar
-    scores**; (4) gerar novo rascunho, relatório e hashes; (5) apresentar o
-    subconjunto para assinatura. Se não houver subconjunto com cobertura
-    suficiente, registrar formalmente o **benchmark primário inconclusivo por
-    circularidade** e apresentar opções de reformulação do desfecho; a coluna
-    `mancType` **não** vira gold label confirmatório. `tools/sealed_labels.py`
-    e o desvio de revisor único (changelog 1.1) permanecem prontos; crosswalk e
-    rótulos seguem fora de features e tuning.
+  - Bloqueio (2026-09-14, executor): o rascunho `draft-1.0` **não foi assinado**
+    (circularidade total dos 4.182 tipos esvaziaria a sensibilidade obrigatória);
+    reformulação executada nos passos 1–4 — auditoria de proveniência
+    (`tools/label_provenance_audit.py`: 11.751 tipos; correspondência 11.751,
+    linhagem 10.461, genético 909, manual 2) — e o resultado formal é
+    **benchmark primário inconclusivo por circularidade**: nenhum subconjunto
+    do desfecho T0 é independente de conectividade/morfologia e `mancType` não
+    vira gold confirmatório. Cobertura K=10 sem scores para alternativas:
+    `fruDsx` 6 classes (menor 16; 4.976 neurônios) e `trumanHl` 64 classes
+    (17.704). Relatório e hashes em `artifacts/reports/H07-PROVENANCE-AUDIT.md/.json`;
+    rascunho mantido como artefato provisório de engenharia. **Aguardando
+    decisão humana sobre a reformulação** (trocar para `fruDsx`, trocar para
+    linhagem, manter T0 exploratório com inconclusivo, ou novo par de datasets)
+    e o segundo revisor antes de M08, se disponível.
 
 - [x] **H08 — Processar releases completas e medir recursos.**
   - Objetivo: gerar snapshots canônicos reproduzíveis no hardware-alvo.

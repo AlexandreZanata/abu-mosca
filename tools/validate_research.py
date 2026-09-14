@@ -430,6 +430,8 @@ H08_TOKENS = (
 )
 H07_TOOL = ROOT / "tools" / "sealed_labels.py"
 H07_PACKAGE = ROOT / "docs" / "research" / "H07-PACKAGE.md"
+H07_AUDIT_MD = ROOT / "artifacts" / "reports" / "H07-PROVENANCE-AUDIT.md"
+H07_AUDIT_JSON = ROOT / "artifacts" / "reports" / "H07-PROVENANCE-AUDIT.json"
 H07_DRAFT = ROOT / "preregistration" / "crosswalk-manc-mcns.draft.json"
 H07_DRAFT_METRICS = ROOT / "artifacts" / "reports" / "H07-CROSSWALK-DRAFT.json"
 H07_TOKENS = (
@@ -2218,6 +2220,10 @@ def check_h07_blocked() -> tuple[list[str], int]:
         ROOT / "tests" / "test_sealed_labels.py",
         H07_DRAFT,
         H07_DRAFT_METRICS,
+        ROOT / "tools" / "label_provenance_audit.py",
+        ROOT / "tests" / "test_label_provenance_audit.py",
+        H07_AUDIT_MD,
+        H07_AUDIT_JSON,
     ):
         if not path.exists():
             failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
@@ -2235,6 +2241,26 @@ def check_h07_blocked() -> tuple[list[str], int]:
     spec = importlib.util.spec_from_file_location("sealed_labels_module", H07_TOOL)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
+    audit = json.loads(H07_AUDIT_JSON.read_text(encoding="utf-8"))
+    conclusion = audit.get("conclusion", {})
+    if conclusion.get("non_circular_subset_for_t0_types") is not False:
+        failures.append(f"{label}: auditoria deve registrar ausência de subconjunto não circular para T0")
+    if "inconclusivo" not in str(conclusion.get("primary_benchmark", "")).lower():
+        failures.append(f"{label}: benchmark primário deve ser registrado como inconclusivo por circularidade")
+    if len(conclusion.get("reformulation_options", [])) < 3:
+        failures.append(f"{label}: auditoria deve apresentar opções de reformulação")
+    if audit.get("genetic_label_coverage", {}).get("classes_with_k_min", 0) < 1:
+        failures.append(f"{label}: cobertura K=10 do rótulo genético ausente")
+    audit_digest = hashlib.sha256(H07_AUDIT_JSON.read_bytes()).hexdigest()
+    if not re.fullmatch(r"[0-9a-f]{64}", audit_digest):
+        failures.append(f"{label}: hash da auditoria inválido")
+    audit_report = H07_AUDIT_MD.read_text(encoding="utf-8")
+    for token in ("inconclusivo por circularidade", "k=10", "fruDsx", "trumanHl", "nenhum ID"):
+        if token.lower() not in " ".join(audit_report.split()).lower():
+            failures.append(f"{label}: auditoria sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(audit_report)
+    if leak:
+        failures.append(f"{label}: auditoria com possível ID cru ('{leak.group(0)}')")
     draft = json.loads(H07_DRAFT.read_text(encoding="utf-8"))
     draft_failures = module.validate_crosswalk(draft, H07_DRAFT.name)
     for failure in draft_failures:

@@ -68,6 +68,25 @@ descreve a ferramenta pronta, o checklist da curadoria e o bloqueio.
   features, transformador de arestas nem pelo contrato de run (checado no
   validador); nada de ID por neurônio no rascunho.
 
+## 3c. Resultado da reformulação (passos 1–4 executados)
+
+- **Passo 1 — proveniência tipo a tipo** (`tools/label_provenance_audit.py`):
+  11.751 tipos com `type`; canais: correspondência entre datasets 11.751,
+  linhagem 10.461, genético 909, apenas curadoria manual 2. Nenhum canal
+  documenta tipo atribuído sem conectividade/morfologia (LIT-0023/D07).
+- **Passo 2 — subconjunto não circular:** **não existe** para o desfecho T0;
+  benchmark primário formalmente **inconclusivo por circularidade**.
+- **Passo 3 — cobertura K=10 sem scores:** rótulos alternativos com canal
+  independente — genético `fruDsx` (6 classes, todas ≥10, 4.976 neurônios,
+  menor classe 16) e linhagem `trumanHl` (64 classes ≥10, 17.704 neurônios).
+- **Passo 4 — novo relatório e hashes:**
+  `artifacts/reports/H07-PROVENANCE-AUDIT.md` + `.json` (agregados; nenhum ID);
+  rascunho `draft-1.0` mantido sem alteração.
+- **Passo 5 — decisão humana:** escolher uma das opções de reformulação (trocar
+  para `fruDsx`, trocar para linhagem, manter T0 exploratório com inconclusivo,
+  ou buscar novo par de datasets) com novo pré-registro quando mudar o
+  estimando.
+
 ## 4. Estado do bloqueio
 
 - Revisor único: **decisão 1b registrada** no changelog 1.1 (desvio formal com
@@ -76,5 +95,8 @@ descreve a ferramenta pronta, o checklist da curadoria e o bloqueio.
 - Rascunho do crosswalk: **pronto**, aguardando **revisão final e assinatura**
   do responsável (decisão 2b); nenhuma materialização selada foi feita.
 - Custodiante: acumulado pelo responsável com limitação declarada (decisão 3b).
-- Próximo passo: revisar/assinar o rascunho; depois materializar o label set em
-  `data/sealed/` com `tools/sealed_labels.py` e seguir para H08.
+- Benchmark primário: **inconclusivo por circularidade** registrado; o
+  rascunho `draft-1.0` não será assinado e a coluna `mancType` não vira gold
+  confirmatório.
+- Próximo passo: **decisão humana sobre a reformulação** (seção 3c) e, se
+  houver, segundo revisor antes de M08.
