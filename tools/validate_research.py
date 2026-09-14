@@ -396,6 +396,46 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+SELECTION = ROOT / "research" / "datasets" / "SELECAO.md"
+SELECTION_SECTIONS = (
+    "## 1. Estado e escopo",
+    "## 2. Notas por dataset",
+    "## 3. Ranking dos pares aprovados em D08",
+    "## 4. Papéis propostos",
+    "## 5. Condições de defensabilidade do MVP MANC → MCNS",
+    "## 6. Matriz de fallback",
+    "## 7. Efeito nos recursos (base D09)",
+    "## 8. Decisões propostas (pendentes de G2)",
+    "## 9. Limitações",
+)
+SELECTION_TOKENS = (
+    "comparabilidade",
+    "independência",
+    "labels",
+    "licença",
+    "acesso",
+    "escala",
+    "circularidade",
+    "MVP",
+    "fonte",
+    "alvo-piloto",
+    "reserva",
+    "fallback",
+    "incompatibilidade",
+    "acesso negado",
+    "crosswalk",
+    "réplica biológica",
+    "mesmo indivíduo",
+    "MANC",
+    "MCNS",
+    "BANC",
+    "MAOL",
+    "hemibrain",
+    "PAIR-04",
+    "G2",
+)
+SELECTION_DECISIONS = ("DEC-SEL-01", "DEC-SEL-02", "DEC-SEL-03", "DEC-SEL-04")
+SELECTION_PENDING = "proposta (pendente de G2)"
 RESOURCES_TOKENS = (
     "publicado",
     "medido",
@@ -1641,6 +1681,57 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_dataset_selection() -> tuple[list[str], int]:
+    label = "SELECAO.md"
+    if not SELECTION.exists():
+        return [f"{label}: arquivo ausente em research/datasets/"], 0
+    text = SELECTION.read_text(encoding="utf-8")
+    flat = " ".join(text.split())
+    failures: list[str] = []
+    for section in SELECTION_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for token in SELECTION_TOKENS:
+        if token.lower() not in text.lower():
+            failures.append(f"{label}: token obrigatório ausente '{token}'")
+    for decision in SELECTION_DECISIONS:
+        block = re.search(
+            rf"### {decision} — .*?\n(.*?)(?=\n### |\n## |\Z)", text, re.S
+        )
+        if block is None:
+            failures.append(f"{label}: decisão obrigatória ausente {decision}")
+            continue
+        status = field_value(block.group(1).splitlines(), "Status")
+        if status != SELECTION_PENDING:
+            failures.append(
+                f"{label}: {decision} deve ficar como '{SELECTION_PENDING}' até o G2 (achado '{status}')"
+            )
+    for line in text.splitlines():
+        match = re.match(r"^\s*- Status: (.+?)\s*$", line)
+        if match and match.group(1).strip().rstrip(".") != SELECTION_PENDING:
+            failures.append(f"{label}: status '{match.group(1).strip()}' não é proposta pendente de G2")
+
+    known_lit = set(re.findall(r"^(LIT-\d{4})\t", LIT_LEDGER.read_text(encoding="utf-8"), re.M))
+    refs = sorted(set(re.findall(r"LIT-\d{4}", text)))
+    if len(refs) < 5:
+        failures.append(f"{label}: menos de 5 referências LIT-* para justificar o ranking")
+    for lit_id in refs:
+        if known_lit and lit_id not in known_lit:
+            failures.append(f"{label}: referencia ledger inexistente '{lit_id}'")
+
+    leak = PUBLIC_ID_RE.search(text)
+    if leak:
+        failures.append(f"{label}: possível ID cru de neurônio no documento público ('{leak.group(0)}')")
+
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    for ref in sorted(ref for ref in phase_refs(text) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    pairs = sorted(set(re.findall(r"PAIR-\d{2}", text)))
+    if len(pairs) < 6:
+        failures.append(f"{label}: esperados ao menos 6 pares avaliados (achados {len(pairs)})")
+    return failures, len(pairs)
+
+
 def check_resource_estimates() -> tuple[list[str], int]:
     label = "RECURSOS.md"
     if not RESOURCES.exists():
@@ -1833,6 +1924,7 @@ def main() -> int:
     inventory_failures, inventory_candidates = check_dataset_inventory()
     crosswalk_failures, crosswalk_pairs, crosswalk_approved = check_crosswalk_audit()
     resources_failures, resource_samples = check_resource_estimates()
+    selection_failures, selection_pairs = check_dataset_selection()
     failures += (
         ref_failures
         + path_failures
@@ -1853,6 +1945,7 @@ def main() -> int:
         + inventory_failures
         + crosswalk_failures
         + resources_failures
+        + selection_failures
     )
 
     if failures:
@@ -1928,6 +2021,10 @@ def main() -> int:
     print(
         f"OK: research/datasets/RECURSOS.md com {resource_samples} amostras medidas, "
         f"checksums e projeções classificadas"
+    )
+    print(
+        f"OK: research/datasets/SELECAO.md com {selection_pairs} pares ranqueados e "
+        f"decisão pendente de G2"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

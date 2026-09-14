@@ -93,4 +93,6 @@ Campos obrigatórios do inventário e dos cards (identificadores estáveis):
 - Nenhuma capacidade, licença ou disponibilidade é afirmada aqui.
 - Escala, checksums medidos e projeções de recursos ficam em
   `research/datasets/RECURSOS.md` (D09).
+- Ranking, papéis e fallback propostos ficam em `research/datasets/SELECAO.md`
+  (D10), pendentes do gate G2.
 - Validação: `python3 tools/validate_research.py`.

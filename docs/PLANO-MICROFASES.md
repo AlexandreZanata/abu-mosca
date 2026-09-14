@@ -819,7 +819,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   188.508 vs 188.162 linhas no BANC, varredura MAOL com teto); commit
   fe08b5024f7b0085a4b53dea4fd156423a97fbfc.
 
-- [ ] **D10 — Ranquear pares, escolher papéis e definir fallback.**
+- [x] **D10 — Ranquear pares, escolher papéis e definir fallback.**
   - Objetivo: selecionar fonte, alvo-piloto, alvo confirmatório e reservas com
     justificativa multicritério.
   - Entregas: `research/datasets/SELECAO.md` com ranking por comparabilidade,
@@ -831,6 +831,30 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     do mesmo indivíduo de cross-individual.
   - Dependências: D08, D09.
   - Orçamento: IA baixa + revisão humana; sem GPU.
+  Evidência (2026-09-14, executor): arquivos `research/datasets/SELECAO.md`
+  (9 seções: notas dos 6 datasets, ranking de 7 pares, MVP MANC→MCNS com 7
+  condições de defensabilidade, matriz de fallback com 6 modos de falha e
+  DEC-SEL-01 a DEC-SEL-04), `research/datasets/INVENTARIO.md` (link) e
+  `tools/validate_research.py` (checagem D10 com smoke negativo inline);
+  fontes/versões: cards D02–D07, CROSSWALK-AUDIT aprovado em D08 (PAIR-01 a
+  PAIR-07, DEC-CW-01 a DEC-CW-04), RECURSOS.md (D09), LIT-0001/0002/0006/0007/
+  0009/0010/0011/0014/0015/0016/0019/0020/0023/0027/0034/0038/0060/0068/0070/
+  0072/0074/0076/0078/0079 e reconferência das páginas Janelia do MaleCNS e do
+  MANC em 2026-09-14, sem download; comandos e testes: `python3
+  tools/validate_research.py` (smoke negativo: seção, token, status aprovado
+  indevido, LIT inexistente, menos de 6 pares e ID cru), `python3
+  tools/validate_plan.py` e `git diff --cached --check`; resultado: MVP proposto
+  MANC `manc:v1.2.1` → MCNS `male-cns:v1.0` (mesmo sexo, tecidos sobrepostos,
+  PAIR-04 aprovado, CC BY nos dois lados), reserva confirmatória BANC `v888`,
+  reserva alternativa FlyWire `v783`, hemibrain como comparador e MAOL proibido
+  no MVP por ser o mesmo indivíduo do MCNS; recursos medidos: 0 download
+  adicional (0 MB), sem GPU, sem acesso a `data/sealed`; decisão/limitação: a
+  escolha do par exige revisão humana no G2 conforme PROTOCOLO, as quatro
+  decisões ficam `proposta (pendente de G2)` e nenhuma foi aprovada pela IA;
+  condições incluem crosswalk com dois revisores, sensibilidade a
+  circularidade, checksum ausente do MCNS a registrar no download e
+  armazenamento externo para o bulk; commit
+  ca50f4b26fa97651f4e781ac4cd0ce43de2d2105.
 
 - [ ] **G2 — Aprovar dados e par do MVP.**
   - Objetivo: decidir `GO`, `NO-GO` ou `REFORMULAR` antes do download completo.
