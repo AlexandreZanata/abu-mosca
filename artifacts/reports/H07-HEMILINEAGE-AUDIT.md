@@ -55,3 +55,14 @@ Executada em 2026-09-14. Sem consultar scores. Fontes locais auditadas: MANC
    sua na assinatura.
 3. Se assinar a v2 com independência confirmada, materializar o label set sob
    custódia e seguir para H09.
+
+## 5. Tentativa de confirmação do MCNS (2026-09-14, sem sucesso)
+
+- Europe PMC (API, acesso 2026-09-14): registro PMID 42691995 /
+  DOI 10.1016/j.cell.2026.08.015, `isOpenAccess: N`, `inEPMC: N` — sem texto
+  completo.
+- bioRxiv 10.1101/2025.10.09.680999 (v1 e v2, `.full`): HTTP 429
+  (rate limit) em duas tentativas — texto completo não obtido.
+- Conclusão da tentativa: a proveniência de `trumanHl` **continua não
+  confirmada**; nenhuma evidência nova foi usada e a condição 5 permanece
+  (desfecho não materializável como confirmatório até confirmação humana).
