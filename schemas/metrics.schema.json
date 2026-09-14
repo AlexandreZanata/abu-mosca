@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crossconnectome-mu.invalid/schemas/metrics.schema.json",
+  "title": "Pacote de métricas agregadas do avaliador selado (R06)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "evaluated_at", "inputs", "counts", "primary", "comparisons", "open_set", "calibration", "within_cross", "secondary", "nulls"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "run_id": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+    "evaluated_at": {"type": "string"},
+    "inputs": {
+      "type": "object",
+      "required": ["predictions_sha256", "label_set_sha256"],
+      "properties": {
+        "predictions_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "label_set_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": ["queries_total", "known", "unknown", "excluded_missing", "excluded_ambiguous", "excluded_conflicting", "classes_known", "classes_small"],
+      "properties": {
+        "queries_total": {"type": "integer", "minimum": 0},
+        "known": {"type": "integer", "minimum": 0},
+        "unknown": {"type": "integer", "minimum": 0},
+        "excluded_missing": {"type": "integer", "minimum": 0},
+        "excluded_ambiguous": {"type": "integer", "minimum": 0},
+        "excluded_conflicting": {"type": "integer", "minimum": 0},
+        "classes_known": {"type": "integer", "minimum": 0},
+        "classes_small": {"type": "integer", "minimum": 0}
+      }
+    },
+    "primary": {
+      "type": "object",
+      "required": ["name", "value", "ci95", "n_classes", "denominator", "median_across_seeds", "seed_range"],
+      "properties": {
+        "name": {"const": "macro-recall@1-t0"},
+        "value": {"type": "number", "minimum": 0, "maximum": 1},
+        "ci95": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+        "n_classes": {"type": "integer", "minimum": 1},
+        "denominator": {"type": "integer", "minimum": 1},
+        "median_across_seeds": {"type": "number", "minimum": 0, "maximum": 1},
+        "seed_range": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}}
+      }
+    },
+    "comparisons": {
+      "type": "object",
+      "required": ["best_baseline", "delta", "delta_ci95", "sesoi_pp", "sesoi_met", "degree_matched", "balanced_sensitivity", "holm_family_size"],
+      "properties": {
+        "best_baseline": {"type": "string"},
+        "delta": {"type": "number"},
+        "delta_ci95": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+        "sesoi_pp": {"const": 5},
+        "sesoi_met": {"type": "boolean"},
+        "degree_matched": {
+          "type": "object",
+          "required": ["delta", "ci95"],
+          "properties": {
+            "delta": {"type": "number"},
+            "ci95": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}}
+          }
+        },
+        "balanced_sensitivity": {
+          "type": "object",
+          "required": ["delta", "ci95", "k_min"],
+          "properties": {
+            "delta": {"type": "number"},
+            "ci95": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+            "k_min": {"type": "integer", "minimum": 1}
+          }
+        },
+        "holm_family_size": {"const": 3}
+      }
+    },
+    "open_set": {
+      "type": "object",
+      "required": ["auroc", "aupr", "fpr_at_tpr95", "tpr_target"],
+      "properties": {
+        "auroc": {"type": "number", "minimum": 0, "maximum": 1},
+        "aupr": {"type": "number", "minimum": 0, "maximum": 1},
+        "fpr_at_tpr95": {"type": "number", "minimum": 0, "maximum": 1},
+        "tpr_target": {"const": 0.95}
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "required": ["brier", "ece", "bins", "temperature_source_fit"],
+      "properties": {
+        "brier": {"type": "number", "minimum": 0, "maximum": 1},
+        "ece": {"type": "number", "minimum": 0, "maximum": 1},
+        "bins": {"const": 15},
+        "temperature_source_fit": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "within_cross": {
+      "type": "object",
+      "required": ["within", "cross", "gap"],
+      "properties": {
+        "within": {"type": "number", "minimum": 0, "maximum": 1},
+        "cross": {"type": "number", "minimum": 0, "maximum": 1},
+        "gap": {"type": "number"}
+      }
+    },
+    "secondary": {
+      "type": "object",
+      "required": ["recall@5", "recall@10", "mrr", "map", "macro_f1", "balanced_accuracy"],
+      "properties": {
+        "recall@5": {"type": "number", "minimum": 0, "maximum": 1},
+        "recall@10": {"type": "number", "minimum": 0, "maximum": 1},
+        "mrr": {"type": "number", "minimum": 0, "maximum": 1},
+        "map": {"type": "number", "minimum": 0, "maximum": 1},
+        "macro_f1": {"type": "number", "minimum": 0, "maximum": 1},
+        "balanced_accuracy": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "nulls": {
+      "type": "object",
+      "required": ["label_permutation_p", "degree_matched_p", "permutations"],
+      "properties": {
+        "label_permutation_p": {"type": "number", "minimum": 0, "maximum": 1},
+        "degree_matched_p": {"type": "number", "minimum": 0, "maximum": 1},
+        "permutations": {"type": "integer", "minimum": 1}
+      }
+    },
+    "sensitivity_circular_labels": {
+      "type": "object",
+      "required": ["primary_without_derived_types"],
+      "properties": {
+        "primary_without_derived_types": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    }
+  }
+}

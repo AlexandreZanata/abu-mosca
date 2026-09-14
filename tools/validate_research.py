@@ -415,6 +415,58 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+SAP_DOC = ROOT / "docs" / "research" / "STATISTICAL-ANALYSIS-PLAN.md"
+PREDICTIONS_SCHEMA = ROOT / "schemas" / "predictions.schema.json"
+METRICS_SCHEMA = ROOT / "schemas" / "metrics.schema.json"
+EVALUATOR_TOOL = ROOT / "tools" / "evaluator_contract.py"
+SAP_SECTIONS = (
+    "## 1. Estado e escopo",
+    "## 2. Métrica primária e cálculo exato",
+    "## 3. SESOI, Δ e regra de decisão",
+    "## 4. Denominadores, missing labels e classes pequenas",
+    "## 5. Dependência, agrupamento e nulos",
+    "## 6. Open-set, calibração e incerteza",
+    "## 7. Métricas secundárias",
+    "## 8. Sensibilidade e circularidade",
+    "## 9. Formato de predições (schema)",
+    "## 10. Contrato do comando avaliador",
+    "## 11. Ordem da análise confirmatória",
+    "## 12. Rastreabilidade e limitações",
+)
+SAP_TOKENS = (
+    "métrica primária",
+    "sesoi",
+    "denominador",
+    "macro",
+    "micro",
+    "ic 95%",
+    "bootstrap agrupado",
+    "permuta",
+    "múltiplas",
+    "seeds",
+    "missing",
+    "classes pequenas",
+    "open-set",
+    "calibra",
+    "não são réplicas biológicas independentes",
+    "fpr@tpr95",
+    "ece",
+    "brier",
+    "auroc",
+    "aupr",
+    "recall@5",
+    "mrr",
+    "macro-f1",
+    "balanced accuracy",
+    "temperatura",
+    "unseal",
+    "holm",
+    "within-vs-cross",
+)
+SAP_METRICS_REQUIRED = (
+    "schema_version", "run_id", "evaluated_at", "inputs", "counts", "primary",
+    "comparisons", "open_set", "calibration", "within_cross", "secondary", "nulls",
+)
 FIREWALL_DOC = ROOT / "docs" / "research" / "FIREWALL.md"
 FIREWALL_TOOL = ROOT / "tools" / "firewall.py"
 FIREWALL_SECTIONS = (
@@ -1875,6 +1927,58 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_statistical_plan() -> tuple[list[str], int]:
+    label = "R06"
+    failures: list[str] = []
+    for path in (
+        SAP_DOC,
+        PREDICTIONS_SCHEMA,
+        METRICS_SCHEMA,
+        EVALUATOR_TOOL,
+        ROOT / "tests" / "test_evaluator_contract.py",
+    ):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+
+    doc = SAP_DOC.read_text(encoding="utf-8")
+    flat_doc = " ".join(doc.split()).lower()
+    for section in SAP_SECTIONS:
+        if section not in doc:
+            failures.append(f"{label}: SAP sem seção '{section}'")
+    for token in SAP_TOKENS:
+        if token.lower() not in flat_doc:
+            failures.append(f"{label}: SAP sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(doc)
+    if leak:
+        failures.append(f"{label}: SAP com possível ID cru ('{leak.group(0)}')")
+
+    predictions_schema = json.loads(PREDICTIONS_SCHEMA.read_text(encoding="utf-8"))
+    metrics_schema = json.loads(METRICS_SCHEMA.read_text(encoding="utf-8"))
+    spec = importlib.util.spec_from_file_location("evaluator_contract_module", EVALUATOR_TOOL)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if tuple(predictions_schema.get("required", ())) != module.PREDICTIONS_REQUIRED:
+        failures.append(f"{label}: schema de predições divergente do validador")
+    if tuple(metrics_schema.get("required", ())) != module.METRICS_REQUIRED:
+        failures.append(f"{label}: schema de métricas divergente do validador")
+    if not module.FORBIDDEN_KEYS:
+        failures.append(f"{label}: validador sem lista de chaves proibidas")
+    if metrics_schema["properties"]["comparisons"]["properties"]["sesoi_pp"]["const"] != 5:
+        failures.append(f"{label}: SESOI deve ser 5 pontos percentuais no schema")
+    if metrics_schema["properties"]["calibration"]["properties"]["bins"]["const"] != 15:
+        failures.append(f"{label}: calibração deve fixar 15 bins no schema")
+    if metrics_schema["properties"]["open_set"]["properties"]["tpr_target"]["const"] != 0.95:
+        failures.append(f"{label}: open-set deve fixar TPR = 0,95 no schema")
+
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(doc) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(SAP_TOKENS)
+
+
 def check_firewall_phase() -> tuple[list[str], int]:
     label = "R05"
     failures: list[str] = []
@@ -2460,6 +2564,7 @@ def main() -> int:
     provenance_failures, provenance_manifests = check_provenance_phase()
     run_contract_failures, run_contract_tokens = check_run_contract()
     firewall_failures, firewall_tokens = check_firewall_phase()
+    statistical_plan_failures, statistical_plan_tokens = check_statistical_plan()
     failures += (
         ref_failures
         + path_failures
@@ -2487,6 +2592,7 @@ def main() -> int:
         + provenance_failures
         + run_contract_failures
         + firewall_failures
+        + statistical_plan_failures
     )
 
     if failures:
@@ -2590,6 +2696,10 @@ def main() -> int:
     print(
         f"OK: firewall R05 com {firewall_tokens} tokens, scanner limpo e selado "
         f"com permissões restritas"
+    )
+    print(
+        f"OK: plano estatístico R06 com {statistical_plan_tokens} tokens, schemas "
+        f"de predições/métricas e avaliador selado"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

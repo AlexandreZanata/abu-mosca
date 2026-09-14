@@ -1078,7 +1078,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   não na sessão do executor); commit
   a9b8a2dccd7ad19d77db9c13ca28cf5662952bca.
 
-- [ ] **R06 — Especificar o plano estatístico e avaliador selado.**
+- [x] **R06 — Especificar o plano estatístico e avaliador selado.**
   - Objetivo: definir cálculo, incerteza e outputs antes de observar o alvo.
   - Entregas: `docs/research/STATISTICAL-ANALYSIS-PLAN.md`, schema de predições e
     contrato do comando avaliador.
@@ -1088,6 +1088,34 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não tratar nós como observações biológicas independentes.
   - Dependências: C04, D08, D10, R05.
   - Orçamento: IA baixa + revisão humana de estatística; sem GPU.
+  Evidência (2026-09-14, executor): arquivos
+  `docs/research/STATISTICAL-ANALYSIS-PLAN.md` (12 seções fixando métrica
+  primária Macro Recall@1 no T0, cálculo exato, SESOI de 5 pontos percentuais,
+  denominadores, missing/ambíguo/conflitante/singleton/classes pequenas,
+  bootstrap agrupado por tipo com 10.000 reamostragens, permutações, família
+  Holm de 3 testes, 5 seeds com mediana e intervalo, open-set AUROC/AUPR/
+  FPR@TPR95, calibração Brier/ECE com 15 bins e temperatura source-fit,
+  ordem da análise e contrato do avaliador),
+  `schemas/predictions.schema.json` (IDs opacos `q`/`g`, top-10, sem rótulos) e
+  `schemas/metrics.schema.json` (agregados com hashes de entrada, contagens,
+  CIs, p-valores; sem resultados por neurônio), `tools/evaluator_contract.py`
+  (validação dos dois pacotes e recusa de rótulos/IDs crus) e
+  `tests/test_evaluator_contract.py` (21 casos); fontes/versões: C02–C05, D08,
+  D10, R04/R05, PROTOCOLO e árvore de C04, Python 3.12.2 (stdlib, sem
+  dependência nova), sem download e sem GPU; comandos e testes:
+  `.venv/bin/python -m pytest tests/ -q` (70 passaram em 4,88 s; 21 novos),
+  `python3 tools/evaluator_contract.py validate predictions|metrics`,
+  nova checagem R06 no `validate_research.py` (28 tokens, seções, sincronia
+  schema/validador e smoke negativo de seção/token/ID cru),
+  `python3 tools/validate_plan.py` e `git diff --cached --check`; resultado: o
+  cálculo, a incerteza e o formato dos resultados ficam definidos antes do
+  alvo, sem IDs ou labels no pacote público e com a regra explícita de que
+  neurônios do mesmo grafo e seeds de treino não são réplicas biológicas
+  independentes; recursos medidos: CPU apenas, suíte em 4,88 s, sem GPU e sem
+  dados brutos; decisão/limitação: K de cobertura, limiar do gap within-vs-cross
+  e contagem final de seeds ficam marcados `R07`, a revisão humana de
+  estatística é obrigatória em R07/G3 e as contagens reais de classes dependem
+  de H07; commit 71cac93531312d5d6798308774faf610750843b3.
 
 - [ ] **R07 — Redigir e assinar o pré-registro.**
   - Objetivo: congelar protocolo confirmatório e seus ramos condicionais.
