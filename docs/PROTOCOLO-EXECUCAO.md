@@ -18,11 +18,15 @@ cegamento perfeito apenas por estar documentada.
 
 ## Protocolo obrigatório para qualquer IA
 
-1. Leia `README.md`, `docs/ESCOPO-E-HIPOTESES.md`, este protocolo e somente a
-   seção relevante de `docs/PLANO-MICROFASES.md`.
+1. Leia `README.md`, este protocolo e os arquivos do programa ativo. No programa
+   principal, use `docs/ESCOPO-E-HIPOTESES.md` e somente a seção relevante de
+   `docs/PLANO-MICROFASES.md`. Depois de G8, no NEXT, use
+   `docs/ESCOPO-NEXT-NEUROVERSE.md` e somente o Stage relevante de
+   `docs/PLANO-MICROFASES-NEXT.md`.
 2. Inspecione `git status --short`, `git log -5 --oneline` quando já houver
    commits e a evidência da fase anterior. Preserve toda alteração preexistente.
-3. Escolha somente a primeira microfase `[ ]` cujas dependências estejam `[x]`.
+3. Escolha somente a primeira microfase `[ ]` do plano ativo cujas dependências
+   estejam `[x]`.
 4. Antes de editar, copie para a resposta: ID, objetivo, entregas, critérios de
    aceite, proibições, orçamento e dependências. Se algo for objetivamente
    impossível, pare e registre o bloqueio; não improvise outra pergunta.

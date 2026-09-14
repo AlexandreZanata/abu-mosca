@@ -1,0 +1,7 @@
+Aprovo integralmente as 9 recomendações, de DEC-EQ-01 a DEC-EQ-09, sem exceções.
+
+Adotem o tipo harmonizado (T0) como target primário; considerem “mesmo tipo” como gold label somente quando condicionado a crosswalk aprovado; mantenham supertype apenas como análise secundária; deixem homologia fora do MVP; utilizem região exclusivamente para estratificação e diagnóstico; mantenham o termo “função” fora do escopo; aceitem as cardinalidades propostas com open-set separado; preservem os casos-limite com cobertura explicitamente reportada; e exijam que o crosswalk seja versionado, selado, imutável, independente e jamais utilizado como feature.
+
+Essa aprovação prioriza o caminho de menor risco científico, mantém a hipótese H1 bem definida e protege a avaliação contra leakage e circularidade.
+
+Podem registrar esta decisão em EQUIVALENCIA.md, marcar C03 como concluído [x] e prosseguir para C04 na próxima sessão.

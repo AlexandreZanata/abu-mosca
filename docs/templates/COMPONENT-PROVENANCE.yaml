@@ -1,0 +1,26 @@
+schema_version: 1
+component_id: "<imutavel>"
+component_type: "connectome|runtime|sensor|motor|body|environment|internal_state|decoder"
+name: "<nome>"
+version: "<versao>"
+provenance: "observed|derived|experimentally_constrained|learned|approximated|synthetic|inferred_missing"
+source:
+  citation_or_artifact: "<DOI/URL/hash/config>"
+  release: "<versao>"
+  accessed_at: "<ISO-8601>"
+transformation:
+  code_commit: "<hash>"
+  config_sha256: "<hash>"
+  input_sha256: "<hash>"
+  output_sha256: "<hash>"
+training:
+  dataset_manifest_sha256: "<hash ou null>"
+  split_sha256: "<hash ou null>"
+  objective: "<descricao ou null>"
+uncertainty:
+  confidence: "<valor/metodo ou null>"
+  known_limitations: []
+flags:
+  observed: false
+  biologically_grounded: false
+  allowed_for_confirmatory_claim: false

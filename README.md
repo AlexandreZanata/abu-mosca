@@ -16,14 +16,23 @@ serão produzidas com evidência nas microfases e não devem ser presumidas.
 3. [Plano de microfases](docs/PLANO-MICROFASES.md)
 4. [Matriz de rastreabilidade](docs/MATRIZ-RASTREABILIDADE.md)
 5. [Modelos de artefatos](docs/templates/README.md)
+6. [Escopo NEXT — NeuroVerse](docs/ESCOPO-NEXT-NEUROVERSE.md)
+7. [Plano NEXT Stage 0–10](docs/PLANO-MICROFASES-NEXT.md)
+8. [Rastreabilidade NEXT](docs/MATRIZ-NEXT-NEUROVERSE.md)
 
 O prompt operacional para retomar o projeto ficará em
 `.local/PROMPT-CONTINUAR.md`. A pasta `.local/` é ignorada pelo Git de propósito.
+Depois do encerramento `G8`, o programa NeuroVerse usa o prompt separado
+`.local/PROMPT-CONTINUAR-NEXT.md`, também privado.
 
 O caminho máximo tem 81 microfases e 9 gates, mas não é uma obrigação executar
 todas: ramos caros e multimodais só abrem se os gates anteriores justificarem.
 O Nível 0 usa 27 passos sem treino; o Nível 1 leva o MVP ao gate em mais 40; os
 13 passos do Nível 2 e os 10 do Nível 3 são condicionais.
+
+O plano NEXT adiciona 71 microfases e 12 gates condicionais. Ele começa apenas
+após evidência real de `G8`; Connectome → Behavior precisa passar antes do Core,
+e Minecraft/evolução nunca entram como validação biológica.
 
 ## Regra de execução
 
@@ -55,3 +64,4 @@ O Nível 0 usa 27 passos sem treino; o Nível 1 leva o MVP ao gate em mais 40; o
 - [ ] Nenhuma pesquisa bibliográfica foi validada ainda.
 - [ ] Nenhum dataset foi aprovado ou baixado ainda.
 - [ ] Nenhum código ou experimento foi executado ainda.
+- [ ] O plano NEXT existe, mas não está liberado antes de G8.

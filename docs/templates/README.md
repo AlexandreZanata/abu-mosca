@@ -9,3 +9,10 @@ todos os marcadores. Não edite o modelo para registrar uma instância.
 - `EXPERIMENT-CARD.md`: contrato imutável de uma execução experimental.
 - `DECISAO-GATE.md`: parecer go/no-go/reformular.
 - `RUN-MANIFEST.yaml`: campos mínimos para reprodução de uma run.
+- `BEHAVIOR-DATASET-CARD.md`: auditoria de intervenção, controles, indivíduos,
+  comportamento e mapping para connectoma.
+- `COMPONENT-PROVENANCE.yaml`: origem e limite de claim de cada componente da
+  engine.
+- `SIMULATION-EXPERIMENT-CARD.md`: contrato de organismo, runtime, ambiente,
+  intervenção, métricas e falsificação.
+- `NEXT-EXPERIMENT.md`: contrato final do único experimento que abre o NEXT.

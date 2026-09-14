@@ -47,3 +47,9 @@ IDs referem-se a `docs/PLANO-MICROFASES.md`.
   datasets, não de universalidade entre indivíduos.
 - Se o protocolo confirmatório falhar mas uma análise pós-unseal funcionar,
   rotulá-la exploratória e exigir novo alvo para confirmação.
+
+## Programa posterior
+
+O possível uso dos embeddings para intervenção, comportamento e organismos
+incorporados não integra os claims deste estudo. Ele possui escopo, hipóteses e
+gates próprios em `docs/PLANO-MICROFASES-NEXT.md` e só começa após G8.

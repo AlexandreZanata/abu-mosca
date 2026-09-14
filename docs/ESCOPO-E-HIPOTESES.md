@@ -189,3 +189,6 @@ escolhido” antes desse inventário.
 - Ajustar no alvo e ainda nomear o resultado zero-shot.
 - Procurar hiperparâmetros após observar as métricas seladas do alvo.
 - Fazer alegações entre espécies, estágios ou regiões sem experimento próprio.
+
+O programa posterior Connectome → Behavior/NeuroVerse é deliberadamente
+separado em `docs/ESCOPO-NEXT-NEUROVERSE.md` e só pode começar após G8.
