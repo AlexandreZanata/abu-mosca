@@ -1,0 +1,775 @@
+{
+  "edges": [
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "nd1a1f39f02e8b6b3",
+      "weight": 24
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n24352700870da742",
+      "weight": 2
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n661f11e6348a1db9",
+      "weight": 8
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "nd045671122130790",
+      "weight": 38
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n4d779c2cff2d66af",
+      "weight": 1
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "nd9a25e6467c577c9",
+      "weight": 146
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "ndde068d486076888",
+      "weight": 6
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n336640ece7161c74",
+      "weight": 1
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "naaf07f8357f53ddc",
+      "weight": 17
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "ne812df68e619ddd0",
+      "weight": 1
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "nec24d7343f8254f5",
+      "weight": 30
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "nbc6bd02f1011204e",
+      "weight": 4
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n4bd7f6024bf700d0",
+      "weight": 7
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "ncbdb3c2c49a7b43a",
+      "weight": 1
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n87a635527e2fcd77",
+      "weight": 5
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "ne53de35f7455dd7c",
+      "weight": 10
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n41e8512121b1f9eb",
+      "weight": 4
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n0da1fe9c0b0dcea7",
+      "weight": 6
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "naaaacdd0e2a1d44b",
+      "weight": 2
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "nc12616755b14ea5c",
+      "weight": 1
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n73008b5885501c36",
+      "weight": 19
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n1953c60c9f699cca",
+      "weight": 2
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n3e03fd88413a605f",
+      "weight": 21
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n5c25c05535b18284",
+      "weight": 10
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n4b92dd0912db0e40",
+      "weight": 33
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n6cfac5d50c806c3b",
+      "weight": 1
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "nbad2cae3fb8e6a25",
+      "weight": 6
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "naa0dd29e6fb5c6a9",
+      "weight": 36
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "nad4d038d804558a2",
+      "weight": 13
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n5e79ffeb38ae90d3",
+      "weight": 1
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n8f33acafaf453441",
+      "weight": 1
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n6dac84f68d06aae7",
+      "weight": 1
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "nbec1b1ddb6d3d792",
+      "weight": 16
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n31bc7551afe426d9",
+      "weight": 1
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n91b285a9768919c1",
+      "weight": 2
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "n0d1c698bce5c2287",
+      "weight": 2
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "nfde1bad0c228f27b",
+      "weight": 3
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "nf67bcca2caad4e31",
+      "weight": 47
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n1009ad005a46547c",
+      "target": "nf37ec13f9d2505a8",
+      "weight": 3
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "n1009ad005a46547c",
+      "weight": 25
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "n24352700870da742",
+      "weight": 6
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "nd045671122130790",
+      "weight": 12
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "n4d779c2cff2d66af",
+      "weight": 5
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "nd9a25e6467c577c9",
+      "weight": 4
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "ndde068d486076888",
+      "weight": 1
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "n336640ece7161c74",
+      "weight": 4
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "naaf07f8357f53ddc",
+      "weight": 2
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "ne812df68e619ddd0",
+      "weight": 4
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "nec24d7343f8254f5",
+      "weight": 2
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "ncbdb3c2c49a7b43a",
+      "weight": 6
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "ne53de35f7455dd7c",
+      "weight": 26
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "n0da1fe9c0b0dcea7",
+      "weight": 5
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "naaaacdd0e2a1d44b",
+      "weight": 1
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "n73008b5885501c36",
+      "weight": 28
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "n3e03fd88413a605f",
+      "weight": 12
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "n5c25c05535b18284",
+      "weight": 4
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "n4b92dd0912db0e40",
+      "weight": 17
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "n6cfac5d50c806c3b",
+      "weight": 3
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "nbad2cae3fb8e6a25",
+      "weight": 3
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "nd1a1f39f02e8b6b3",
+      "target": "naa0dd29e6fb5c6a9",
+      "weight": 45
+    }
+  ],
+  "graph": {
+    "aggregation": "sum",
+    "allow_self_loops": true,
+    "directed": true,
+    "threshold": {
+      "rule": "keep",
+      "weight_min": 0
+    },
+    "weight_units": "synapse_count",
+    "weighted": true
+  },
+  "nodes": [
+    {
+      "attributes": {
+        "degree_in": 1432,
+        "degree_out": 1580
+      },
+      "id": "n1009ad005a46547c",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 1376,
+        "degree_out": 1388
+      },
+      "id": "nd1a1f39f02e8b6b3",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 15298,
+        "degree_out": 22669
+      },
+      "id": "n24352700870da742",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 14767,
+        "degree_out": 18947
+      },
+      "id": "n661f11e6348a1db9",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 16156,
+        "degree_out": 12335
+      },
+      "id": "nd045671122130790",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 12712,
+        "degree_out": 14398
+      },
+      "id": "n4d779c2cff2d66af",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 3670,
+        "degree_out": 289
+      },
+      "id": "nd9a25e6467c577c9",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 6296,
+        "degree_out": 10777
+      },
+      "id": "ndde068d486076888",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 13709,
+        "degree_out": 8904
+      },
+      "id": "n336640ece7161c74",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 876,
+        "degree_out": 694
+      },
+      "id": "naaf07f8357f53ddc",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 13418,
+        "degree_out": 9072
+      },
+      "id": "ne812df68e619ddd0",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 9919,
+        "degree_out": 8411
+      },
+      "id": "nec24d7343f8254f5",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 6538,
+        "degree_out": 6239
+      },
+      "id": "nbc6bd02f1011204e",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 5696,
+        "degree_out": 12066
+      },
+      "id": "n4bd7f6024bf700d0",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 5413,
+        "degree_out": 6278
+      },
+      "id": "ncbdb3c2c49a7b43a",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 6496,
+        "degree_out": 14795
+      },
+      "id": "n87a635527e2fcd77",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 8214,
+        "degree_out": 5556
+      },
+      "id": "ne53de35f7455dd7c",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 418,
+        "degree_out": 7202
+      },
+      "id": "n41e8512121b1f9eb",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 7154,
+        "degree_out": 4838
+      },
+      "id": "n0da1fe9c0b0dcea7",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 6794,
+        "degree_out": 6461
+      },
+      "id": "naaaacdd0e2a1d44b",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 628,
+        "degree_out": 6967
+      },
+      "id": "nc12616755b14ea5c",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 7656,
+        "degree_out": 5178
+      },
+      "id": "n73008b5885501c36",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 5835,
+        "degree_out": 5148
+      },
+      "id": "n1953c60c9f699cca",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 5125,
+        "degree_out": 5535
+      },
+      "id": "n3e03fd88413a605f",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 5827,
+        "degree_out": 7618
+      },
+      "id": "n5c25c05535b18284",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 5403,
+        "degree_out": 5183
+      },
+      "id": "n4b92dd0912db0e40",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 7369,
+        "degree_out": 6239
+      },
+      "id": "n6cfac5d50c806c3b",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 6270,
+        "degree_out": 12440
+      },
+      "id": "nbad2cae3fb8e6a25",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 5758,
+        "degree_out": 6631
+      },
+      "id": "naa0dd29e6fb5c6a9",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 6526,
+        "degree_out": 4691
+      },
+      "id": "nad4d038d804558a2",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 4202,
+        "degree_out": 4582
+      },
+      "id": "n5e79ffeb38ae90d3",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 633,
+        "degree_out": 6653
+      },
+      "id": "n8f33acafaf453441",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 834,
+        "degree_out": 6661
+      },
+      "id": "n6dac84f68d06aae7",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 6906,
+        "degree_out": 688
+      },
+      "id": "nbec1b1ddb6d3d792",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 4968,
+        "degree_out": 35
+      },
+      "id": "n31bc7551afe426d9",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 6338,
+        "degree_out": 7150
+      },
+      "id": "n91b285a9768919c1",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 5899,
+        "degree_out": 3865
+      },
+      "id": "n0d1c698bce5c2287",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 10017,
+        "degree_out": 2734
+      },
+      "id": "nfde1bad0c228f27b",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 6613,
+        "degree_out": 955
+      },
+      "id": "nf67bcca2caad4e31",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 9244,
+        "degree_out": 6510
+      },
+      "id": "nf37ec13f9d2505a8",
+      "missing": []
+    }
+  ],
+  "provenance": {
+    "adapter": {
+      "config_sha256": "1db393eded74d1b5f253f8d4f872bec19a07110a0e44c768b0e2ea05f74cd56e",
+      "name": "manc-adapter-golden",
+      "version": "1.0"
+    },
+    "created_at": "2026-09-14",
+    "dataset": "MANC",
+    "license": "CC-BY-4.0",
+    "release": "manc:v1.2.1",
+    "source_files": [
+      {
+        "path": "data/raw/spikes/manc_traced_connections.csv",
+        "sha256": "4553191e8fd0a198e3588e188b649b7cb39b0550e35d6a11d63b0cd7d8145fda"
+      }
+    ]
+  },
+  "schema_version": "1.0"
+}

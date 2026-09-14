@@ -1,0 +1,18 @@
+{
+  "config_sha256": "1db393eded74d1b5f253f8d4f872bec19a07110a0e44c768b0e2ea05f74cd56e",
+  "edges_after_aggregation": 5243574,
+  "golden_edges": 60,
+  "golden_nodes": 40,
+  "golden_sha256": "859f10f0f61aeaf4275d6ef746bcf47fbf65c07223a84d306c95deae898d9cef",
+  "input_sha256": "4553191e8fd0a198e3588e188b649b7cb39b0550e35d6a11d63b0cd7d8145fda",
+  "multiedge_groups": 0,
+  "nodes": 23188,
+  "output_sha256": "7a21a94787cee3aff9d0af9d12795fa8065783a3f84a5a25bfa500d36a16f5a5",
+  "peak_rss_mib": 6735.3,
+  "rows_in": 5243574,
+  "seconds": 13.076,
+  "self_loops": 1,
+  "weight_conserved": true,
+  "weight_sum_in": 30698527,
+  "weight_sum_out": 30698527
+}

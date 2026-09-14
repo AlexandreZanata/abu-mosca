@@ -415,6 +415,21 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+ADAPTER_TOOL = ROOT / "tools" / "adapter_manc.py"
+ADAPTER_REPORT = ROOT / "artifacts" / "reports" / "H02-ADAPTER-FONTE.md"
+ADAPTER_METRICS = ROOT / "artifacts" / "reports" / "H02-ADAPTER-FONTE.json"
+ADAPTER_GOLDEN = ROOT / "tests" / "fixtures" / "manc-sample-graph.json"
+ADAPTER_TOKENS = (
+    "adapter",
+    "agregação",
+    "conserv",
+    "self-loop",
+    "reconcilia",
+    "trilho a",
+    "checksum",
+    "amostra dourada",
+    "limitaç",
+)
 GRAPH_SCHEMA = ROOT / "schemas" / "graph.schema.json"
 GRAPH_CONTRACT_DOC = ROOT / "docs" / "research" / "GRAPH-CONTRACT.md"
 GRAPH_TOOL = ROOT / "tools" / "graph_contract.py"
@@ -2065,6 +2080,71 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_adapter_source() -> tuple[list[str], int]:
+    label = "H02"
+    failures: list[str] = []
+    for path in (
+        ADAPTER_TOOL,
+        ADAPTER_REPORT,
+        ADAPTER_METRICS,
+        ADAPTER_GOLDEN,
+        ROOT / "tests" / "test_adapter_manc.py",
+    ):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+
+    report = ADAPTER_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in ADAPTER_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+
+    spec = importlib.util.spec_from_file_location("adapter_module", ADAPTER_TOOL)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    golden = json.loads(ADAPTER_GOLDEN.read_text(encoding="utf-8"))
+    graph_spec = importlib.util.spec_from_file_location("graph_module", GRAPH_TOOL)
+    graph_module = importlib.util.module_from_spec(graph_spec)
+    graph_spec.loader.exec_module(graph_module)
+    failures += [f"{label}: {f}" for f in graph_module.validate_graph(golden, ADAPTER_GOLDEN.name)]
+    if len(golden.get("nodes", [])) != 40 or len(golden.get("edges", [])) != 60:
+        failures.append(f"{label}: amostra dourada fora do tamanho esperado (40 nodes/60 edges)")
+    for node in golden.get("nodes", []):
+        if set(node.get("attributes", {})) & set(module.FORBIDDEN_NODE_ATTRIBUTES):
+            failures.append(f"{label}: atributo proibido no trilho A na amostra dourada")
+
+    metrics = json.loads(ADAPTER_METRICS.read_text(encoding="utf-8"))
+    if metrics.get("weight_conserved") is not True:
+        failures.append(f"{label}: peso não conservado nas métricas")
+    if not isinstance(metrics.get("rows_in"), int) or metrics["rows_in"] < 1:
+        failures.append(f"{label}: métricas sem linhas de entrada")
+    if not isinstance(metrics.get("nodes"), int) or metrics["nodes"] < 1:
+        failures.append(f"{label}: métricas sem nodes")
+    manifest_path = ROOT / "data" / "manifests" / "manc-v1.0.json"
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        entry = next(
+            (item for item in manifest["files"] if item["path"].endswith("manc_traced_connections.csv")),
+            None,
+        )
+        if entry is not None and metrics.get("input_sha256") != entry["sha256"]:
+            failures.append(f"{label}: sha256 de entrada diverge do manifesto R03")
+    digest = hashlib.sha256(ADAPTER_GOLDEN.read_bytes()).hexdigest()
+    if metrics.get("golden_sha256") != digest:
+        failures.append(f"{label}: sha256 da amostra dourada diverge das métricas")
+
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(ADAPTER_TOKENS)
+
+
 def check_graph_contract() -> tuple[list[str], int]:
     label = "H01"
     failures: list[str] = []
@@ -3000,6 +3080,7 @@ def main() -> int:
     dry_run_failures, dry_run_tokens = check_dry_run()
     gate_g3_failures, gate_g3_entries, gate_g3_state = check_gate_g3()
     graph_contract_failures, graph_contract_tokens = check_graph_contract()
+    adapter_source_failures, adapter_source_tokens = check_adapter_source()
     failures += (
         ref_failures
         + path_failures
@@ -3032,6 +3113,7 @@ def main() -> int:
         + dry_run_failures
         + gate_g3_failures
         + graph_contract_failures
+        + adapter_source_failures
     )
 
     if failures:
@@ -3154,6 +3236,10 @@ def main() -> int:
     print(
         f"OK: contrato de grafo H01 com {graph_contract_tokens} tokens, fixture "
         f"dirigida/ponderada e round-trip preservado"
+    )
+    print(
+        f"OK: adapter H02 com {adapter_source_tokens} tokens, amostra dourada e "
+        f"peso conservado"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

@@ -1255,7 +1255,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   e a conversão de cada dataset fica para os adapters H02/H03; commit
   037a61e98750807b056cbebc6e0aa3e156b32178.
 
-- [ ] **H02 — Implementar e validar o adapter da fonte.**
+- [x] **H02 — Implementar e validar o adapter da fonte.**
   - Objetivo: converter a release-fonte imutável ao schema canônico.
   - Entregas: adapter, testes de schema, amostra dourada, contagens e relatório de
     campos descartados/transformados.
@@ -1265,6 +1265,33 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não incluir tipo/posição/região no tensor do trilho A.
   - Dependências: H01, R03.
   - Orçamento: IA baixa; primeiro amostra, depois CPU/RAM conforme D09.
+  Evidência (2026-09-14, executor): arquivos `tools/adapter_manc.py`
+  (conversão somente-topologia da tabela `bodyId_pre,bodyId_post,weight` para o
+  contrato H01, agregação por soma com conservação, IDs opacos, graus derivados
+  e recusa de atributos proibidos), `tests/test_adapter_manc.py` (5 casos,
+  incluindo integração com a amostra real e conferência do sha256 contra o
+  manifesto R03), amostra dourada `tests/fixtures/manc-sample-graph.json`
+  (40 nodes/60 edges, sha256 `859f10f0…`) e `artifacts/reports/H02-ADAPTER-FONTE.md`
+  + `.json` com métricas e reconciliação; fontes/versões: MANC `manc:v1.2.1`
+  (bucket flat v1.0), amostra de D09 com sha256 `4553191e…` conferido, LIT-0074
+  para contagens oficiais, contrato H01 e manifesto R03, Python 3.12.2 (stdlib,
+  sem dependência nova), sem GPU; comandos e testes: `.venv/bin/python
+  tools/adapter_manc.py --connections data/raw/spikes/manc_traced_connections.csv
+  --out runs/h02/manc-graph.json --golden tests/fixtures/manc-sample-graph.json
+  --metrics artifacts/reports/H02-ADAPTER-FONTE.json` (5.243.574 linhas, 23.188
+  nodes, 1 self-loop preservado, 0 multiedges no arquivo real, soma de pesos
+  30.698.527 conservada, saída `7a21a947…`), `.venv/bin/python -m pytest tests/
+  -q` (96 passaram; 5 novos), nova checagem H02 no `validate_research.py` com
+  smoke negativo (token, peso não conservado, sha divergente do manifesto,
+  atributo proibido e ID cru), `python3 tools/validate_plan.py` e
+  `git diff --cached --check`; resultado: grafo canônico validado, IDs únicos,
+  endpoints válidos, pesos não negativos, direção `pre→post` e totais
+  reconciliados com explicação (`nodes` ~0,8% acima de ~23.000 publicados e
+  pares vs sítios/PSDs em unidades diferentes); recursos medidos: build 13,1 s,
+  comando completo 51,4 s, pico de 6.735 MiB (serialização do JSON de 790,7 MB),
+  CPU apenas; decisão/limitação: release completo e eventual escrita colunar
+  ficam para H08 sem mudar o schema, e a amostra dourada não substitui o grafo
+  completo; commit 45239ab2298c2ce876825fad5f306140b0233e4c.
 
 - [ ] **H03 — Implementar e validar o adapter público do alvo.**
   - Objetivo: converter apenas o grafo/features permitidos do alvo sem tocar
