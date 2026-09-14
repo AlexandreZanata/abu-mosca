@@ -355,7 +355,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   arquivos não relacionados preservados fora do commit; commit
   22c58cae53b12ad7d3693cc1f412370de22ed1c0.
 
-- [ ] **L04 — Revisar predição de tipo por conectividade e morfologia.**
+- [x] **L04 — Revisar predição de tipo por conectividade e morfologia.**
   - Objetivo: testar a plausibilidade e a circularidade da hipótese biológica.
   - Entregas: `research/literature/CELL-TYPE.md` com evidência a favor, contra e
     condições de validade.
@@ -365,6 +365,29 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: correlação dentro de um indivíduo não prova transferência.
   - Dependências: L01, L02.
   - Orçamento: IA baixa + revisão; sem GPU.
+  Evidência (2026-09-14, executor): arquivos `research/literature/CELL-TYPE.md`,
+  `research/literature/LEDGER.tsv` (LIT-0033 a LIT-0038),
+  `research/literature/QUERY-LOG.tsv` (consultas Q3/Q6),
+  `tools/validate_research.py` (funções de L04) e esta linha; fontes/versões:
+  buscas de 2026-09-14 verificadas em fontes primárias — Scheffer 2020 e
+  Schlegel 2024 (já no ledger), Mehta 2023 (10.1162/netn_a_00283), Eckstein 2024
+  (10.1016/j.cell.2024.03.016), NeuNet 2024 (10.1609/aaai.v38i1.27771), CBLAST
+  (github.com/connectome-neuprint/CBLAST), Ito 2014
+  (10.1016/j.neuron.2013.12.017) e flywire_annotations (v2.1.0 e v3.0.0);
+  Python 3.12.2 (stdlib); comandos e testes: `python3 tools/validate_research.py`
+  com smoke negativo inline (campo ausente, modalidade ausente, proibição
+  removida, LIT inexistente, proveniência insuficiente, consulta Q3/Q6 ausente e
+  seção ausente), `python3 tools/validate_plan.py`, `git diff --cached --check` e
+  `git status --porcelain`; resultado: 6 modalidades (conectividade, morfologia,
+  posição, região, neurotransmissor e função) com evidência a favor, contra e
+  condições de validade, 4 registros de proveniência de rótulos (hemibrain,
+  FlyWire, conectomas masculinos com BANC e MANC, e nomenclatura de regiões) e a
+  proibição "correlação dentro de um indivíduo não prova transferência"
+  registrada; 38 registros no ledger e 23 consultas no log; recursos: 16,6 MB de
+  RAM e 0,08 s no validador, sem GPU; decisão/limitação: revisão documental, sem
+  dados baixados e sem métricas reproduzidas; revisão humana em G1; arquivos não
+  relacionados preservados fora do commit; commit
+  f70de5f59229c03e223589811525a746398ce543.
 
 - [ ] **L05 — Revisar aprendizado auto-supervisionado e embeddings de grafo.**
   - Objetivo: selecionar objetivos que possam generalizar sem node IDs.

@@ -231,6 +231,32 @@ ALIGNMENT_SUPERVISIONS = (
     "auto-supervisionado",
     "híbrido",
 )
+CELL_TYPE = ROOT / "research" / "literature" / "CELL-TYPE.md"
+CELL_TYPE_SECTIONS = (
+    "## 1. Estado e escopo",
+    "## 2. Modalidades",
+    "## 3. Proveniência dos rótulos",
+    "## 4. Síntese e validade",
+    "## 5. Limitações",
+)
+CELL_TYPE_MODALITIES = ("CT-M1", "CT-M2", "CT-M3", "CT-M4", "CT-M5", "CT-M6")
+CELL_TYPE_MODALITY_TOPICS = (
+    "Connectivity-only",
+    "Morphology-only",
+    "Posição",
+    "Região",
+    "Neurotransmissor",
+    "Função",
+)
+CELL_TYPE_MODALITY_FIELDS = (
+    "Referência",
+    "Evidência a favor",
+    "Evidência contra",
+    "Condições de validade",
+    "Status",
+)
+CELL_TYPE_PROVENANCE_FIELDS = ("Como o rótulo foi produzido", "Fonte", "Status")
+CELL_TYPE_PROHIBITION = "correlação dentro de um indivíduo não prova transferência"
 LIT_ID_RE = re.compile(r"^LIT-\d{4}$")
 LIT_QUERY_LOG = ROOT / "research" / "literature" / "QUERY-LOG.tsv"
 LIT_QUERY_LOG_COLUMNS = (
@@ -1002,6 +1028,79 @@ def check_alignment_review() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_cell_type_review() -> tuple[list[str], int]:
+    label = "CELL-TYPE.md"
+    if not CELL_TYPE.exists():
+        return [f"{label}: arquivo ausente em research/literature/"], 0
+    text = CELL_TYPE.read_text(encoding="utf-8")
+    flat = " ".join(text.split()).lower()
+    failures: list[str] = []
+    for section in CELL_TYPE_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    if CELL_TYPE_PROHIBITION not in flat:
+        failures.append(f"{label}: falta a proibição '{CELL_TYPE_PROHIBITION}'")
+    for topic in CELL_TYPE_MODALITY_TOPICS:
+        if topic.lower() not in flat:
+            failures.append(f"{label}: modalidade obrigatória ausente ('{topic}')")
+
+    rows = _ledger_rows()
+    known_lit: set[str] = set()
+    if len(rows) >= 2 and "lit_id" in rows[0]:
+        index = rows[0].index("lit_id")
+        known_lit = {row[index] for row in rows[1:] if len(row) > index}
+
+    modalities = parse_heading_blocks(text, r"^### (CT-M\d) — (.+)$")
+    seen_modalities: set[str] = set()
+    for mod_id, block in modalities:
+        seen_modalities.add(mod_id)
+        if mod_id not in CELL_TYPE_MODALITIES:
+            failures.append(f"{label}: modalidade inesperada {mod_id}")
+        for field in CELL_TYPE_MODALITY_FIELDS:
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {mod_id} sem campo '{field}'")
+        reference = field_value(block, "Referência") or ""
+        refs = sorted(set(re.findall(r"LIT-\d{4}", reference)))
+        if not refs:
+            failures.append(f"{label}: {mod_id} sem referência LIT-*")
+        for lit_id in refs:
+            if known_lit and lit_id not in known_lit:
+                failures.append(f"{label}: {mod_id} referencia ledger inexistente '{lit_id}'")
+    for mod_id in CELL_TYPE_MODALITIES:
+        if mod_id not in seen_modalities:
+            failures.append(f"{label}: modalidade obrigatória ausente {mod_id}")
+
+    provenance = parse_heading_blocks(text, r"^### (CT-P\d) — (.+)$")
+    if len(provenance) < 3:
+        failures.append(f"{label}: esperados ao menos 3 registros de proveniência (achados {len(provenance)})")
+    for prov_id, block in provenance:
+        for field in CELL_TYPE_PROVENANCE_FIELDS:
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {prov_id} sem campo '{field}'")
+        source = field_value(block, "Fonte") or ""
+        refs = sorted(set(re.findall(r"LIT-\d{4}", source)))
+        if not refs:
+            failures.append(f"{label}: {prov_id} sem fonte LIT-*")
+        for lit_id in refs:
+            if known_lit and lit_id not in known_lit:
+                failures.append(f"{label}: {prov_id} referencia ledger inexistente '{lit_id}'")
+
+    if len(rows) >= 2 and "query_id" in rows[0] and "fase" in rows[0]:
+        qi, fi = rows[0].index("query_id"), rows[0].index("fase")
+        queries = {
+            row[qi] for row in rows[1:] if len(row) > max(qi, fi) and row[fi] == "L04"
+        }
+        for query in ("Q3", "Q6"):
+            if query not in queries:
+                failures.append(f"{label}: ledger sem consulta {query} em L04")
+
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    refs = phase_refs(text)
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(modalities)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
@@ -1018,6 +1117,7 @@ def check_paths() -> tuple[list[str], int]:
         GATE_G0,
         LIT_PROTOCOL,
         ALIGNMENT,
+        CELL_TYPE,
     ):
         if not path.exists():
             continue
@@ -1052,6 +1152,7 @@ def main() -> int:
     lit_failures, lit_queries = check_literature_protocol()
     ledger_failures, ledger_rows, query_log_rows = check_literature_ledger()
     alignment_failures, alignment_methods = check_alignment_review()
+    cell_type_failures, cell_type_modalities = check_cell_type_review()
     failures += (
         ref_failures
         + path_failures
@@ -1064,6 +1165,7 @@ def main() -> int:
         + lit_failures
         + ledger_failures
         + alignment_failures
+        + cell_type_failures
     )
 
     if failures:
@@ -1107,6 +1209,10 @@ def main() -> int:
     print(
         f"OK: research/literature/ALIGNMENT.md com {alignment_methods} métodos "
         f"e supervisão classificada"
+    )
+    print(
+        f"OK: research/literature/CELL-TYPE.md com {cell_type_modalities} "
+        f"modalidades e proveniência de rótulos"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
