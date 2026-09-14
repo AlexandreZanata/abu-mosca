@@ -2056,6 +2056,16 @@ def check_preregistration() -> tuple[list[str], int, str]:
     pending = any("a preencher" in value.lower() for value in tracked_values)
     if not pending and "2026-" not in "\n".join(signature_lines):
         failures.append(f"{label}: assinatura preenchida sem data")
+    if not pending:
+        package_value = field_value(signature_lines, "Hash do pacote assinado") or ""
+        match = re.search(r"[0-9a-f]{64}", package_value)
+        if not match:
+            failures.append(f"{label}: assinatura sem hash do pacote")
+        else:
+            frozen_lines = [line for line in registry_lines if PREREG_HASH_RE.match(line)]
+            expected = hashlib.sha256("\n".join(frozen_lines).encode("utf-8")).hexdigest()
+            if match.group(0) != expected:
+                failures.append(f"{label}: hash do pacote assinado não confere com os artefatos congelados")
     changelog = PREREG_CHANGELOG.read_text(encoding="utf-8")
     if "2026-09-14" not in changelog:
         failures.append(f"{label}: CHANGELOG.md sem entrada da minuta")

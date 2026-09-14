@@ -1117,7 +1117,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   estatística é obrigatória em R07/G3 e as contagens reais de classes dependem
   de H07; commit 71cac93531312d5d6798308774faf610750843b3.
 
-- [ ] **R07 — Redigir e assinar o pré-registro.**
+- [x] **R07 — Redigir e assinar o pré-registro.**
   - Objetivo: congelar protocolo confirmatório e seus ramos condicionais.
   - Entregas: `preregistration/PROTOCOL.md`, cards dos experimentos previstos e
     registro assinado com hash.
@@ -1128,15 +1128,31 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não ler resultados-alvo; alteração posterior segue changelog.
   - Dependências: R03–R06, G2.
   - Orçamento: IA baixa para minuta; assinatura humana obrigatória.
-  - Minuta preparada (2026-09-14, executor): `preregistration/PROTOCOL.md`
-    (15 seções: fonte/alvo/releases, população, features, modelo/baselines,
-    grid de 12 trials, 5 seeds finais, stopping, métricas/SESOI/exclusões,
-    análises, condicionais do Nível 2, exploratório vs confirmatório,
-    unseal e changelog), cards `E1`–`E3`, `CHANGELOG.md` e `REGISTRY.md` com
-    13 artefatos congelados por SHA-256; a assinatura humana é obrigatória
-    (responsável científico, revisor de estatística e custodiante) e ainda
-    está pendente, por isso o item permanece `[ ]` até a assinatura; commit
-    6ab45267f7e7acd21e7967cb134c1358e740474f.
+  Evidência (2026-09-14, executor): pré-registro **assinado** — decisão humana
+  `(a) assinar como está`, com Alexandre Zanata acumulando os três papéis
+  (responsável científico, revisor de estatística e custodiante; limitação
+  declarada) em 2026-09-14; arquivos `preregistration/PROTOCOL.md` (15 seções:
+  fonte MANC `manc:v1.2.1` → alvo MCNS `male-cns:v1.0`, BANC `v888` reservado e
+  FlyWire `v783` reserva, população, features do trilho A, modelo/baselines,
+  grid fixo de 12 trials, 5 seeds finais, stopping 20/200, métricas/SESOI de
+  5 p.p./K=10/exclusões, análises, condicionais do Nível 2, exploratório vs
+  confirmatório, unseal e changelog), cards `E1`–`E3`, `CHANGELOG.md` e
+  `REGISTRY.md` com 12 artefatos congelados por SHA-256 e hash de pacote
+  `9411af0c…`; o executor apenas registrou a decisão, sem alterar nenhum
+  artefato congelado; fontes/versões: R03–R06, G2, C02–C05, D08–D10 e
+  PROTOCOLO, Python 3.12.2 (stdlib, sem dependência nova); comandos e testes:
+  `python3 tools/validate_research.py` (checagem R07 agora `ASSINADO`, com
+  verificação do hash do pacote contra os 12 artefatos e smoke negativo de
+  hash divergente/seção ausente/assinatura com plano aberto),
+  `python3 tools/validate_plan.py`, `.venv/bin/python -m pytest tests/ -q`
+  (70 passaram) e `git diff --cached --check`; resultado: protocolo
+  confirmatório congelado com fonte/alvo/versões, features, modelo, baselines,
+  grid de 12 trials, seeds, stopping, métricas, SESOI, exclusões e decisões
+  condicionais; recursos medidos: CPU apenas, sem GPU, sem downloads e sem
+  acesso a `data/sealed`; decisão/limitação: revisor único acumula os três
+  papéis (declarado no `REGISTRY.md` e no changelog), a versão assinada `1.0`
+  mantém os mesmos bytes da minuta e qualquer mudança futura exige changelog e
+  nova assinatura; commit f162f693cf41059f3850a6f2f199f5b79ca2446d.
 
 - [ ] **R08 — Ensaiar o protocolo completo em dados sintéticos e congelar versão.**
   - Objetivo: descobrir falhas operacionais antes de gastar o alvo ou a GPU.
