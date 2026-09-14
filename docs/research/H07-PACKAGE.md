@@ -87,6 +87,17 @@ descreve a ferramenta pronta, o checklist da curadoria e o bloqueio.
   ou buscar novo par de datasets) com novo pré-registro quando mudar o
   estimando.
 
+## 3d. Decisão final (2026-09-14, humano)
+
+- Aplicada a **condição 5**: o desfecho de hemilinhagem foi declarado
+  **inconclusivo por circularidade** (NBLAST + co-clustering de conectividade
+  não dão independência suficiente; excluir apenas many:1/ambíguos não
+  resolve).
+- H07 encerrada **sem materialização confirmatória**; nenhum label set foi
+  escrito em `data/sealed/`; artefatos e hashes preservados como provisórios.
+- Nenhum claim confirmatório de transferência é autorizado; H09 prossegue em
+  modo estritamente exploratório.
+
 ## 4. Estado do bloqueio
 
 - Revisor único: **decisão 1b registrada** no changelog 1.1 (desvio formal com

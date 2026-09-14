@@ -1450,7 +1450,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   ampliação do contrato H01 está documentada em `GRAPH-CONTRACT.md`; commit
   ea63e7faa0f0c1ba4922ef2265360d3cf6129208.
 
-- [ ] **H07 — Materializar crosswalk e conjuntos avaliativos sob custódia.**
+- [x] **H07 — Materializar crosswalk e conjuntos avaliativos sob custódia.**
   - Objetivo: transformar a decisão ontológica em arquivos imutáveis de scoring.
   - Entregas: crosswalk versionado, conjuntos `known`, `unknown`, ambíguo e
     excluído, hashes e relatório de cobertura por dataset.
@@ -1460,23 +1460,33 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: lista por node ID não sai da zona selada.
   - Dependências: D08, H04, R07; execução pelo custodiante.
   - Orçamento: IA baixa + dupla revisão humana; sem GPU.
-  - Bloqueio (2026-09-14, executor): correções do responsável aplicadas —
-    exclusão dos 5 rótulos incertos (cobertura agora **35 classes K≥10 nos dois
-    lados**, crosswalk `hemilineage-2.0-draft`, sha256 `2dc94f8a…`), H1′
-    corrigida (o grafo público do alvo pode ser usado **apenas em inferência
-    congelada**; proibidos rótulos, crosswalk, morfologia, posição, IDs, tuning
-    e estatísticas globais do alvo), auditoria atualizada com **PMC12636603** e
-    changelog `2.2-draft`. Achado novo do preprint do MCNS (Methods
-    “Hemilineage”): as hemilinhagens do alvo foram **transferidas por
-    correspondência** entre datasets (NBLAST + co-clustering de conectividade),
-    não atribuídas de novo; logo **a independência em relação à conectividade de
-    entrada não está demonstrada** e a condição 5 do responsável está em vigor:
-    o desfecho **não é materializado como confirmatório** sem justificativa
-    humana registrada; caso contrário, declarar inconclusivo (opção 3). T0
-    permanece exploratório e inconclusivo por circularidade; revisor único
-    segue declarado (segundo revisor não disponível). Aguardando decisão humana
-    (justificar a transferência como suficiente ou aplicar inconclusivo) e a
-    **assinatura** da v2.
+  Evidência (2026-09-14, executor): decisão humana registrada — condição 5
+  aplicada e **desfecho de hemilinhagem inconclusivo por circularidade**:
+  NBLAST + co-clustering de conectividade não dão independência suficiente para
+  um modelo que usa conectividade (excluir only many:1/ambíguos não resolve),
+  com registro no `CHANGELOG.md` 2.3; H07 encerrada **sem materialização
+  confirmatória** de label set (nada escrito em `data/sealed/`) e **sem claims
+  confirmatórios de transferência**. Artefatos e hashes preservados:
+  `preregistration/crosswalk-hemilineage.draft.json` (sha256 `2dc94f8a…`,
+  35 classes K≥10 nos dois lados, 5 incertos excluídos, proveniência por
+  classe), `docs/research/H07-PACKAGE.md` (pacote do custodiante com dupla
+  revisão obrigatória e desvio de revisor único), auditorias
+  `artifacts/reports/H07-PROVENANCE-AUDIT.{md,json}` e
+  `H07-HEMILINEAGE-AUDIT.{md,json}` (fonte PMC12636603; transferência por
+  correspondência), `tools/sealed_labels.py` + 6 testes e
+  `tools/hemilineage_crosswalk.py` + 4 testes; fontes/versões: D07/LIT-0023,
+  PMC12636603 (acesso 2026-09-14), LIT-0015, R07/G3 e manifestos R03, Python
+  3.12.2 com pyarrow do lock R02, sem GPU; comandos e testes:
+  `.venv/bin/python -m pytest tests/ -q` (145 passaram), `python3
+  tools/validate_research.py` (checagem H07 ajustada ao encerramento por
+  decisão humana) e `python3 tools/validate_plan.py`; resultado: T0 e
+  hemilinhagem formalmente inconclusivos por circularidade, nenhum score do
+  alvo consultado, nenhum unseal e nenhuma lista por node ID fora do selado;
+  recursos medidos: CPU apenas, sem downloads novos e sem GPU; decisão/
+  limitação: revisor único acumulando papéis (segundo revisor indisponível),
+  `mancType` não é gold confirmatório e qualquer análise futura com esses
+  rótulos é exploratória; H09 segue em modo estritamente exploratório; commit
+  <hash>.
 
 - [x] **H08 — Processar releases completas e medir recursos.**
   - Objetivo: gerar snapshots canônicos reproduzíveis no hardware-alvo.
@@ -1521,6 +1531,9 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   commit 1bb229c67aa113839b23cf1b7b36b80c1e35abcf.
 
 - [ ] **H09 — Executar auditoria de qualidade e congelar dataset analítico.**
+  - Nota (2026-09-14, humano): executar em **modo estritamente exploratório**
+    (H07 inconclusiva por circularidade); sem claims confirmatórios de
+    transferência e sem materialização de rótulos como confirmação.
   - Objetivo: decidir se os dados preparados ainda suportam o protocolo.
   - Entregas: `artifacts/reports/DATA-QUALITY.md`, manifests finais, estatísticas
     permitidas e lista de desvios.

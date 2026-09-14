@@ -2338,14 +2338,14 @@ def check_h07_blocked() -> tuple[list[str], int]:
 
     plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
     h07_line = next((line for line in plan_lines if "**H07 —" in line), None)
-    if h07_line is None or not h07_line.startswith("- [ ]"):
-        failures.append(f"{label}: H07 deve permanecer [ ] enquanto bloqueada")
+    if h07_line is None or not h07_line.startswith("- [x]"):
+        failures.append(f"{label}: H07 deve estar encerrada [x] por decisão humana (condição 5)")
     else:
         index = plan_lines.index(h07_line)
-        note = " ".join(plan_lines[index:index + 40]).lower()
-        pending_tokens = ("segundo revisor", "revisão final", "revisor único")
-        if "bloqueio" not in note or not any(token in note for token in pending_tokens):
-            failures.append(f"{label}: item do plano sem nota de bloqueio/pendência humana")
+        note = " ".join(" ".join(plan_lines[index:index + 40]).split()).lower()
+        for token in ("inconclusiv", "circularidade", "sem materialização confirmatória"):
+            if token not in note:
+                failures.append(f"{label}: encerramento sem o token '{token}'")
     return failures, len(H07_TOKENS)
 
 
@@ -3800,8 +3800,8 @@ def main() -> int:
         f"primária conservada e variantes pré-registradas"
     )
     print(
-        f"OK: pacote H07 preparado e bloqueado ({h07_tokens} tokens) aguardando "
-        f"segundo revisor humano"
+        f"OK: H07 encerrada ({h07_tokens} tokens) — desfecho inconclusivo por "
+        f"circularidade, sem materialização confirmatória"
     )
     print(
         f"OK: snapshots H08 com {h08_tokens} tokens, idempotência e picos abaixo "
