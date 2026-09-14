@@ -415,6 +415,19 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+B03_TOOL = ROOT / "tools" / "baselines_source.py"
+B03_REPORT = ROOT / "artifacts" / "reports" / "B03-BASELINES-FONTE.md"
+B03_METRICS = ROOT / "artifacts" / "reports" / "B03-BASELINES-FONTE.json"
+B03_TOKENS = (
+    "random estratificado",
+    "maioria",
+    "degree-only",
+    "source-fit",
+    "chance analítica",
+    "simulado",
+    "seeds",
+    "congeláveis",
+)
 B02_TOOL = ROOT / "tools" / "calibration.py"
 B02_REPORT = ROOT / "artifacts" / "reports" / "B02-CALIBRACAO-OPEN-SET.md"
 B02_TOKENS = (
@@ -2228,6 +2241,51 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_b03_source_baselines() -> tuple[list[str], int]:
+    label = "B03"
+    failures: list[str] = []
+    for path in (B03_TOOL, B03_REPORT, B03_METRICS, ROOT / "tests" / "test_baselines_source.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    report = B03_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in B03_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+    source = B03_TOOL.read_text(encoding="utf-8")
+    for token in ("male-cns", "data/sealed", "target_labels", "crosswalk"):  # firewall-allow
+        if token in source:
+            failures.append(f"{label}: baselines da fonte não podem referenciar o alvo ('{token}')")
+    metrics = json.loads(B03_METRICS.read_text(encoding="utf-8"))
+    results = metrics.get("results", {})
+    majority = results.get("baselines", {}).get("majority", {})
+    if abs(float(majority.get("simulated_accuracy", 0)) - float(majority.get("analytical_accuracy", -1))) > 1e-5:
+        failures.append(f"{label}: maioria simulada difere da analítica")
+    random_result = results.get("baselines", {}).get("stratified_random", {})
+    if abs(float(random_result.get("simulated_draws_mean", 0)) - float(random_result.get("analytical_accuracy", -1))) > 0.01:
+        failures.append(f"{label}: random simulado não concorda com a chance analítica")
+    if list(random_result.get("seeds", [])) != [297979363399525401, 1699981902186354598, 3729859090210297070]:
+        failures.append(f"{label}: seeds divergentes do pré-registro")
+    degree = results.get("baselines", {}).get("degree_only", {}).get("recall", {}).get("@1", {})
+    if not 0.0 <= float(degree.get("macro", -1)) <= 1.0:
+        failures.append(f"{label}: macro do degree-only fora de [0,1]")
+    if metrics.get("labels", {}).get("nodes_used", 0) < 1:
+        failures.append(f"{label}: sem nodes usados")
+    for entry in metrics.get("predictions", []):
+        if not re.fullmatch(r"[0-9a-f]{64}", str(entry.get("sha256", ""))):
+            failures.append(f"{label}: predição sem hash válido")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(B03_TOKENS)
+
+
 def check_b02_calibration() -> tuple[list[str], int]:
     label = "B02"
     failures: list[str] = []
@@ -3884,6 +3942,7 @@ def main() -> int:
     gate_g4_failures, gate_g4_entries, gate_g4_state = check_gate_g4()
     b01_failures, b01_tokens = check_b01_metrics()
     b02_failures, b02_tokens = check_b02_calibration()
+    b03_failures, b03_tokens = check_b03_source_baselines()
     failures += (
         ref_failures
         + path_failures
@@ -3927,6 +3986,7 @@ def main() -> int:
         + gate_g4_failures
         + b01_failures
         + b02_failures
+        + b03_failures
     )
 
     if failures:
@@ -4092,6 +4152,10 @@ def main() -> int:
     print(
         f"OK: calibração B02 com {b02_tokens} tokens, fixtures conferidas e "
         f"limiar só na fonte"
+    )
+    print(
+        f"OK: baselines da fonte B03 com {b03_tokens} tokens, chance analítica "
+        f"concordando com a simulada"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

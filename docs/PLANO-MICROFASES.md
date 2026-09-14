@@ -1664,7 +1664,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   no alvo é proibido pelo pré-registro; commit
   54c4312c4128902c8db5d7e7df96ea60a663b2b3.
 
-- [ ] **B03 — Executar random, majority e degree-only.**
+- [x] **B03 — Executar random, majority e degree-only.**
   - Objetivo: estabelecer pisos e o principal controle de atalho.
   - Entregas: configs, modelos, predições congeláveis e métricas internas da fonte
     para aleatório estratificado, maioria e features de grau.
@@ -1673,6 +1673,31 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não avaliar rótulos reais do alvo ainda.
   - Dependências: B01, B02, H09.
   - Orçamento: IA baixa; CPU.
+  Evidência (2026-09-14, executor; modo exploratório e somente na fonte):
+  arquivos `tools/baselines_source.py` (random estratificado, maioria e
+  degree-only com split determinístico por hash, z-score ajustado só no treino e
+  predições congeláveis com SHA-256), `tests/test_baselines_source.py` (4 casos)
+  e `artifacts/reports/B03-BASELINES-FONTE.md` + `.json`; números medidos na
+  validação interna da fonte (14.847 nodes, 519 classes K≥10; 11.668/3.179
+  treino/validação): chance uniforme 0,001927; random estratificado analítico
+  0,004920 com média simulada 0,004931 em 200 sorteios e mediana 0,005662 nas 3
+  seeds do pré-registro; maioria 0,022963 com analítico idêntico ao simulado;
+  degree-only macro Recall@1 0,149547 usando exatamente as transformações
+  source-fit (4 features de grau); fontes/versões: propriedades públicas do MANC
+  `manc:v1.2.1`, snapshot H08, B01/B02 e R07 (seeds de seleção), Python 3.12.2
+  com pyarrow do lock R02, sem GPU e sem qualquer leitura do alvo; comandos e
+  testes: `.venv/bin/python tools/baselines_source.py --properties
+  data/raw/spikes/manc_neuron_properties.feather --snapshot runs/h08/source
+  --out-dir runs/b03 --report artifacts/reports/B03-BASELINES-FONTE.json`
+  (30,9 s; pico 1.139 MiB), `.venv/bin/python -m pytest tests/ -q` (169 testes),
+  nova checagem B03 no `validate_research.py` (chance analítica vs simulada,
+  seeds, hashes das predições e proibição de referências ao alvo no código) e
+  `python3 tools/validate_plan.py`; resultado: pisos estabelecidos e degree-only
+  como principal controle de atalho, com predições hashadas em `runs/b03/`;
+  recursos medidos: CPU apenas, sem downloads; decisão/limitação: resultados
+  são internos à fonte (sem claim de transferência), 405 nodes sem aresta
+  traçada foram descartados com registro e o alvo permanece intocado; commit
+  49342c9f26b9eb81eb5d21a792f6ff8d4ce9a330.
 
 - [ ] **B04 — Implementar estatísticas artesanais.**
   - Objetivo: comparar a GNN com assinaturas estruturais interpretáveis.
