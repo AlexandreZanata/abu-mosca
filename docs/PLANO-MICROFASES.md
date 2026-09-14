@@ -1221,7 +1221,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
 
 ### Ingestão e harmonização
 
-- [ ] **H01 — Especificar schema canônico de grafo e fixtures.**
+- [x] **H01 — Especificar schema canônico de grafo e fixtures.**
   - Objetivo: representar todos os datasets sem apagar diferenças relevantes.
   - Entregas: contrato versionado para nodes, edges, direção, peso, atributos,
     provenance e missingness; fixture sintética dirigida/ponderada.
@@ -1230,6 +1230,30 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não criar campo “comum” que um dataset não possui.
   - Dependências: G3, D02–D09.
   - Orçamento: IA baixa; CPU.
+  Evidência (2026-09-14, executor): arquivos `schemas/graph.schema.json`
+  (contrato versionado 1.0), `docs/research/GRAPH-CONTRACT.md` (9 seções: nodes,
+  edges, grafo/agregados, proveniência, missingness, round-trip, constraints),
+  `tools/graph_contract.py` (`validate` e `roundtrip` em stdlib),
+  `tests/fixtures/graph-fixture.json` (6 nodes, 8 edges dirigidas e ponderadas,
+  com multiedge conservando soma 8, self-loop permitido, peso zero preservado,
+  atributo ausente explícito em `missing` e proveniência completa) e
+  `tests/test_graph_contract.py` (16 casos); fontes/versões: G3 `GO`, D02–D09,
+  PROTOCOLO e ESCOPO, Python 3.12.2 (sem dependência nova), sem download e sem
+  GPU; comandos e testes: `python3 tools/graph_contract.py validate` e
+  `roundtrip` (OK: round-trip preserva nodes, edges, multiedges, missingness e
+  proveniência), `.venv/bin/python -m pytest tests/ -q` (91 passaram em 11,5 s;
+  16 novos), nova checagem H01 no `validate_research.py` com smoke negativo
+  (seção, token, multiedge ausente, self-loop ausente, peso zero, ID cru),
+  `python3 tools/validate_plan.py` e `git diff --cached --check`; resultado:
+  tipos, unidades (contagem de sinapses), constraints, multiedges, self-loops,
+  zero/NaN, threshold, agregação, proveniência e missingness ficam definidos e
+  o round-trip da fixture preserva os dados; falhas reais encontradas e
+  corrigidas pelos testes: peso `null` era aceito em grafo ponderado e `null`
+  de atributo sem `missing` não era detectado; recursos medidos: CPU apenas,
+  suíte em 11,5 s, sem GPU e sem dados brutos; decisão/limitação: atributos de
+  região/neurotransmissor entram apenas como chaves opcionais do Experimento B
+  e a conversão de cada dataset fica para os adapters H02/H03; commit
+  037a61e98750807b056cbebc6e0aa3e156b32178.
 
 - [ ] **H02 — Implementar e validar o adapter da fonte.**
   - Objetivo: converter a release-fonte imutável ao schema canônico.

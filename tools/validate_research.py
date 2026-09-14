@@ -415,6 +415,35 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+GRAPH_SCHEMA = ROOT / "schemas" / "graph.schema.json"
+GRAPH_CONTRACT_DOC = ROOT / "docs" / "research" / "GRAPH-CONTRACT.md"
+GRAPH_TOOL = ROOT / "tools" / "graph_contract.py"
+GRAPH_FIXTURE = ROOT / "tests" / "fixtures" / "graph-fixture.json"
+GRAPH_SECTIONS = (
+    "## 1. Princípios",
+    "## 2. Nodes",
+    "## 3. Edges",
+    "## 4. Grafo e agregados",
+    "## 5. Proveniência",
+    "## 6. Missingness",
+    "## 7. Round-trip",
+    "## 8. Constraints e validação",
+    "## 9. Limitações",
+)
+GRAPH_TOKENS = (
+    "multiedge",
+    "self-loop",
+    "peso zero",
+    "nan",
+    "threshold",
+    "agregação",
+    "proveniência",
+    "missingness",
+    "opaco",
+    "round-trip",
+    "unidades",
+    "conservação",
+)
 GATE_G3 = ROOT / "docs" / "gates" / "G3-PREREGISTRO.md"
 GATE_G3_SECTIONS = (
     "## Pacote de revisão",
@@ -2036,6 +2065,64 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_graph_contract() -> tuple[list[str], int]:
+    label = "H01"
+    failures: list[str] = []
+    for path in (
+        GRAPH_SCHEMA,
+        GRAPH_CONTRACT_DOC,
+        GRAPH_TOOL,
+        GRAPH_FIXTURE,
+        ROOT / "tests" / "test_graph_contract.py",
+    ):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+
+    doc = GRAPH_CONTRACT_DOC.read_text(encoding="utf-8")
+    for section in GRAPH_SECTIONS:
+        if section not in doc:
+            failures.append(f"{label}: GRAPH-CONTRACT.md sem seção '{section}'")
+    flat = " ".join(doc.split()).lower()
+    for token in GRAPH_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: GRAPH-CONTRACT.md sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(doc)
+    if leak:
+        failures.append(f"{label}: GRAPH-CONTRACT.md com possível ID cru ('{leak.group(0)}')")
+
+    schema = json.loads(GRAPH_SCHEMA.read_text(encoding="utf-8"))
+    spec = importlib.util.spec_from_file_location("graph_contract_module", GRAPH_TOOL)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if tuple(schema.get("required", ())) != module.TOP_REQUIRED:
+        failures.append(f"{label}: schema do grafo divergente do validador")
+    fixture = json.loads(GRAPH_FIXTURE.read_text(encoding="utf-8"))
+    failures += [f"{label}: {failure}" for failure in module.validate_graph(fixture, "graph-fixture.json")]
+    _, preserved = module.roundtrip(GRAPH_FIXTURE)
+    if not preserved:
+        failures.append(f"{label}: round-trip da fixture não preserva os dados")
+
+    edges = fixture.get("edges", [])
+    pairs = [(edge.get("source"), edge.get("target")) for edge in edges]
+    if len(pairs) == len(set(pairs)):
+        failures.append(f"{label}: fixture sem multiedge para testar conservação")
+    if not any(edge.get("source") == edge.get("target") for edge in edges):
+        failures.append(f"{label}: fixture sem self-loop")
+    if not any(edge.get("weight") == 0 for edge in edges):
+        failures.append(f"{label}: fixture sem peso zero preservado")
+    provenance = fixture.get("provenance", {})
+    if not all(provenance.get(field) for field in module.PROVENANCE_REQUIRED):
+        failures.append(f"{label}: fixture com proveniência incompleta")
+
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(doc) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(GRAPH_TOKENS)
+
+
 def check_gate_g3() -> tuple[list[str], int, str]:
     label = "G3-PREREGISTRO.md"
     if not GATE_G3.exists():
@@ -2912,6 +2999,7 @@ def main() -> int:
     prereg_failures, prereg_entries, prereg_state = check_preregistration()
     dry_run_failures, dry_run_tokens = check_dry_run()
     gate_g3_failures, gate_g3_entries, gate_g3_state = check_gate_g3()
+    graph_contract_failures, graph_contract_tokens = check_graph_contract()
     failures += (
         ref_failures
         + path_failures
@@ -2943,6 +3031,7 @@ def main() -> int:
         + prereg_failures
         + dry_run_failures
         + gate_g3_failures
+        + graph_contract_failures
     )
 
     if failures:
@@ -3061,6 +3150,10 @@ def main() -> int:
     )
     print(
         f"OK: gate G3 com {gate_g3_entries} hashes e decisão {gate_g3_state}"
+    )
+    print(
+        f"OK: contrato de grafo H01 com {graph_contract_tokens} tokens, fixture "
+        f"dirigida/ponderada e round-trip preservado"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

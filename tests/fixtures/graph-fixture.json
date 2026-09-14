@@ -1,0 +1,142 @@
+{
+  "edges": [
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n35971be6e9bb024a",
+      "target": "n1779f59f4df251f6",
+      "weight": 5
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n35971be6e9bb024a",
+      "target": "n1779f59f4df251f6",
+      "weight": 3
+    },
+    {
+      "attributes": {},
+      "missing": [
+        "confidence"
+      ],
+      "source": "n1779f59f4df251f6",
+      "target": "na84cfe8a8631a26c",
+      "weight": 0
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "na84cfe8a8631a26c",
+      "target": "na84cfe8a8631a26c",
+      "weight": 2
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "na84cfe8a8631a26c",
+      "target": "n9bc63dae6e565eb2",
+      "weight": 7
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n9bc63dae6e565eb2",
+      "target": "naac5cbd0a0796f9e",
+      "weight": 1
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "naac5cbd0a0796f9e",
+      "target": "n6b8cc1547544e44f",
+      "weight": 4
+    },
+    {
+      "attributes": {},
+      "missing": [],
+      "source": "n6b8cc1547544e44f",
+      "target": "n35971be6e9bb024a",
+      "weight": 2
+    }
+  ],
+  "graph": {
+    "aggregation": "sum",
+    "allow_self_loops": true,
+    "directed": true,
+    "threshold": {
+      "rule": "keep",
+      "weight_min": 0
+    },
+    "weight_units": "synapse_count",
+    "weighted": true
+  },
+  "nodes": [
+    {
+      "attributes": {
+        "degree_in": 2,
+        "degree_out": 8
+      },
+      "id": "n35971be6e9bb024a",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 8,
+        "degree_out": 0
+      },
+      "id": "n1779f59f4df251f6",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 2,
+        "degree_out": 9
+      },
+      "id": "na84cfe8a8631a26c",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 7,
+        "degree_out": 1
+      },
+      "id": "n9bc63dae6e565eb2",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 1,
+        "degree_out": 4
+      },
+      "id": "naac5cbd0a0796f9e",
+      "missing": []
+    },
+    {
+      "attributes": {
+        "degree_in": 4
+      },
+      "id": "n6b8cc1547544e44f",
+      "missing": [
+        "degree_out"
+      ]
+    }
+  ],
+  "provenance": {
+    "adapter": {
+      "config_sha256": "4730192d14ec994ca78386c453bb83508c2237eaec7f59cdbb9ab31bfc63b656",
+      "name": "synthetic-adapter",
+      "version": "1.0"
+    },
+    "created_at": "2026-09-14",
+    "dataset": "fixture-sintetica",
+    "license": "CC0-1.0",
+    "release": "h01-v1",
+    "source_files": [
+      {
+        "path": "tests/fixtures/raw-synthetic.csv",
+        "sha256": "9646b160ad4a35e2243cdf6ffbc4300e93c30a6e6daf2317f3d4ceb927252fdc"
+      }
+    ]
+  },
+  "schema_version": "1.0"
+}
