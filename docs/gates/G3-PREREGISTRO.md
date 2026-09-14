@@ -1,17 +1,21 @@
 # Decisão do gate G3 — pré-registro e firewall
 
 Pacote preparado pela IA executora em 2026-09-14 11:27 -0400; **nenhum
-critério científico foi aprovado pela IA**. A decisão `GO`, `NO-GO` ou
-`REFORMULAR` pertence aos revisores humano científico, estatístico e
-custodiante. Este pacote apenas consolida hashes, testes e política pós-unseal;
-o executor não autoriza ingestão integral, treino, unseal ou leitura de
-`data/sealed/`.
+critério científico foi aprovado pela IA**. A decisão `GO` foi tomada pela
+revisão humana (científica, estatística e do custodiante) em 2026-09-14 12:10
+-04; o executor apenas registrou o parecer. Este pacote consolida hashes,
+testes e política pós-unseal; o executor não autoriza ingestão integral, treino,
+unseal ou leitura de `data/sealed/`.
 
-- Data/hora e fuso: 2026-09-14 11:27 -0400
-- Commit e estado dirty: preparação sobre HEAD `f5f39e8`; modificações não
-  relacionadas do workstream NEXT preservadas fora do commit
-- Revisores: a preencher (científico, estatístico e custodiante)
-- Decisão: AGUARDAR (pacote preparado; nenhuma decisão tomada pela IA)
+- Data/hora e fuso: preparação em 2026-09-14 11:27 -04 (commit `ecb3975`);
+  decisão humana registrada em 2026-09-14 12:10 -04
+- Commit e estado dirty: preparação sobre HEAD `f5f39e8`; decisão registrada no
+  commit desta fase; modificações não relacionadas do workstream NEXT
+  preservadas fora do commit
+- Revisores: Alexandre Zanata (revisor humano) — acumula responsável
+  científico, revisão de estatística e custódia; limitação declarada
+- Decisão: GO (registrada pela revisão humana em 2026-09-14; executor apenas
+  registrou o parecer)
 
 ## Pacote de revisão
 
@@ -50,7 +54,7 @@ o executor não autoriza ingestão integral, treino, unseal ou leitura de
 - Dry run ponta a ponta: `PASS` — download idempotente, treino trivial, freeze, inferência opaca e avaliação selada em fixture sintética.
 - Suíte de testes: `PASS` — 75 testes automatizados passando na suíte completa.
 - Política pós-unseal explícita: `PASS` — pré-registro e PROTOCOLO definem unseal único pelo custodiante e invalidação por reabertura de tuning.
-- Aprovação científica, estatística e do custodiante: `NÃO VERIFICADO` — assinaturas humanas pendentes neste gate.
+- Aprovação científica, estatística e do custodiante: `PASS` — GO aprovado por Alexandre Zanata em 2026-09-14, acumulando os três papéis com limitação declarada.
 
 ## Riscos e divergências
 
@@ -70,6 +74,10 @@ o executor não autoriza ingestão integral, treino, unseal ou leitura de
 - Designar o custodiante e registrar a política de unseal antes de M08.
 - Resolver armazenamento externo antes do bulk do MCNS (H08).
 - Qualquer edição nos artefatos congelados invalida este pacote e exige novo G3.
+- Decisão registrada: `GO` aprovando o pré-registro assinado, o firewall e a
+  política pós-unseal, com a limitação de revisor único acumulando científico,
+  estatística e custódia; designar custodiante independente antes de M08
+  permanece obrigatório no fluxo.
 
 ## Escopo liberado
 
@@ -81,6 +89,9 @@ o executor não autoriza ingestão integral, treino, unseal ou leitura de
 
 ## Assinaturas
 
-- Responsável científico: a preencher
-- Revisor de estatística: a preencher
-- Custodiante designado: a preencher
+- Responsável científico: Alexandre Zanata — GO registrado em 2026-09-14
+- Revisor de estatística: Alexandre Zanata — GO registrado em 2026-09-14
+  (mesmo revisor acumulando papéis; limitação declarada)
+- Custodiante designado: Alexandre Zanata — designado em 2026-09-14
+  (acumula a custódia; limitação declarada; custodiante independente segue
+  recomendado antes de M08)

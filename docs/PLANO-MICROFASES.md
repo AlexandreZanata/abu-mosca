@@ -1191,7 +1191,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   o custodiante em H04/H07/M08 e a versão do protocolo fica congelada pela tag
   interna; commit de71950ee6715362de87a4c792cfd8acdd4cdf2a.
 
-- [ ] **G3 — Aprovar pré-registro e firewall.**
+- [x] **G3 — Aprovar pré-registro e firewall.**
   - Objetivo: autorizar ingestão integral sem mudar a pergunta durante o caminho.
   - Entregas: `docs/gates/G3-PREREGISTRO.md` com hashes do protocolo, schemas e
     teste antileakage.
@@ -1200,12 +1200,24 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: nenhuma análise real inicia com critério `não verificado`.
   - Dependências: R01–R08.
   - Orçamento: pacote por IA baixa; revisão humana obrigatória.
-  - Pacote preparado (2026-09-14, executor): `docs/gates/G3-PREREGISTRO.md` com
-    10 artefatos hashados (pré-registro assinado, SAP, firewall, schemas,
-    dry run), 8 critérios (7 `PASS` e 1 `NÃO VERIFICADO` para as assinaturas) e
-    decisão `AGUARDAR`; o item permanece `[ ]` até a aprovação humana
-    (científico, estatístico e custodiante); commit
-    f6410231c928f9be8decbf379da3ec41e4bc7d8c.
+  Evidência (2026-09-14, executor): decisão humana `GO` registrada em
+  2026-09-14 12:10 -04 por Alexandre Zanata, acumulando os três papéis
+  (responsável científico, revisor de estatística e custodiante; limitação
+  declarada), aprovando o pré-registro assinado (`REGISTRY.md` com 12 artefatos
+  e hash de pacote `9411af0c…`), o firewall (R05), o teste antileakage e o dry
+  run (R08, tag `dryrun-1.0-f90a4927`); o executor apenas registrou o parecer;
+  arquivos `docs/gates/G3-PREREGISTRO.md` (8 critérios, 10 artefatos hashados,
+  condições e escopo liberado para H01–H09 sob o pré-registro) e esta linha;
+  comandos e testes: `python3 tools/validate_research.py` (checagem G3 agora
+  `GO`, com hash do pacote do pré-registro conferido e smoke negativo),
+  `python3 tools/validate_plan.py`, `.venv/bin/python -m pytest tests/ -q`
+  (75 testes) e `git diff --cached --check`; resultado: ingestão integral
+  autorizada conforme dependências, com custodiante independente ainda
+  recomendado antes de M08 e nenhuma análise com critério `não verificado`;
+  recursos medidos: CPU apenas, sem GPU, sem downloads e sem acesso a
+  `data/sealed`; decisão/limitação: revisor único acumula os três papéis;
+  qualquer edição nos artefatos congelados invalida o pacote; commit
+  a12c35a66f6f7a55fbb81bcdcbd6abf522213349.
 
 ### Ingestão e harmonização
 
