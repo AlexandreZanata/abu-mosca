@@ -415,6 +415,20 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+H09_TOOL = ROOT / "tools" / "data_quality.py"
+H09_REPORT = ROOT / "artifacts" / "reports" / "DATA-QUALITY.md"
+H09_METRICS = ROOT / "artifacts" / "reports" / "DATA-QUALITY.json"
+H09_MANIFEST = ROOT / "data" / "manifests" / "analitico-v1.json"
+H09_TOKENS = (
+    "exploratório",
+    "duplicad",
+    "componentes",
+    "reciprocidade",
+    "drift",
+    "congel",
+    "inconclusiv",
+    "nenhum rótulo",
+)
 H08_TOOL = ROOT / "tools" / "snapshot_build.py"
 H08_REPORT = ROOT / "artifacts" / "reports" / "H08-SNAPSHOTS.md"
 H08_METRICS = ROOT / "artifacts" / "reports" / "H08-SNAPSHOTS.json"
@@ -2172,6 +2186,54 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_h09_quality() -> tuple[list[str], int]:
+    label = "H09"
+    failures: list[str] = []
+    for path in (H09_TOOL, H09_REPORT, H09_METRICS, H09_MANIFEST, ROOT / "tests" / "test_data_quality.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    report = H09_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in H09_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+    metrics = json.loads(H09_METRICS.read_text(encoding="utf-8"))
+    if metrics.get("mode") != "exploratory-only":
+        failures.append(f"{label}: auditoria deve ser exploratória")
+    for side in ("source", "target_public"):
+        data = metrics.get(side, {})
+        if data.get("duplicate_pairs") != 0:
+            failures.append(f"{label}: duplicatas em '{side}'")
+        if data.get("negative_weight_edges") != 0:
+            failures.append(f"{label}: pesos negativos em '{side}'")
+        if data.get("degree_mismatch_in") != 0 or data.get("degree_mismatch_out") != 0:
+            failures.append(f"{label}: graus divergentes em '{side}'")
+        if data.get("schema", {}).get("edges", {}).get("drift") or data.get("schema", {}).get("nodes", {}).get("drift"):
+            failures.append(f"{label}: drift de schema em '{side}'")
+    manifest = json.loads(H09_MANIFEST.read_text(encoding="utf-8"))
+    if manifest.get("status") != "exploratory-only" or manifest.get("labels_used") is not False:
+        failures.append(f"{label}: manifesto analítico deve ser exploratório e sem rótulos")
+    if "inconclusiv" not in str(manifest.get("confirmatory_outcome", "")).lower():
+        failures.append(f"{label}: manifesto analítico sem desfecho inconclusivo")
+    if not re.fullmatch(r"[0-9a-f]{64}", str(manifest.get("analytic_sha256", ""))):
+        failures.append(f"{label}: hash analítico ausente")
+    if metrics.get("analytic_manifest", {}).get("analytic_sha256") != manifest.get("analytic_sha256"):
+        failures.append(f"{label}: hash analítico divergente entre relatório e manifesto")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    h09_line = next((line for line in plan_lines if "**H09 —" in line), None)
+    if h09_line is None or not h09_line.startswith("- [x]"):
+        failures.append(f"{label}: H09 deve estar marcada [x] com evidência")
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(H09_TOKENS)
+
+
 def check_h08_snapshots() -> tuple[list[str], int]:
     label = "H08"
     failures: list[str] = []
@@ -3149,6 +3211,8 @@ def check_provenance_phase() -> tuple[list[str], int]:
         except json.JSONDecodeError as error:
             failures.append(f"{path.name}: JSON inválido ({error})")
             continue
+        if "status" in payload and "dataset" not in payload:
+            continue  # manifesto de congelamento analítico (H09), schema próprio
         for failure in module.validate_manifest(payload, path.name):
             failures.append(f"{label}: {failure}")
     return failures, len(manifests)
@@ -3617,6 +3681,7 @@ def main() -> int:
     edge_transform_failures, edge_transform_tokens = check_edge_transform()
     h07_failures, h07_tokens = check_h07_blocked()
     h08_failures, h08_tokens = check_h08_snapshots()
+    h09_failures, h09_tokens = check_h09_quality()
     failures += (
         ref_failures
         + path_failures
@@ -3656,6 +3721,7 @@ def main() -> int:
         + edge_transform_failures
         + h07_failures
         + h08_failures
+        + h09_failures
     )
 
     if failures:
@@ -3806,6 +3872,10 @@ def main() -> int:
     print(
         f"OK: snapshots H08 com {h08_tokens} tokens, idempotência e picos abaixo "
         f"de 28 GB"
+    )
+    print(
+        f"OK: auditoria H09 com {h09_tokens} tokens, dataset congelado em modo "
+        f"exploratório e hash analítico"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

@@ -65,7 +65,10 @@ def test_schema_arquivo_declara_os_mesmos_obrigatorios():
 
 
 def test_manifestos_reais_validam():
-    paths = sorted((ROOT / "data" / "manifests").glob("*.json"))
+    paths = [
+        path for path in sorted((ROOT / "data" / "manifests").glob("*.json"))
+        if "dataset" in json.loads(path.read_text(encoding="utf-8"))
+    ]
     assert len(paths) >= 4, "esperados ao menos 4 manifestos versionados"
     failures, checked = m.validate_paths(paths, with_files=False)
     assert not failures, failures

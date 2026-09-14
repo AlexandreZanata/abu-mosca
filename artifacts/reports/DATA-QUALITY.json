@@ -1,0 +1,215 @@
+{
+  "analytic_manifest": {
+    "analytic_sha256": "5c7b96bd4939e285e5fd41d80a1012d686b69c608d627f47a1ee17dd746f9737",
+    "confirmatory_outcome": "nenhum (H07 inconclusiva por circularidade)",
+    "created_at": "2026-09-14",
+    "labels_used": false,
+    "path": "data/manifests/analitico-v1.json",
+    "schema_version": "1.0",
+    "source": {
+      "files": {
+        "edges.parquet": "06b9e844b8583ab924307aa4307dc7aab5a4cf93f2f02cd5b2c05f7cea01d1d9",
+        "nodes.parquet": "3b168c5fd6fe71127f6bcb99760e1e80bdd3a14933349c7ae144c43190a00a41"
+      },
+      "kind": "MANC",
+      "release": "manc:v1.2.1",
+      "snapshot": "runs/h08/source"
+    },
+    "status": "exploratory-only",
+    "target_public": {
+      "files": {
+        "edges.parquet": "485c7a935fe5117e9be819a30664b6af157645b364b33014994c28b912cce279",
+        "nodes.parquet": "1959efd7019957a3ba4bc751151b622bc374d8e179254f076752dd8418e19563"
+      },
+      "kind": "MCNS",
+      "release": "male-cns:v1.0",
+      "snapshot": "runs/h08/target-neuron"
+    }
+  },
+  "deviations": [
+    "MCNS: arquivo público é segmento-a-segmento (151.856.684 arestas); o snapshot usa o nível-neurônio (26.028.386 arestas entre 211.577 bodies anotados) e descarta 125.828.298 arestas com lado não anotado (H08).",
+    "MANC: 23.188 nodes medidos contra ~23.000 neurônios publicados (~0,8% acima; segmentos traçados) (LIT-0074).",
+    "MCNS: 211.577 bodies anotados incluem além dos 166.700 neurônios curados; o recorte T0 é da custódia e ficou inconclusivo (H07).",
+    "Desfecho confirmatório inexistente: H07 inconclusiva por circularidade; dataset congelado apenas para uso exploratório.",
+    "Revisor humano único acumulando papéis (segundo indisponível)."
+  ],
+  "missingness": "não se aplica: grafo somente-topologia, sem atributos de nó/aresta no snapshot",
+  "mode": "exploratory-only",
+  "peak_rss_mib": 5484.6,
+  "reconciliation": {
+    "published": {
+      "MANC": {
+        "neurons": "~23.000 (LIT-0074)",
+        "nodes": 23188
+      },
+      "MCNS": {
+        "annotated_bodies": 211577,
+        "neurons": "166.700 (LIT-0023)"
+      }
+    },
+    "source_provenance": {
+      "columns": {
+        "edges": [
+          "source",
+          "target",
+          "weight"
+        ],
+        "nodes": [
+          "id",
+          "degree_in",
+          "degree_out"
+        ]
+      },
+      "dataset": "MANC",
+      "degree_semantics": "weighted_sum",
+      "files": {
+        "edges.parquet": "06b9e844b8583ab924307aa4307dc7aab5a4cf93f2f02cd5b2c05f7cea01d1d9",
+        "nodes.parquet": "3b168c5fd6fe71127f6bcb99760e1e80bdd3a14933349c7ae144c43190a00a41"
+      },
+      "id_scheme": "opaque n<16 hex> via sha256(dataset|release|body)",
+      "input": "data/raw/spikes/manc_traced_connections.csv",
+      "input_sha256": "4553191e8fd0a198e3588e188b649b7cb39b0550e35d6a11d63b0cd7d8145fda",
+      "kind": "source",
+      "license": "CC-BY-4.0",
+      "nodes": 23188,
+      "peak_rss_mib": 1090.3,
+      "release": "manc:v1.2.1",
+      "rows": 5243574,
+      "seconds": 4.568,
+      "self_loops": 1,
+      "snapshot_set_sha256": "747f99250f477499fe588497e2e5884853483fd4e4c42d3e66da8c68019c81e7",
+      "verified": {
+        "rows": 5243574,
+        "weight_sum": 30698527
+      },
+      "weight_sum": 30698527
+    },
+    "target_provenance": {
+      "annotations": "data/raw/spikes/mcns_body_annotations.feather",
+      "annotations_columns_used": [
+        "bodyId"
+      ],
+      "annotations_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+      "columns": {
+        "edges": [
+          "source",
+          "target",
+          "weight"
+        ],
+        "nodes": [
+          "id",
+          "degree_in",
+          "degree_out"
+        ]
+      },
+      "dataset": "MCNS",
+      "degree_semantics": "weighted_sum",
+      "files": {
+        "edges.parquet": "485c7a935fe5117e9be819a30664b6af157645b364b33014994c28b912cce279",
+        "nodes.parquet": "1959efd7019957a3ba4bc751151b622bc374d8e179254f076752dd8418e19563"
+      },
+      "id_scheme": "opaque n<16 hex> via sha256(dataset|release|body)",
+      "input": "data/raw/target-public/mcns_connectome_weights.feather",
+      "input_sha256": "e35da783d1c686b2b58b3b87cd6a403ae43bfcfba8bff28e08ef752c1a56afc1",
+      "kind": "target-public",
+      "level": "neuron-level",
+      "license": "CC-BY-4.0",
+      "no_labels": true,
+      "nodes": 211577,
+      "peak_rss_mib": 9953.2,
+      "release": "male-cns:v1.0",
+      "rows": 26028386,
+      "seconds": 27.638,
+      "segment_edges_dropped": 125828298,
+      "segment_edges_kept_both_annotated": 26028386,
+      "segment_edges_total": 151856684,
+      "self_loops": 112,
+      "snapshot_set_sha256": "89a4f59d4ccd12644684edf2b5ef896f55301d9679c4495cf594188e9941290d",
+      "verified": {
+        "rows": 26028386,
+        "weight_sum": 125365933
+      },
+      "weight_sum": 125365933
+    }
+  },
+  "schema_version": "1.0",
+  "seconds_total": 45.037,
+  "source": {
+    "components": 1,
+    "degree_in_mean": 1323.8971,
+    "degree_mismatch_in": 0,
+    "degree_mismatch_out": 0,
+    "degree_out_mean": 1323.8971,
+    "duplicate_pairs": 0,
+    "edges": 5243574,
+    "isolated_nodes": 0,
+    "label": "MANC",
+    "negative_weight_edges": 0,
+    "nodes": 23188,
+    "reciprocal_edges": 1595990,
+    "reciprocity_fraction": 0.304371,
+    "schema": {
+      "edges": {
+        "columns": {
+          "source": "string",
+          "target": "string",
+          "weight": "int64"
+        },
+        "drift": {}
+      },
+      "nodes": {
+        "columns": {
+          "degree_in": "int64",
+          "degree_out": "int64",
+          "id": "string"
+        },
+        "drift": {}
+      }
+    },
+    "seconds": 5.956,
+    "self_loops": 1,
+    "weight_max": 1080,
+    "weight_min": 1,
+    "weight_sum": 30698527,
+    "zero_weight_edges": 0
+  },
+  "target_public": {
+    "components": 22944,
+    "degree_in_mean": 592.531,
+    "degree_mismatch_in": 0,
+    "degree_mismatch_out": 0,
+    "degree_out_mean": 592.531,
+    "duplicate_pairs": 0,
+    "edges": 26028386,
+    "isolated_nodes": 22799,
+    "label": "MCNS",
+    "negative_weight_edges": 0,
+    "nodes": 211577,
+    "reciprocal_edges": 7752760,
+    "reciprocity_fraction": 0.297859,
+    "schema": {
+      "edges": {
+        "columns": {
+          "source": "string",
+          "target": "string",
+          "weight": "int64"
+        },
+        "drift": {}
+      },
+      "nodes": {
+        "columns": {
+          "degree_in": "int64",
+          "degree_out": "int64",
+          "id": "string"
+        },
+        "drift": {}
+      }
+    },
+    "seconds": 39.081,
+    "self_loops": 112,
+    "weight_max": 2591,
+    "weight_min": 1,
+    "weight_sum": 125365933,
+    "zero_weight_edges": 0
+  }
+}

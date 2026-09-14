@@ -1530,7 +1530,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   segue bloqueada por circularidade e reformulação exigida pelo responsável);
   commit 1bb229c67aa113839b23cf1b7b36b80c1e35abcf.
 
-- [ ] **H09 — Executar auditoria de qualidade e congelar dataset analítico.**
+- [x] **H09 — Executar auditoria de qualidade e congelar dataset analítico.**
   - Nota (2026-09-14, humano): executar em **modo estritamente exploratório**
     (H07 inconclusiva por circularidade); sem claims confirmatórios de
     transferência e sem materialização de rótulos como confirmação.
@@ -1543,6 +1543,37 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não consultar distribuição de acerto ou labels do alvo.
   - Dependências: H07, H08.
   - Orçamento: IA baixa; CPU; sem GPU.
+  Evidência (2026-09-14, executor; modo estritamente exploratório por decisão
+  humana): arquivos `tools/data_quality.py` (checks de duplicatas, componentes
+  conexas, graus ponderados conferidos, pesos zero/negativos, self-loops,
+  isolados, reciprocidade/assimetria, drift de schema, cobertura e manifesto de
+  congelamento), `tests/test_data_quality.py` (3 casos), `artifacts/reports/
+  DATA-QUALITY.md` + `.json` e `data/manifests/analitico-v1.json` (status
+  `exploratory-only`, `labels_used: false`, desfecho confirmatório inexistente
+  por H07 inconclusiva); medições: fonte 23.188 nodes/5.243.574 arestas/peso
+  30.698.527, 1 componente, 1 self-loop, reciprocidade 0,3044; alvo público
+  211.577 nodes/26.028.386 arestas/peso 125.365.933, 22.944 componentes,
+  22.799 isolados, 112 self-loops, reciprocidade 0,2979; duplicatas 0, pesos
+  negativos 0, divergência de grau 0 e drift de schema 0 nos dois lados;
+  desvios encontrados e corrigidos: semântica de grau padronizada como
+  `weighted_sum` (a fonte armazenava contagem) e agregação do alvo tornada
+  determinística (ordenação por source/target; duas reconstruções idênticas,
+  `edges.parquet` `485c7a93…`); hash analítico congelado
+  `5c7b96bd4939e285e5fd41d80a1012d686b69c608d627f47a1ee17dd746f9737`; fontes/
+  versões: snapshots H08, manifestos R03, LIT-0074/LIT-0023 para contagens
+  publicadas e changelog 2.3; comandos e testes: `python3 tools/data_quality.py
+  --source runs/h08/source --target runs/h08/target-neuron --out
+  artifacts/reports/DATA-QUALITY.json --manifest data/manifests/analitico-v1.json`
+  (45 s, pico 5.485 MiB, CPU), `.venv/bin/python -m pytest tests/ -q` (148
+  testes), `python3 tools/manifest.py validate --check-files` (4 manifestos de
+  dataset; o analítico usa schema próprio), nova checagem H09 no
+  `validate_research.py` e `python3 tools/validate_plan.py`; resultado:
+  dataset analítico público congelado, sem rótulos, pronto apenas para uso
+  exploratório; recursos medidos: CPU apenas, pico 5.485 MiB, sem GPU e sem
+  downloads; decisão/limitação: 22.799 bodies anotados ficaram isolados no
+  subgrafo mantido, não existe desfecho confirmatório (T0 e hemilinhagem
+  inconclusivos) e revisor único; commit
+  6cf003e71fa6ccd35f65c73b82208dc7270f7e21.
 
 - [ ] **G4 — Aprovar o gate de dados analíticos.**
   - Objetivo: liberar baselines somente se qualidade e isolamento passarem.

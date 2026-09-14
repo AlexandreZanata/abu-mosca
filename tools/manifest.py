@@ -143,6 +143,8 @@ def validate_paths(paths: list[Path], with_files: bool) -> tuple[list[str], int]
         except json.JSONDecodeError as error:
             failures.append(f"{label}: JSON inválido ({error})")
             continue
+        if "status" in payload and "dataset" not in payload:
+            continue  # manifesto de congelamento analítico (H09), schema próprio
         failures += validate_manifest(payload, label)
         if with_files:
             failures += check_files(payload, label)

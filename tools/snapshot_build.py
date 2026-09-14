@@ -148,8 +148,9 @@ def build_manc(connections: Path, manifest: Path, out_dir: Path) -> dict:
             "weight": weight_array,
         }
     )
-    degree_in = np.bincount(np.asarray(targets), minlength=len(order)).astype("int64")
-    degree_out = np.bincount(np.asarray(sources), minlength=len(order)).astype("int64")
+    weights_np = np.asarray(weights, dtype="int64")
+    degree_in = np.bincount(np.asarray(targets), weights=weights_np, minlength=len(order)).astype("int64")
+    degree_out = np.bincount(np.asarray(sources), weights=weights_np, minlength=len(order)).astype("int64")
     nodes = pa.table(
         {
             "id": node_ids,
@@ -174,6 +175,7 @@ def build_manc(connections: Path, manifest: Path, out_dir: Path) -> dict:
         "self_loops": sum(1 for source, target in zip(sources, targets) if source == target),
         "id_scheme": "opaque n<16 hex> via sha256(dataset|release|body)",
         "columns": {"edges": list(EDGE_COLUMNS), "nodes": list(NODE_COLUMNS)},
+        "degree_semantics": "weighted_sum",
         "seconds": round(time.perf_counter() - started, 3),
         "verified": verified,
     }
@@ -199,7 +201,9 @@ def _build_mcns_neuron_level(table: pa.Table, bodies: pa.Array, node_ids: pa.Arr
             "weight": weight_f,
         }
     ).group_by(["pre", "post"]).aggregate([("weight", "sum")])
-    grouped = grouped.rename_columns(["pre", "post", "weight"])
+    grouped = grouped.rename_columns(["pre", "post", "weight"]).sort_by(
+        [("pre", "ascending"), ("post", "ascending")]
+    )
     pre_idx = grouped["pre"].to_numpy(zero_copy_only=False)
     post_idx = grouped["post"].to_numpy(zero_copy_only=False)
     weights_np = grouped["weight"].to_numpy(zero_copy_only=False)
@@ -269,6 +273,7 @@ def build_mcns(weights: Path, manifest: Path, out_dir: Path, annotations: Path |
             "weight_sum": metrics["weight_sum"],
             "id_scheme": "opaque n<16 hex> via sha256(dataset|release|body)",
             "columns": {"edges": list(EDGE_COLUMNS), "nodes": list(NODE_COLUMNS)},
+            "degree_semantics": "weighted_sum",
             "no_labels": True,
             "seconds": round(time.perf_counter() - started, 3),
             "verified": verified,

@@ -1,0 +1,26 @@
+{
+  "analytic_sha256": "5c7b96bd4939e285e5fd41d80a1012d686b69c608d627f47a1ee17dd746f9737",
+  "confirmatory_outcome": "nenhum (H07 inconclusiva por circularidade)",
+  "created_at": "2026-09-14",
+  "labels_used": false,
+  "schema_version": "1.0",
+  "source": {
+    "files": {
+      "edges.parquet": "06b9e844b8583ab924307aa4307dc7aab5a4cf93f2f02cd5b2c05f7cea01d1d9",
+      "nodes.parquet": "3b168c5fd6fe71127f6bcb99760e1e80bdd3a14933349c7ae144c43190a00a41"
+    },
+    "kind": "MANC",
+    "release": "manc:v1.2.1",
+    "snapshot": "runs/h08/source"
+  },
+  "status": "exploratory-only",
+  "target_public": {
+    "files": {
+      "edges.parquet": "485c7a935fe5117e9be819a30664b6af157645b364b33014994c28b912cce279",
+      "nodes.parquet": "1959efd7019957a3ba4bc751151b622bc374d8e179254f076752dd8418e19563"
+    },
+    "kind": "MCNS",
+    "release": "male-cns:v1.0",
+    "snapshot": "runs/h08/target-neuron"
+  }
+}
