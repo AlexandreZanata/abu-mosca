@@ -231,7 +231,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   humana em G0; arquivos não relacionados preservados fora do commit; commit
   42259a2fbfcdb0d3b47578a605c347a5eb191219.
 
-- [ ] **G0 — Aprovar o contrato científico provisório.**
+- [x] **G0 — Aprovar o contrato científico provisório.**
   - Objetivo: decidir se a pergunta é testável antes de buscar confirmação.
   - Entregas: `docs/gates/G0-CONTRATO.md` usando o modelo de decisão.
   - Aceite: revisão humana aprova ou reformula H0/H1, equivalência, desfecho,
@@ -247,6 +247,22 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   `tools/validate_research.py` (15,3 MB de RAM, 0,07 s, sem GPU); próxima ação
   humana: decidir GO/NO-GO/REFORMULAR e assinar; commit
   505619c3a5e545044cbc29023f8376cb6ad38673.
+  Evidência (2026-09-14, executor + revisor humano): arquivos
+  `docs/gates/G0-CONTRATO.md` (decisão GO, 9 critérios `PASS`, condições do GO e
+  assinaturas registradas), `tools/validate_research.py` (estado aprovado do
+  gate) e esta linha; fontes/versões: parecer do revisor humano de 2026-09-14
+  (GO integral; nome não informado na aprovação) e documentos internos de
+  C01–C06, nenhuma fonte externa, Python 3.12.2 (stdlib); comandos e testes:
+  `python3 tools/validate_research.py` com smoke negativo inline (decisão GO com
+  G0 aberto, assinatura pendente com GO, critério `NÃO VERIFICADO` com GO e
+  critério `FAIL`), `python3 tools/validate_plan.py`, `git diff --cached --check`
+  e `git status --porcelain`; resultado: GO registrado, escopo liberado para
+  L01–L07 e D01–D10 conforme dependências, condições de R05/R07/G3 registradas;
+  recursos: 15,3 MB de RAM e 0,07 s no validador, sem GPU; decisão/limitação:
+  aprovação humana apenas registrada pelo executor, nome do responsável não
+  informado, riscos seguem abertos e não mitigados; arquivos não relacionados
+  preservados fora do commit; commit
+  ad336fe72e1c3e97f728d05501e48442cd72a1ec.
 
 ### Literatura e novidade
 
