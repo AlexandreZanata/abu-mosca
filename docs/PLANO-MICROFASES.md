@@ -1575,7 +1575,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   inconclusivos) e revisor único; commit
   6cf003e71fa6ccd35f65c73b82208dc7270f7e21.
 
-- [ ] **G4 — Aprovar o gate de dados analíticos.**
+- [x] **G4 — Aprovar o gate de dados analíticos.**
   - Objetivo: liberar baselines somente se qualidade e isolamento passarem.
   - Entregas: `docs/gates/G4-DADOS-ANALITICOS.md` com checksums e desvios aceitos.
   - Aceite: custodiante confirma separação; responsável científico confirma
@@ -1584,14 +1584,21 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: dataset reprovado não é “limpo” manualmente sem nova proveniência.
   - Dependências: H01–H09.
   - Orçamento: IA baixa para pacote; revisão humana.
-  - Pacote preparado (2026-09-14, executor): `docs/gates/G4-DADOS-ANALITICOS.md`
-    com 8 artefatos hashados (manifesto analítico, DATA-QUALITY, H08, registro
-    do pré-registro, firewall), 8 critérios (6 `PASS` e 2 `NÃO VERIFICADO`
-    para custodiante e responsável científico), desvios aceitos documentados
-    (nível do alvo, 22.799 isolados, sem desfecho confirmatório, revisor único)
-    e decisão `AGUARDAR`; com `GO`, libera B01–B09 apenas em modo exploratório,
-    sem unseal, sem rótulos-alvo e sem claims confirmatórios; commit
-    90c40c20bc86967213dc8cb093bf6935ac848699.
+  Evidência (2026-09-14, executor): decisão humana `GO` registrada em
+  2026-09-14 14:04 -04 por Alexandre Zanata acumulando os três papéis
+  (responsável científico, custódia dos dados e método/estatística; limitação
+  declarada), aprovando o dataset analítico **apenas para uso exploratório**;
+  `docs/gates/G4-DADOS-ANALITICOS.md` com 8 artefatos hashados (manifesto
+  analítico `5c7b96bd…`, DATA-QUALITY, H08, registro do pré-registro, firewall)
+  e 8 critérios todos `PASS`; o executor apenas registrou o parecer; desvios
+  aceitos: nível do alvo (segmento→neurônio; 125,8M arestas descartadas),
+  22.799 bodies isolados, ausência de desfecho confirmatório (T0 e
+  hemilinhagem inconclusivos por circularidade) e revisor único; condições:
+  B01–B09 restritos a diagnóstico/exploração, sem unseal, rótulos-alvo ou
+  alegação confirmatória; comandos e testes: `python3 tools/validate_research.py`
+  (checagem G4 agora `GO`, hashes conferidos) e `python3 tools/validate_plan.py`;
+  recursos medidos: CPU apenas, sem GPU, sem downloads e sem acesso a
+  `data/sealed`; commit 7127cc0e0861485840d62e23ba2a4a68c2a4ee63.
 
 ### Avaliação e baselines obrigatórios
 

@@ -1,17 +1,21 @@
 # Decisão do gate G4 — dados analíticos (modo exploratório)
 
 Pacote preparado pela IA executora em 2026-09-14 14:01 -04; **nenhum critério
-científico foi aprovado pela IA**. A decisão `GO`, `NO-GO` ou `REFORMULAR`
-pertence ao responsável científico, ao custodiante e ao revisor de método. O
-dataset analítico é público, sem rótulos, e está congelado em modo
-**estritamente exploratório** porque o desfecho confirmatório ficou
-**inconclusivo por circularidade** (H07; changelog 2.3).
+científico foi aprovado pela IA**. A decisão `GO` foi tomada pela revisão humana
+em 2026-09-14 14:04 -04; o executor apenas registrou o parecer. O dataset
+analítico é público, sem rótulos, e está congelado em modo **estritamente
+exploratório** porque o desfecho confirmatório ficou **inconclusivo por
+circularidade** (H07; changelog 2.3).
 
-- Data/hora e fuso: 2026-09-14 14:01 -04
-- Commit e estado dirty: preparação sobre HEAD `0c8ade2`; modificações não
-  relacionadas do workstream NEXT preservadas fora do commit
-- Revisores: a preencher (científico, custodiante e método/estatística)
-- Decisão: AGUARDAR (pacote preparado; nenhuma decisão tomada pela IA)
+- Data/hora e fuso: preparação em 2026-09-14 14:01 -04 (commit `85679ca`);
+  decisão humana registrada em 2026-09-14 14:04 -04
+- Commit e estado dirty: preparação sobre HEAD `0c8ade2`; decisão registrada no
+  commit desta fase; modificações não relacionadas do workstream NEXT
+  preservadas fora do commit
+- Revisores: Alexandre Zanata (revisor humano) — acumula responsável
+  científico, custódia dos dados e método/estatística; limitação declarada
+- Decisão: GO (aprovado para uso exploratório; registrado pela revisão humana
+  em 2026-09-14; executor apenas registrou o parecer)
 
 ## Pacote de revisão
 
@@ -53,8 +57,8 @@ dataset analítico é público, sem rótulos, e está congelado em modo
 - Cobertura e reconciliação: `PASS` — contagens reconciliadas com H02/H03 e cards, com desvios listados e corrigidos quando técnicos (grau, determinismo).
 - Desfecho confirmatório inexistente: `PASS` — T0 e hemilinhagem inconclusivos por circularidade (H07, changelog 2.3); dataset só exploratório.
 - Pré-registro atualizado para alterações materiais: `PASS` — changelog 2.2/2.3 e H1′ corrigida antes de qualquer baseline.
-- Custodiante confirma separação e integridade do selado: `NÃO VERIFICADO` — assinatura humana pendente.
-- Responsável científico confirma cobertura/validade para uso exploratório: `NÃO VERIFICADO` — assinatura humana pendente.
+- Custodiante confirma separação e integridade do selado: `PASS` — confirmado por Alexandre Zanata em 2026-09-14, acumulando o papel com limitação declarada.
+- Responsável científico confirma cobertura/validade para uso exploratório: `PASS` — confirmado por Alexandre Zanata em 2026-09-14, com desvios aceitos e escopo exploratório.
 
 ## Riscos e divergências
 
@@ -73,6 +77,10 @@ dataset analítico é público, sem rótulos, e está congelado em modo
 - Qualquer alteração material no dataset exige nova versão de manifesto e
   atualização do pré-registro antes de resultados.
 - Dataset reprovado não pode ser “limpo” manualmente sem nova proveniência.
+- Decisão registrada: `GO` exploratório com revisor único acumulando os três
+  papéis (limitação declarada); B01–B09 ficam restritos a diagnóstico e
+  exploração, sem alegação confirmatória de transferência; a limitação deve
+  constar de qualquer relatório futuro.
 
 ## Escopo liberado
 
@@ -84,6 +92,6 @@ dataset analítico é público, sem rótulos, e está congelado em modo
 
 ## Assinaturas
 
-- Responsável científico: a preencher
-- Custodiante dos dados: a preencher
-- Revisor de método/estatística: a preencher
+- Responsável científico: Alexandre Zanata — GO exploratório registrado em 2026-09-14
+- Custodiante dos dados: Alexandre Zanata — confirmado em 2026-09-14 (mesmo revisor acumulando papéis; limitação declarada)
+- Revisor de método/estatística: Alexandre Zanata — confirmado em 2026-09-14 (mesmo revisor acumulando papéis; limitação declarada)
