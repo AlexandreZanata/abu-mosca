@@ -389,7 +389,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   relacionados preservados fora do commit; commit
   f70de5f59229c03e223589811525a746398ce543.
 
-- [ ] **L05 — Revisar aprendizado auto-supervisionado e embeddings de grafo.**
+- [x] **L05 — Revisar aprendizado auto-supervisionado e embeddings de grafo.**
   - Objetivo: selecionar objetivos que possam generalizar sem node IDs.
   - Entregas: `research/literature/SSL-GRAFOS.md` com masked edge/weight,
     neighborhood reconstruction, contrastive, autoencoders e link prediction.
@@ -400,6 +400,29 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     transdutivos desalinhados como se fossem comuns.
   - Dependências: L01, L03, L04.
   - Orçamento: IA baixa; sem GPU.
+  Evidência (2026-09-14, executor): arquivos `research/literature/SSL-GRAFOS.md`,
+  `research/literature/LEDGER.tsv` (LIT-0039 a LIT-0048),
+  `research/literature/QUERY-LOG.tsv` (consultas Q4/Q7),
+  `tools/validate_research.py` (funções de L05) e esta linha; fontes/versões:
+  buscas de 2026-09-14 verificadas em fontes primárias — GraphMAE 2022
+  (10.1145/3534678.3539321), DGI 2019 (10.17863/cam.40744), GraphCL 2020
+  (10.48550/arXiv.2010.13902), VGAE 2016 (10.48550/arXiv.1611.07308), GraphSAGE
+  2017 (arXiv 1706.02216), MagNet 2021 (arXiv 2102.11391), Rosenthal 2018
+  (10.1038/s41467-018-04614-w), Liu 2023 (10.48550/arXiv.2310.11829), Wang 2025
+  (10.1145/3711896.3736568) e Mao 2024 (PMLR v235); Python 3.12.2 (stdlib);
+  comandos e testes: `python3 tools/validate_research.py` com smoke negativo
+  inline (campo, família, proibição, LIT, CEM, GFM, consulta Q4/Q7 e seção
+  ausentes), `python3 tools/validate_plan.py`, `git diff --cached --check` e
+  `git status --porcelain`; resultado: 5 famílias (masked edge/weight,
+  neighborhood reconstruction, contrastive, autoencoders e link prediction) com
+  hipótese de sinal, atalhos prováveis, custo, suporte a grafo dirigido/ponderado
+  e capacidade indutiva, 1 connectome embedding e 3 alegações de graph foundation
+  model com riscos; proibições de Transformer superior e de comparação entre
+  espaços transdutivos registradas; 48 registros no ledger e 31 consultas no log;
+  recursos: 17,1 MB de RAM e 0,08 s no validador, sem GPU; decisão/limitação:
+  revisão documental sem treino e sem medição real de custo; revisão humana em
+  G1; arquivos não relacionados preservados fora do commit; commit
+  6a253668348f0ade2206bce2cae74d4174440ba8.
 
 - [ ] **L06 — Montar matriz de métodos, baselines e implementações auditáveis.**
   - Objetivo: transformar literatura em opções realmente executáveis.

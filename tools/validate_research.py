@@ -257,6 +257,34 @@ CELL_TYPE_MODALITY_FIELDS = (
 )
 CELL_TYPE_PROVENANCE_FIELDS = ("Como o rótulo foi produzido", "Fonte", "Status")
 CELL_TYPE_PROHIBITION = "correlação dentro de um indivíduo não prova transferência"
+SSL_REVIEW = ROOT / "research" / "literature" / "SSL-GRAFOS.md"
+SSL_SECTIONS = (
+    "## 1. Estado e escopo",
+    "## 2. Famílias de objetivos",
+    "## 3. Embeddings de connectomas",
+    "## 4. Alegações de graph foundation models",
+    "## 5. Síntese e limitações",
+)
+SSL_FAMILIES = ("SSL-01", "SSL-02", "SSL-03", "SSL-04", "SSL-05")
+SSL_FAMILY_TOPICS = (
+    "Masked edge/weight",
+    "Neighborhood reconstruction",
+    "Contrastive",
+    "Autoencoders",
+    "Link prediction",
+)
+SSL_FAMILY_FIELDS = (
+    "Referência",
+    "Hipótese de sinal",
+    "Atalhos prováveis",
+    "Custo",
+    "Grafo dirigido/ponderado",
+    "Capacidade indutiva",
+    "Status",
+)
+SSL_CEM_FIELDS = ("Referência", "Input", "Resultado relatado", "Limitação", "Status")
+SSL_GFM_FIELDS = ("Referência", "Alegação", "Risco/limitação", "Status")
+SSL_RULES = ("não assume transformer superior", "não são comparáveis sem alinhamento")
 LIT_ID_RE = re.compile(r"^LIT-\d{4}$")
 LIT_QUERY_LOG = ROOT / "research" / "literature" / "QUERY-LOG.tsv"
 LIT_QUERY_LOG_COLUMNS = (
@@ -1101,6 +1129,90 @@ def check_cell_type_review() -> tuple[list[str], int]:
     return failures, len(modalities)
 
 
+def _known_lit_ids(rows: list[list[str]]) -> set[str]:
+    if len(rows) >= 2 and "lit_id" in rows[0]:
+        index = rows[0].index("lit_id")
+        return {row[index] for row in rows[1:] if len(row) > index}
+    return set()
+
+
+def check_ssl_review() -> tuple[list[str], int]:
+    label = "SSL-GRAFOS.md"
+    if not SSL_REVIEW.exists():
+        return [f"{label}: arquivo ausente em research/literature/"], 0
+    text = SSL_REVIEW.read_text(encoding="utf-8")
+    flat = " ".join(text.split()).lower()
+    failures: list[str] = []
+    for section in SSL_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for topic in SSL_FAMILY_TOPICS:
+        if topic.lower() not in flat:
+            failures.append(f"{label}: família obrigatória ausente ('{topic}')")
+    for rule in SSL_RULES:
+        if rule not in flat:
+            failures.append(f"{label}: proibição obrigatória ausente ('{rule}')")
+
+    rows = _ledger_rows()
+    known_lit = _known_lit_ids(rows)
+
+    families = parse_heading_blocks(text, r"^### (SSL-\d{2}) — (.+)$")
+    seen: set[str] = set()
+    for ssl_id, block in families:
+        seen.add(ssl_id)
+        if ssl_id not in SSL_FAMILIES:
+            failures.append(f"{label}: família inesperada {ssl_id}")
+        for field in SSL_FAMILY_FIELDS:
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {ssl_id} sem campo '{field}'")
+        reference = field_value(block, "Referência") or ""
+        for lit_id in sorted(set(re.findall(r"LIT-\d{4}", reference))):
+            if known_lit and lit_id not in known_lit:
+                failures.append(f"{label}: {ssl_id} referencia ledger inexistente '{lit_id}'")
+        if not re.search(r"LIT-\d{4}", reference):
+            failures.append(f"{label}: {ssl_id} sem referência LIT-*")
+    for ssl_id in SSL_FAMILIES:
+        if ssl_id not in seen:
+            failures.append(f"{label}: família obrigatória ausente {ssl_id}")
+
+    cem_blocks = parse_heading_blocks(text, r"^### (CEM-\d{2}) — (.+)$")
+    if len(cem_blocks) < 1:
+        failures.append(f"{label}: nenhum registro de connectome embedding (CEM-*)")
+    for cem_id, block in cem_blocks:
+        for field in SSL_CEM_FIELDS:
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {cem_id} sem campo '{field}'")
+        reference = field_value(block, "Referência") or ""
+        if not re.search(r"LIT-\d{4}", reference):
+            failures.append(f"{label}: {cem_id} sem referência LIT-*")
+
+    gfm_blocks = parse_heading_blocks(text, r"^### (GFM-\d{2}) — (.+)$")
+    if len(gfm_blocks) < 2:
+        failures.append(f"{label}: esperados ao menos 2 registros de GFM (achados {len(gfm_blocks)})")
+    for gfm_id, block in gfm_blocks:
+        for field in SSL_GFM_FIELDS:
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {gfm_id} sem campo '{field}'")
+        reference = field_value(block, "Referência") or ""
+        if not re.search(r"LIT-\d{4}", reference):
+            failures.append(f"{label}: {gfm_id} sem referência LIT-*")
+
+    if len(rows) >= 2 and "query_id" in rows[0] and "fase" in rows[0]:
+        qi, fi = rows[0].index("query_id"), rows[0].index("fase")
+        queries = {
+            row[qi] for row in rows[1:] if len(row) > max(qi, fi) and row[fi] == "L05"
+        }
+        for query in ("Q4", "Q7"):
+            if query not in queries:
+                failures.append(f"{label}: ledger sem consulta {query} em L05")
+
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    refs = phase_refs(text)
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(families)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
@@ -1118,6 +1230,7 @@ def check_paths() -> tuple[list[str], int]:
         LIT_PROTOCOL,
         ALIGNMENT,
         CELL_TYPE,
+        SSL_REVIEW,
     ):
         if not path.exists():
             continue
@@ -1153,6 +1266,7 @@ def main() -> int:
     ledger_failures, ledger_rows, query_log_rows = check_literature_ledger()
     alignment_failures, alignment_methods = check_alignment_review()
     cell_type_failures, cell_type_modalities = check_cell_type_review()
+    ssl_failures, ssl_families = check_ssl_review()
     failures += (
         ref_failures
         + path_failures
@@ -1166,6 +1280,7 @@ def main() -> int:
         + ledger_failures
         + alignment_failures
         + cell_type_failures
+        + ssl_failures
     )
 
     if failures:
@@ -1213,6 +1328,10 @@ def main() -> int:
     print(
         f"OK: research/literature/CELL-TYPE.md com {cell_type_modalities} "
         f"modalidades e proveniência de rótulos"
+    )
+    print(
+        f"OK: research/literature/SSL-GRAFOS.md com {ssl_families} famílias "
+        f"SSL, connectome embedding e alegações de GFM"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
