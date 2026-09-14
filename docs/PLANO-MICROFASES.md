@@ -1634,7 +1634,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   com o avaliador (H04/R06); commit
   20ec9e040c9c93eaf5bfdd4d7c7997e0fec68311.
 
-- [ ] **B02 — Implementar calibração, open-set e incerteza.**
+- [x] **B02 — Implementar calibração, open-set e incerteza.**
   - Objetivo: evitar que toda consulta seja forçada a uma classe conhecida.
   - Entregas: Brier, ECE com bins fixos, reliability data, AUROC/AUPR open-set,
     FPR@TPR pré-fixada, bootstrap/permutação agrupados e testes.
@@ -1644,6 +1644,25 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não ajustar bins/threshold no alvo confirmatório.
   - Dependências: B01, R06.
   - Orçamento: IA baixa; CPU.
+  Evidência (2026-09-14, executor; modo exploratório): arquivos
+  `tools/calibration.py` (funções puras: Brier multiclasse, ECE com bins fixos
+  e tabela de confiabilidade, AUROC/AUPR, FPR@TPR pré-fixada, bootstrap
+  agrupado por classe e permutação por troca de sinal com seed registrada,
+  limiar ajustado só na fonte com `fitted_on: source` e aplicação sem refit;
+  convenção de score = confiança de ser conhecido), `tests/test_calibration.py`
+  (10 casos com fixtures perfeita, não calibrada, desbalanceada, degenerada e
+  FPR@TPR conferidas à mão) e `artifacts/reports/B02-CALIBRACAO-OPEN-SET.md`;
+  fontes/versões: R06/SAP e G4 `GO` exploratório, B01 para métricas, Python
+  3.12.2 (stdlib), sem GPU e sem rótulos reais; comandos e testes:
+  `.venv/bin/python -m pytest tests/ -q` (165 testes; 10 novos), nova checagem
+  B02 no `validate_research.py` (fixtures canônicas, bootstrap determinístico,
+  limiar só na fonte, I/O proibido) e `python3 tools/validate_plan.py`;
+  resultado: calibração, open-set e incerteza prontos com bins e seeds
+  congelados e nenhum ajuste no alvo; recursos medidos: CPU apenas,
+  milissegundos, sem downloads; decisão/limitação: a integração final com o
+  avaliador selado (H04/M08) permanece, e qualquer refit de temperatura/limiar
+  no alvo é proibido pelo pré-registro; commit
+  54c4312c4128902c8db5d7e7df96ea60a663b2b3.
 
 - [ ] **B03 — Executar random, majority e degree-only.**
   - Objetivo: estabelecer pisos e o principal controle de atalho.

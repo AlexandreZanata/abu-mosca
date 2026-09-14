@@ -415,6 +415,20 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+B02_TOOL = ROOT / "tools" / "calibration.py"
+B02_REPORT = ROOT / "artifacts" / "reports" / "B02-CALIBRACAO-OPEN-SET.md"
+B02_TOKENS = (
+    "brier",
+    "ece",
+    "auroc",
+    "aupr",
+    "fpr@tpr",
+    "bootstrap",
+    "permuta",
+    "seed",
+    "somente na fonte",
+    "sem i/o",
+)
 B01_TOOL = ROOT / "tools" / "metrics.py"
 B01_REPORT = ROOT / "artifacts" / "reports" / "B01-METRICAS.md"
 B01_TOKENS = (
@@ -2214,6 +2228,50 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_b02_calibration() -> tuple[list[str], int]:
+    label = "B02"
+    failures: list[str] = []
+    for path in (B02_TOOL, B02_REPORT, ROOT / "tests" / "test_calibration.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    report = B02_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in B02_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+    source = B02_TOOL.read_text(encoding="utf-8")
+    for token in ("open(", "read_text", "pathlib"):
+        if token in source:
+            failures.append(f"{label}: calibração não pode fazer I/O ('{token}')")
+    spec = importlib.util.spec_from_file_location("calibration_module", B02_TOOL)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if module.brier_multiclass({"q": {"A": 1.0}}, {"q": "A"}) != 0.0:
+        failures.append(f"{label}: Brier perfeito deveria ser 0")
+    ece = module.expected_calibration_error([0.9, 0.9, 0.6], [True, True, False], bins=2)
+    if abs(ece - 0.133333) > 1e-6:
+        failures.append(f"{label}: ECE canônico divergente")
+    if module.auroc([0.5, 0.5], [0.5, 0.5]) != 0.5:
+        failures.append(f"{label}: AUROC degenerado deveria ser 0,5")
+    first = module.bootstrap_ci_grouped({"A": [1, 1], "B": [0, 0]}, iterations=100, seed=3)
+    second = module.bootstrap_ci_grouped({"A": [1, 1], "B": [0, 0]}, iterations=100, seed=3)
+    if first != second or first["seed"] != 3:
+        failures.append(f"{label}: bootstrap não determinístico ou sem seed registrada")
+    fitted = module.fit_threshold_source([0.9, 0.6], [0.1], tpr=1.0)
+    if fitted.get("fitted_on") != "source":
+        failures.append(f"{label}: limiar deve ser ajustado somente na fonte")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(B02_TOKENS)
+
+
 def check_b01_metrics() -> tuple[list[str], int]:
     label = "B01"
     failures: list[str] = []
@@ -3825,6 +3883,7 @@ def main() -> int:
     h09_failures, h09_tokens = check_h09_quality()
     gate_g4_failures, gate_g4_entries, gate_g4_state = check_gate_g4()
     b01_failures, b01_tokens = check_b01_metrics()
+    b02_failures, b02_tokens = check_b02_calibration()
     failures += (
         ref_failures
         + path_failures
@@ -3867,6 +3926,7 @@ def main() -> int:
         + h09_failures
         + gate_g4_failures
         + b01_failures
+        + b02_failures
     )
 
     if failures:
@@ -4028,6 +4088,10 @@ def main() -> int:
     print(
         f"OK: métricas B01 com {b01_tokens} tokens, exemplo canônico conferido e "
         f"sem I/O"
+    )
+    print(
+        f"OK: calibração B02 com {b02_tokens} tokens, fixtures conferidas e "
+        f"limiar só na fonte"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
