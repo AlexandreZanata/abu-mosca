@@ -357,6 +357,23 @@ GATE_G1_SIGNATURE_FIELDS = (
     "Custodiante do alvo, quando aplicável",
     "Revisor de literatura/novidade",
 )
+GATE_G2 = ROOT / "docs" / "gates" / "G2-DADOS.md"
+GATE_G2_SECTIONS = (
+    "## Pacote de revisão",
+    "## Cards congelados",
+    "## Critérios",
+    "## Riscos e divergências",
+    "## Condições do G2",
+    "## Escopo liberado",
+    "## Assinaturas",
+)
+GATE_G2_SIGNATURE_FIELDS = (
+    "Responsável científico",
+    "Custodiante do alvo, quando aplicável",
+    "Revisor de termos/licenças",
+)
+GATE_G2_RELEASES = ("manc:v1.2.1", "male-cns:v1.0", "v888", "v783", "v1.2.1")
+GATE_G2_HASH_RE = re.compile(r"^- SHA-256 `([0-9a-f]{64})` — `([^`]+)`$")
 DATASETS_INVENTORY = ROOT / "research" / "datasets" / "INVENTARIO.md"
 DATASET_CARDS_DIR = ROOT / "research" / "datasets" / "cards"
 INVENTORY_SECTIONS = (
@@ -1681,6 +1698,101 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_gate_g2() -> tuple[list[str], int, str]:
+    label = "G2-DADOS.md"
+    if not GATE_G2.exists():
+        return [f"{label}: arquivo ausente"], 0, "AUSENTE"
+    text = GATE_G2.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    failures: list[str] = []
+    for section in GATE_G2_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for field in GATE_HEADER_FIELDS:
+        if field_value(lines, field) is None:
+            failures.append(f"{label}: cabeçalho sem campo '{field}'")
+    decision = field_value(lines, "Decisão")
+    if decision is None or not decision.startswith(("AGUARDAR", "GO", "NO-GO", "REFORMULAR")):
+        failures.append(f"{label}: decisão deve começar com AGUARDAR, GO, NO-GO ou REFORMULAR")
+    pending = decision is not None and decision.startswith("AGUARDAR")
+    approved = decision is not None and decision.startswith("GO")
+
+    start = next((i for i, line in enumerate(lines) if line.startswith("## Cards congelados")), None)
+    end = next(
+        (i for i, line in enumerate(lines) if line.startswith("## ") and start is not None and i > start),
+        len(lines),
+    )
+    frozen = lines[start:end] if start is not None else []
+    entries = 0
+    for line in frozen:
+        match = GATE_G2_HASH_RE.match(line)
+        if match is None:
+            continue
+        digest, rel = match.groups()
+        path = ROOT / rel
+        if not path.exists():
+            failures.append(f"{label}: arquivo congelado ausente '{rel}'")
+            continue
+        if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+            failures.append(f"{label}: SHA-256 divergente para '{rel}'")
+        entries += 1
+    if entries < 10:
+        failures.append(f"{label}: esperados ao menos 10 arquivos congelados (achados {entries})")
+    for token in GATE_G2_RELEASES:
+        if token not in text:
+            failures.append(f"{label}: release obrigatória ausente '{token}'")
+    if "alvo confirmatório" not in text or "reservado" not in text:
+        failures.append(f"{label}: alvo confirmatório reservado não declarado")
+
+    criteria = [line for line in lines if CRITERION_RE.match(line)]
+    if len(criteria) < 8:
+        failures.append(f"{label}: esperados ao menos 8 critérios no formato do modelo (achados {len(criteria)})")
+    if pending and not any("`NÃO VERIFICADO`" in line for line in criteria):
+        failures.append(f"{label}: nenhum critério marcado 'NÃO VERIFICADO' com decisão pendente")
+    if approved and any("`NÃO VERIFICADO`" in line for line in criteria):
+        failures.append(f"{label}: decisão GO com critério ainda 'NÃO VERIFICADO'")
+    if approved and any("`FAIL`" in line for line in criteria):
+        failures.append(f"{label}: critério FAIL exige decisão NO-GO/REFORMULAR")
+
+    start = next((i for i, line in enumerate(lines) if line.startswith("## Assinaturas")), None)
+    signature_lines = lines[start:] if start is not None else []
+    for field in GATE_G2_SIGNATURE_FIELDS:
+        value = field_value(signature_lines, field)
+        if value is None:
+            failures.append(f"{label}: assinatura sem campo '{field}'")
+            continue
+        if pending and "a preencher" not in value.lower():
+            failures.append(f"{label}: assinatura '{field}' preenchida antes da revisão humana")
+        if approved and "a preencher" in value.lower():
+            failures.append(f"{label}: assinatura '{field}' ainda pendente com decisão GO")
+
+    known_lit = set(re.findall(r"^(LIT-\d{4})\t", LIT_LEDGER.read_text(encoding="utf-8"), re.M))
+    refs = sorted(set(re.findall(r"LIT-\d{4}", text)))
+    if len(refs) < 3:
+        failures.append(f"{label}: menos de 3 referências LIT-* no pacote")
+    for lit_id in refs:
+        if known_lit and lit_id not in known_lit:
+            failures.append(f"{label}: referencia ledger inexistente '{lit_id}'")
+    leak = PUBLIC_ID_RE.search(text)
+    if leak:
+        failures.append(f"{label}: possível ID cru de neurônio no documento público ('{leak.group(0)}')")
+
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    g2_line = next((line for line in plan_lines if "**G2 —" in line), None)
+    if g2_line is None:
+        failures.append(f"{label}: item G2 não encontrado no plano")
+    elif pending and not g2_line.startswith("- [ ]"):
+        failures.append(f"{label}: G2 marcado como concluído enquanto a decisão é AGUARDAR")
+    elif approved and g2_line.startswith("- [ ]"):
+        failures.append(f"{label}: decisão GO exige G2 marcado [x] no plano")
+
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(text) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    state = "GO" if approved else "AGUARDAR"
+    return failures, len(criteria), state
+
+
 def check_dataset_selection() -> tuple[list[str], int]:
     label = "SELECAO.md"
     if not SELECTION.exists():
@@ -1925,6 +2037,7 @@ def main() -> int:
     crosswalk_failures, crosswalk_pairs, crosswalk_approved = check_crosswalk_audit()
     resources_failures, resource_samples = check_resource_estimates()
     selection_failures, selection_pairs = check_dataset_selection()
+    gate_g2_failures, gate_g2_criteria, gate_g2_state = check_gate_g2()
     failures += (
         ref_failures
         + path_failures
@@ -1946,6 +2059,7 @@ def main() -> int:
         + crosswalk_failures
         + resources_failures
         + selection_failures
+        + gate_g2_failures
     )
 
     if failures:
@@ -2025,6 +2139,10 @@ def main() -> int:
     print(
         f"OK: research/datasets/SELECAO.md com {selection_pairs} pares ranqueados e "
         f"decisão pendente de G2"
+    )
+    print(
+        f"OK: docs/gates/G2-DADOS.md com {gate_g2_criteria} critérios, cards congelados "
+        f"e decisão {gate_g2_state}"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

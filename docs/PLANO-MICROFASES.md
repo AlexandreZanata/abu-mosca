@@ -865,6 +865,12 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     mesmo connectoma; produzir relatório de inviabilidade/reformulação.
   - Dependências: D01–D10.
   - Orçamento: pacote por IA baixa; revisão humana científica e de termos.
+  - Pacote preparado (2026-09-14, executor): `docs/gates/G2-DADOS.md` com 9
+    critérios (5 `NÃO VERIFICADO` para parecer humano e 4 `PASS` medidos), 10
+    arquivos congelados por SHA-256 e releases fixados; decisão `AGUARDAR`,
+    pois `GO`/`NO-GO`/`REFORMULAR` dependem da revisão humana científica e de
+    termos (PROTOCOLO); bloqueio mantido com `[ ]` até a decisão; commit
+    b6224b552b9cd8efd35a424d848f940fc3095236.
 
 ## Nível 1 — infraestrutura, dados e MVP confirmatório
 
