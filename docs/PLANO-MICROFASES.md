@@ -1128,6 +1128,15 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não ler resultados-alvo; alteração posterior segue changelog.
   - Dependências: R03–R06, G2.
   - Orçamento: IA baixa para minuta; assinatura humana obrigatória.
+  - Minuta preparada (2026-09-14, executor): `preregistration/PROTOCOL.md`
+    (15 seções: fonte/alvo/releases, população, features, modelo/baselines,
+    grid de 12 trials, 5 seeds finais, stopping, métricas/SESOI/exclusões,
+    análises, condicionais do Nível 2, exploratório vs confirmatório,
+    unseal e changelog), cards `E1`–`E3`, `CHANGELOG.md` e `REGISTRY.md` com
+    13 artefatos congelados por SHA-256; a assinatura humana é obrigatória
+    (responsável científico, revisor de estatística e custodiante) e ainda
+    está pendente, por isso o item permanece `[ ]` até a assinatura; commit
+    6ab45267f7e7acd21e7967cb134c1358e740474f.
 
 - [ ] **R08 — Ensaiar o protocolo completo em dados sintéticos e congelar versão.**
   - Objetivo: descobrir falhas operacionais antes de gastar o alvo ou a GPU.

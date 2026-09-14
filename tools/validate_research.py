@@ -415,6 +415,72 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+PREREG_DIR = ROOT / "preregistration"
+PREREG_PROTOCOL = PREREG_DIR / "PROTOCOL.md"
+PREREG_REGISTRY = PREREG_DIR / "REGISTRY.md"
+PREREG_CHANGELOG = PREREG_DIR / "CHANGELOG.md"
+PREREG_CARDS = (
+    PREREG_DIR / "cards" / "E1-selecao-fonte.md",
+    PREREG_DIR / "cards" / "E2-mvp-zero-shot.md",
+    PREREG_DIR / "cards" / "E3-nivel2-condicional.md",
+)
+PREREG_SECTIONS = (
+    "## 1. Fonte, alvo e versões fixados",
+    "## 2. População, unidade e independência",
+    "## 3. Features permitidas (trilho A — topologia)",
+    "## 4. Modelo, baselines e capacidade",
+    "## 5. Espaço de hiperparâmetros e budget de trials",
+    "## 6. Seeds finais",
+    "## 7. Stopping e early stop",
+    "## 8. Métricas, SESOI e exclusões",
+    "## 9. Análise confirmatória",
+    "## 10. Decisões condicionais do Nível 2",
+    "## 11. Exploratório versus confirmatório",
+    "## 12. Avaliação selada e unseal",
+    "## 13. Alterações",
+    "## 14. Assinatura",
+    "## 15. Rastreabilidade e limitações",
+)
+PREREG_TOKENS = (
+    "manc:v1.2.1",
+    "male-cns:v1.0",
+    "v888",
+    "v783",
+    "população",
+    "features",
+    "graphsage",
+    "gin",
+    "mlp",
+    "degree-only",
+    "hiperparâmetros",
+    "12 trials",
+    "seeds",
+    "early stop",
+    "sesoi",
+    "5 pontos percentuais",
+    "k = 10",
+    "holm",
+    "exclusões",
+    "exploratório",
+    "confirmatório",
+    "unseal",
+    "changelog",
+)
+PREREG_CARD_SECTIONS = (
+    "## Pergunta e status",
+    "## Dados",
+    "## Informação permitida",
+    "## Método",
+    "## Avaliação",
+    "## Orçamento e parada",
+    "## Artefatos esperados",
+)
+PREREG_SIGNATURE_FIELDS = (
+    "Responsável científico",
+    "Revisor de estatística",
+    "Custodiante designado",
+)
+PREREG_HASH_RE = re.compile(r"^- SHA-256 `([0-9a-f]{64})` — `([^`]+)`$")
 SAP_DOC = ROOT / "docs" / "research" / "STATISTICAL-ANALYSIS-PLAN.md"
 PREDICTIONS_SCHEMA = ROOT / "schemas" / "predictions.schema.json"
 METRICS_SCHEMA = ROOT / "schemas" / "metrics.schema.json"
@@ -1927,6 +1993,88 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_preregistration() -> tuple[list[str], int, str]:
+    label = "R07"
+    failures: list[str] = []
+    for path in (PREREG_PROTOCOL, PREREG_REGISTRY, PREREG_CHANGELOG, *PREREG_CARDS):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0, "AUSENTE"
+
+    protocol = PREREG_PROTOCOL.read_text(encoding="utf-8")
+    flat = " ".join(protocol.split()).lower().replace("**", "")
+    for section in PREREG_SECTIONS:
+        if section not in protocol:
+            failures.append(f"{label}: PROTOCOL.md sem seção '{section}'")
+    for token in PREREG_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: PROTOCOL.md sem token '{token}'")
+    numeric_list_re = re.compile(r"^\s*[(),.\d\s]+$")
+    for number, line in enumerate(protocol.splitlines(), 1):
+        if any(word in line.lower() for word in ("seed", "bootstrap", "permuta")):
+            continue
+        if numeric_list_re.match(line):
+            continue
+        leak = PUBLIC_ID_RE.search(line)
+        if leak:
+            failures.append(
+                f"{label}: PROTOCOL.md:{number} com possível ID cru ('{leak.group(0)}')"
+            )
+    for card in PREREG_CARDS:
+        text = card.read_text(encoding="utf-8")
+        found = sum(1 for section in PREREG_CARD_SECTIONS if section in text)
+        if found < 6:
+            failures.append(f"{label}: card '{card.name}' incompleto ({found} seções do modelo)")
+
+    registry_lines = PREREG_REGISTRY.read_text(encoding="utf-8").splitlines()
+    entries = 0
+    for line in registry_lines:
+        match = PREREG_HASH_RE.match(line)
+        if match is None:
+            continue
+        digest, rel = match.groups()
+        path = ROOT / rel
+        if not path.exists():
+            failures.append(f"{label}: artefato congelado ausente '{rel}'")
+            continue
+        if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+            failures.append(f"{label}: SHA-256 divergente para '{rel}'")
+        entries += 1
+    if entries < 10:
+        failures.append(f"{label}: esperados ao menos 10 artefatos congelados (achados {entries})")
+
+    signature_start = next(
+        (i for i, line in enumerate(registry_lines) if line.startswith("## 2. Assinaturas")), None
+    )
+    signature_lines = registry_lines[signature_start:] if signature_start is not None else []
+    tracked_fields = (*PREREG_SIGNATURE_FIELDS, "Data da assinatura", "Hash do pacote assinado")
+    for field in PREREG_SIGNATURE_FIELDS:
+        if field_value(signature_lines, field) is None:
+            failures.append(f"{label}: REGISTRY.md sem campo de assinatura '{field}'")
+    tracked_values = [field_value(signature_lines, field) or "" for field in tracked_fields]
+    pending = any("a preencher" in value.lower() for value in tracked_values)
+    if not pending and "2026-" not in "\n".join(signature_lines):
+        failures.append(f"{label}: assinatura preenchida sem data")
+    changelog = PREREG_CHANGELOG.read_text(encoding="utf-8")
+    if "2026-09-14" not in changelog:
+        failures.append(f"{label}: CHANGELOG.md sem entrada da minuta")
+
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    r07_line = next((line for line in plan_lines if "**R07 —" in line), None)
+    if r07_line is None:
+        failures.append(f"{label}: item R07 não encontrado no plano")
+    elif pending and not r07_line.startswith("- [ ]"):
+        failures.append(f"{label}: R07 marcado concluído enquanto a assinatura está pendente")
+    elif not pending and r07_line.startswith("- [ ]"):
+        failures.append(f"{label}: assinatura preenchida exige R07 marcado [x]")
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(protocol) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    state = "AGUARDAR" if pending else "ASSINADO"
+    return failures, entries, state
+
+
 def check_statistical_plan() -> tuple[list[str], int]:
     label = "R06"
     failures: list[str] = []
@@ -2565,6 +2713,7 @@ def main() -> int:
     run_contract_failures, run_contract_tokens = check_run_contract()
     firewall_failures, firewall_tokens = check_firewall_phase()
     statistical_plan_failures, statistical_plan_tokens = check_statistical_plan()
+    prereg_failures, prereg_entries, prereg_state = check_preregistration()
     failures += (
         ref_failures
         + path_failures
@@ -2593,6 +2742,7 @@ def main() -> int:
         + run_contract_failures
         + firewall_failures
         + statistical_plan_failures
+        + prereg_failures
     )
 
     if failures:
@@ -2700,6 +2850,10 @@ def main() -> int:
     print(
         f"OK: plano estatístico R06 com {statistical_plan_tokens} tokens, schemas "
         f"de predições/métricas e avaliador selado"
+    )
+    print(
+        f"OK: pré-registro R07 com {prereg_entries} artefatos congelados e "
+        f"assinatura {prereg_state}"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
