@@ -91,4 +91,6 @@ Campos obrigatórios do inventário e dos cards (identificadores estáveis):
 - Esquema provisório de conteúdo, congelado como processo; pode receber campo
   novo apenas com registro e justificativa antes de D02.
 - Nenhuma capacidade, licença ou disponibilidade é afirmada aqui.
+- Escala, checksums medidos e projeções de recursos ficam em
+  `research/datasets/RECURSOS.md` (D09).
 - Validação: `python3 tools/validate_research.py`.

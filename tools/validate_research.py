@@ -386,6 +386,34 @@ INVENTORY_FIELDS = (
 )
 INVENTORY_CANDIDATES = tuple(f"CAND-{number:02d}" for number in range(1, 7))
 CROSSWALK = ROOT / "research" / "datasets" / "CROSSWALK-AUDIT.md"
+RESOURCES = ROOT / "research" / "datasets" / "RECURSOS.md"
+RESOURCES_SECTIONS = (
+    "## 1. Amostras baixadas, checksums e custo de carga (medido)",
+    "## 2. Tamanhos de release completos (publicado/listado, não baixado)",
+    "## 3. Custo por linha/aresta e compressão (medido)",
+    "## 4. Projeções com intervalo e margem (inferido)",
+    "## 5. Consequências para 32 GB de RAM e 8 GB de VRAM (inferido)",
+    "## 6. Falhas, descartes e limitações",
+    "## 7. Reprodução",
+)
+RESOURCES_TOKENS = (
+    "publicado",
+    "medido",
+    "inferido",
+    "checksum",
+    "COO",
+    "CSR",
+    "Parquet",
+    "Arrow",
+    "mmap",
+    "32 GB",
+    "8 GB",
+    "VRAM",
+    "intervalo",
+    "margem",
+    "sha256",
+    "1 GB",
+)
 CROSSWALK_SECTIONS = (
     "## 1. Estado e escopo",
     "## 2. Método de auditoria",
@@ -1613,6 +1641,47 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_resource_estimates() -> tuple[list[str], int]:
+    label = "RECURSOS.md"
+    if not RESOURCES.exists():
+        return [f"{label}: arquivo ausente em research/datasets/"], 0
+    text = RESOURCES.read_text(encoding="utf-8")
+    failures: list[str] = []
+    for section in RESOURCES_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for token in RESOURCES_TOKENS:
+        if token.lower() not in text.lower():
+            failures.append(f"{label}: token obrigatório ausente '{token}'")
+    if "fora do Git" not in text and "não entram no repositório" not in text:
+        failures.append(f"{label}: sem declaração de que amostras ficam fora do Git")
+
+    rows = [
+        line
+        for line in text.splitlines()
+        if line.startswith("|") and len(line.split("|")) >= 9 and re.search(r"\|\s*[\d.]+\s*\|", line)
+    ]
+    if len(rows) < 6:
+        failures.append(f"{label}: esperadas ao menos 6 amostras com bytes na tabela (achadas {len(rows)})")
+
+    known_lit = set(re.findall(r"^(LIT-\d{4})\t", LIT_LEDGER.read_text(encoding="utf-8"), re.M))
+    refs = sorted(set(re.findall(r"LIT-\d{4}", text)))
+    if len(refs) < 5:
+        failures.append(f"{label}: menos de 5 referências LIT-* para contagens publicadas")
+    for lit_id in refs:
+        if known_lit and lit_id not in known_lit:
+            failures.append(f"{label}: referencia ledger inexistente '{lit_id}'")
+
+    leak = PUBLIC_ID_RE.search(text)
+    if leak:
+        failures.append(f"{label}: possível ID cru de neurônio no documento público ('{leak.group(0)}')")
+
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    for ref in sorted(ref for ref in phase_refs(text) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(rows)
+
+
 def check_crosswalk_audit() -> tuple[list[str], int, int]:
     label = "CROSSWALK-AUDIT.md"
     if not CROSSWALK.exists():
@@ -1763,6 +1832,7 @@ def main() -> int:
     gate_g1_failures, gate_g1_criteria, gate_g1_state = check_gate_g1()
     inventory_failures, inventory_candidates = check_dataset_inventory()
     crosswalk_failures, crosswalk_pairs, crosswalk_approved = check_crosswalk_audit()
+    resources_failures, resource_samples = check_resource_estimates()
     failures += (
         ref_failures
         + path_failures
@@ -1782,6 +1852,7 @@ def main() -> int:
         + gate_g1_failures
         + inventory_failures
         + crosswalk_failures
+        + resources_failures
     )
 
     if failures:
@@ -1853,6 +1924,10 @@ def main() -> int:
     print(
         f"OK: research/datasets/CROSSWALK-AUDIT.md com {crosswalk_pairs} pares e "
         f"{crosswalk_approved} status aprovados por humano"
+    )
+    print(
+        f"OK: research/datasets/RECURSOS.md com {resource_samples} amostras medidas, "
+        f"checksums e projeções classificadas"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

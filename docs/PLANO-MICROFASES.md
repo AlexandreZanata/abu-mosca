@@ -782,7 +782,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   arquivos não relacionados preservados fora do commit; commit
   11f71a184a01b47dcfc70d47aa53cd44dbaed834.
 
-- [ ] **D09 — Estimar escala e fazer spikes mínimos de acesso.**
+- [x] **D09 — Estimar escala e fazer spikes mínimos de acesso.**
   - Objetivo: substituir estimativas vagas por medições sem baixar tudo.
   - Entregas: `research/datasets/RECURSOS.md` com nodes, edges, bytes por tabela,
     projeções de RAM/disco, tempo de download/preprocessamento e método de cálculo.
@@ -793,6 +793,31 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     integral antes do gate.
   - Dependências: D02–D07.
   - Orçamento: IA baixa; CPU; até 1 GB total de disco temporário; sem GPU.
+  Evidência (2026-09-14, executor): arquivos `research/datasets/RECURSOS.md`
+  (7 seções, 6 amostras medidas com md5 oficial e sha256, projeções separando
+  publicado/medido/inferido com intervalo e margem), `research/datasets/INVENTARIO.md`
+  (link para RECURSOS.md), `tools/spike_d09.py` (sondas inspect/parquet/csr) e
+  `tools/validate_research.py` (checagem D09 com smoke negativo inline);
+  fontes/versões: Zenodo 10.5281/zenodo.10676866, buckets GCS
+  `flyem-manc-exports`/`flyem-male-cns`/`flyem-optic-lobe`, Dataverse
+  10.7910/DVN/7WTH1N, LIT-0001/0006/0010/0019/0020/0072/0074/0079, acessos
+  2026-09-14, Python 3.12.2 (pandas 3.0.3, pyarrow 24.0.0, scipy 1.18.0, numpy);
+  comandos e testes: `python3 tools/spike_d09.py inspect|parquet|csr` nas 6
+  amostras, `md5sum`/`sha256sum` contra md5 oficial das APIs, smoke negativo da
+  checagem D09 (seção, token, menos de 6 amostras, LIT inexistente, ID cru),
+  `python3 tools/validate_research.py`, `python3 tools/validate_plan.py` e
+  `git diff --cached --check`; resultado: 6/6 md5 oficiais conferem, MANC
+  traçado com 5.243.574 arestas a 20,0 B/aresta COO e 8,02 B/nnz CSR,
+  Parquet+Arrow zstd 0,322–0,511× do feather, BANC com pico projetado de
+  7,6–15,2 GB em 32 GB, MAOL sem tabela pública (varredura de 20.000 objetos) e
+  FlyWire/MCNS/hemibrain sem contagem de linhas publicada (não projetados);
+  recursos medidos: 226,2 MB de disco temporário (21,4% do teto), pico de RSS
+  1.122,5 MB, sem GPU, transferência 6,4–17,7 MB/s; decisão/limitação: nenhum
+  dump integral antes do gate; disco local com 34 GB livres não comporta
+  BANC+MCNS completos, exigindo armazenamento externo antes da ingestão;
+  divergências registradas para reconciliar (total FlyWire do card vs API,
+  188.508 vs 188.162 linhas no BANC, varredura MAOL com teto); commit
+  fe08b5024f7b0085a4b53dea4fd156423a97fbfc.
 
 - [ ] **D10 — Ranquear pares, escolher papéis e definir fallback.**
   - Objetivo: selecionar fonte, alvo-piloto, alvo confirmatório e reservas com
