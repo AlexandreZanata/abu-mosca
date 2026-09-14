@@ -415,6 +415,19 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+H08_TOOL = ROOT / "tools" / "snapshot_build.py"
+H08_REPORT = ROOT / "artifacts" / "reports" / "H08-SNAPSHOTS.md"
+H08_METRICS = ROOT / "artifacts" / "reports" / "H08-SNAPSHOTS.json"
+H08_TOKENS = (
+    "idempot",
+    "28 gb",
+    "segment-to-segment",
+    "nível-neurônio",
+    "sem labels",
+    "conservada",
+    "retomada",
+    "cached",
+)
 H07_TOOL = ROOT / "tools" / "sealed_labels.py"
 H07_PACKAGE = ROOT / "docs" / "research" / "H07-PACKAGE.md"
 H07_DRAFT = ROOT / "preregistration" / "crosswalk-manc-mcns.draft.json"
@@ -2155,6 +2168,47 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_h08_snapshots() -> tuple[list[str], int]:
+    label = "H08"
+    failures: list[str] = []
+    for path in (H08_TOOL, H08_REPORT, H08_METRICS, ROOT / "tests" / "test_snapshot_build.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    report = H08_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in H08_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+    metrics = json.loads(H08_METRICS.read_text(encoding="utf-8"))
+    source = metrics.get("source", {})
+    target = metrics.get("target_neuron_level", {})
+    if source.get("rows") != 5243574 or source.get("nodes") != 23188:
+        failures.append(f"{label}: contagens da fonte divergem de H02")
+    if source.get("weight_sum") != 30698527:
+        failures.append(f"{label}: peso da fonte não conservado")
+    if target.get("rows") != 26028386 or target.get("nodes") != 211577:
+        failures.append(f"{label}: contagens do alvo nível-neurônio divergem do medido")
+    if target.get("annotations_columns_used") != ["bodyId"] or target.get("no_labels") is not True:
+        failures.append(f"{label}: alvo sem a garantia de 'somente bodyId, sem labels'")
+    for key in ("source", "target_neuron_level", "target_segment_level"):
+        peak = metrics.get(key, {}).get("peak_rss_mib")
+        if not isinstance(peak, (int, float)) or peak >= 28 * 1024:
+            failures.append(f"{label}: pico de RAM inválido ou acima de 28 GB em '{key}'")
+        for field in ("snapshot_set_sha256", "input_sha256"):
+            if not re.fullmatch(r"[0-9a-f]{64}", str(metrics[key].get(field, ""))):
+                failures.append(f"{label}: hash ausente/inválido em '{key}.{field}'")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(H08_TOKENS)
+
+
 def check_h07_blocked() -> tuple[list[str], int]:
     label = "H07"
     failures: list[str] = []
@@ -3508,6 +3562,7 @@ def main() -> int:
     topology_failures, topology_tokens = check_topology_features()
     edge_transform_failures, edge_transform_tokens = check_edge_transform()
     h07_failures, h07_tokens = check_h07_blocked()
+    h08_failures, h08_tokens = check_h08_snapshots()
     failures += (
         ref_failures
         + path_failures
@@ -3546,6 +3601,7 @@ def main() -> int:
         + topology_failures
         + edge_transform_failures
         + h07_failures
+        + h08_failures
     )
 
     if failures:
@@ -3692,6 +3748,10 @@ def main() -> int:
     print(
         f"OK: pacote H07 preparado e bloqueado ({h07_tokens} tokens) aguardando "
         f"segundo revisor humano"
+    )
+    print(
+        f"OK: snapshots H08 com {h08_tokens} tokens, idempotência e picos abaixo "
+        f"de 28 GB"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

@@ -1460,19 +1460,22 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: lista por node ID não sai da zona selada.
   - Dependências: D08, H04, R07; execução pelo custodiante.
   - Orçamento: IA baixa + dupla revisão humana; sem GPU.
-  - Bloqueio (2026-09-14, executor): decisões humanas registradas — 1b desvio
-    de revisor único no `CHANGELOG.md` 1.1 (com motivo, impacto e hash), 2b
-    rascunho do crosswalk a partir de fonte pública auditada (`mancType` do
-    MCNS; 4.217 correspondências, proveniência individual), 3b custódia
-    acumulada com limitação, 4 circularidade total e exclusões vazias, 5a K=10;
-    ferramenta `tools/sealed_labels.py` aceita o desvio declarado e permanece
-    com 6 testes; **falta a revisão final e a assinatura humanas do rascunho**
-    (`preregistration/crosswalk-manc-mcns.draft.json`, sha256 `4ca34aab…`) para
-    materializar o label set em `data/sealed/`; nenhum mapeamento foi assinado,
-    nenhuma lista por node ID saiu da selada e crosswalk/rótulos seguem fora de
-    features e tuning (checado no validador).
+  - Bloqueio (2026-09-14, executor; decisão do responsável): o rascunho
+    `draft-1.0` **não foi assinado** porque circularidade total dos 4.182 tipos
+    esvaziaria a sensibilidade obrigatória e transferiria o bloqueio para a
+    avaliação; rascunho mantido apenas como artefato provisório de engenharia.
+    Reformulação exigida (5 passos): (1) auditar a proveniência dos rótulos tipo
+    a tipo; (2) identificar subconjunto **não circular** (independente de
+    conectividade/morfologia); (3) calcular cobertura com K=10 **sem consultar
+    scores**; (4) gerar novo rascunho, relatório e hashes; (5) apresentar o
+    subconjunto para assinatura. Se não houver subconjunto com cobertura
+    suficiente, registrar formalmente o **benchmark primário inconclusivo por
+    circularidade** e apresentar opções de reformulação do desfecho; a coluna
+    `mancType` **não** vira gold label confirmatório. `tools/sealed_labels.py`
+    e o desvio de revisor único (changelog 1.1) permanecem prontos; crosswalk e
+    rótulos seguem fora de features e tuning.
 
-- [ ] **H08 — Processar releases completas e medir recursos.**
+- [x] **H08 — Processar releases completas e medir recursos.**
   - Objetivo: gerar snapshots canônicos reproduzíveis no hardware-alvo.
   - Entregas: manifests, hashes, logs estruturados, dados fonte e alvo-público
     processados, perfil de tempo/RAM/disco e procedimento de retomada.
@@ -1482,6 +1485,37 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não corrigir dado bruto in-place nem aceitar OOM parcial.
   - Dependências: H02, H03, H05, H06, G3.
   - Orçamento: IA baixa; CPU; teto de recursos do G3.
+  Evidência (2026-09-14, executor): arquivos `tools/snapshot_build.py`
+  (snapshots Parquet canônicos `edges.parquet` com `source/target/weight` e
+  `nodes.parquet` com `id/degree_in/degree_out`, IDs opacos, `provenance.json`
+  e `SHA256SUMS`; idempotente por hash, recusa sobrescrita divergente e valida
+  conservação e contagens), `tests/test_snapshot_build.py` (3 casos),
+  `artifacts/reports/H08-SNAPSHOTS.md` e `H08-SNAPSHOTS.json`; achado corrigido
+  nesta fase: a documentação oficial do MCNS descreve `connectome-weights` como
+  segmento-a-segmento (“This is the full connection graph”), então o snapshot
+  do MVP passou a usar o grafo **nível-neurônio** (arestas restritas aos
+  `bodyId` anotados e agregadas por par, coluna usada só como chave pública);
+  medições: fonte 5.243.574 arestas, 23.188 nodes, peso 30.698.527 conservado,
+  1 self-loop, 13,8 MB de Parquet, 5,5 s e 1.024 MiB de pico; alvo nível-
+  neurônio 26.028.386 arestas mantidas de 151.856.684 (125.828.298 descartadas
+  por lado não anotado), 211.577 nodes, peso 125.365.933 conservado, 112
+  self-loops, 257,4 MB, 27,3 s e 11.055 MiB de pico; intermediário
+  segmento-a-segmento registrado (151.856.684 / 88.384.522 / 311.833.243; 593 s
+  e 16.588 MiB); reexecuções `cached` com hashes conferidos; fontes/versões:
+  MANC `manc:v1.2.1` e MCNS `male-cns:v1.0` conforme manifestos R03, página
+  oficial de download do MCNS (2026-09-14), H01/H06 e G3; comandos e testes:
+  `python3 tools/snapshot_build.py manc|mcns …` (ok, `cached` na segunda
+  execução), `.venv/bin/python -m pytest tests/ -q` (137 testes; 3 novos), nova
+  checagem H08 no `validate_research.py` com smoke negativo (token, contagens,
+  labels e picos), `python3 tools/validate_plan.py` e
+  `git diff --cached --check`; resultado: snapshots completos reproduzíveis com
+  picos bem abaixo de 28 GB, contagens reconciliadas com H02/H03 no nível
+  correto e nenhum label selado ou coluna de tipo no snapshot público; recursos
+  medidos: CPU apenas, disco 144 GB livres após a fase, sem GPU; decisão/
+  limitação: snapshots ficam em `runs/` (fora do Git), a cobertura do alvo
+  exclui 125,8M arestas não anotadas e o recorte T0 é decisão da custódia (H07
+  segue bloqueada por circularidade e reformulação exigida pelo responsável);
+  commit 1bb229c67aa113839b23cf1b7b36b80c1e35abcf.
 
 - [ ] **H09 — Executar auditoria de qualidade e congelar dataset analítico.**
   - Objetivo: decidir se os dados preparados ainda suportam o protocolo.

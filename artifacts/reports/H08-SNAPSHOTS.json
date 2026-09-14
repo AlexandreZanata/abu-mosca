@@ -1,0 +1,68 @@
+{
+  "idempotencia": {
+    "source": "cached",
+    "target_neuron_level": "cached",
+    "verified": true
+  },
+  "source": {
+    "dataset": "MANC",
+    "files": {
+      "edges.parquet": "06b9e844b8583ab924307aa4307dc7aab5a4cf93f2f02cd5b2c05f7cea01d1d9",
+      "nodes.parquet": "24739aa0f5e4b8e1bf8ea3d30f146076cf9737c6274b6f80cbfb0d94632ecd41"
+    },
+    "input_sha256": "4553191e8fd0a198e3588e188b649b7cb39b0550e35d6a11d63b0cd7d8145fda",
+    "kind": "source",
+    "nodes": 23188,
+    "peak_rss_mib": 1023.8,
+    "release": "manc:v1.2.1",
+    "rows": 5243574,
+    "seconds": 5.544,
+    "self_loops": 1,
+    "snapshot_set_sha256": "1b12335adaf7056f52d860d76ce2f57ebce1673ba4bb538329d16dabc4ba1de9",
+    "weight_sum": 30698527
+  },
+  "target_neuron_level": {
+    "annotations_columns_used": [
+      "bodyId"
+    ],
+    "annotations_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+    "dataset": "MCNS",
+    "files": {
+      "edges.parquet": "9466b3f36b1eabc3472aee93d2543ad2131ba2253d06c4be9c6d1ed86af77ed8",
+      "nodes.parquet": "1959efd7019957a3ba4bc751151b622bc374d8e179254f076752dd8418e19563"
+    },
+    "input_sha256": "e35da783d1c686b2b58b3b87cd6a403ae43bfcfba8bff28e08ef752c1a56afc1",
+    "kind": "target-public",
+    "level": "neuron-level",
+    "no_labels": true,
+    "nodes": 211577,
+    "peak_rss_mib": 11055.0,
+    "release": "male-cns:v1.0",
+    "rows": 26028386,
+    "seconds": 27.273,
+    "segment_edges_dropped": 125828298,
+    "segment_edges_kept_both_annotated": 26028386,
+    "segment_edges_total": 151856684,
+    "self_loops": 112,
+    "snapshot_set_sha256": "d9d612874fb1b344c8984b3ba64ca29369460ebec31aa4535fd424dfb086f148",
+    "weight_sum": 125365933
+  },
+  "target_segment_level": {
+    "dataset": "MCNS",
+    "files": {
+      "edges.parquet": "aebeb990ad9ad7ca8632b01306f68b204dc539d9c66e79def488e22ac2c5b7e8",
+      "nodes.parquet": "98c73efc4eb455fec6c18d798aa9d314f08b027086e17260582d9f691174b713"
+    },
+    "input_sha256": "e35da783d1c686b2b58b3b87cd6a403ae43bfcfba8bff28e08ef752c1a56afc1",
+    "kind": "target-public",
+    "no_labels": true,
+    "nodes": 88384522,
+    "peak_rss_mib": 16588.1,
+    "release": "male-cns:v1.0",
+    "rows": 151856684,
+    "seconds": 593.462,
+    "self_loops": 123,
+    "snapshot_set_sha256": "4ed4f5d9916193f52297a63673f00c304ddce2f61bca46493a50874694aafcb3",
+    "weight_sum": 311833243
+  }
+}
