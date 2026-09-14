@@ -61,6 +61,11 @@ def test_constroi_label_set_valido_e_cobertura():
 def test_dupla_revisao_obrigatoria():
     with pytest.raises(sl.SealedError, match="distintos"):
         sl.build_label_set(crosswalk(reviewer2="Revisor A"), annotations())
+    with_deviation = crosswalk(reviewer2="Revisor A")
+    with_deviation["single_reviewer_deviation"] = {"changelog_version": "1.1", "note": "desvio autorizado"}
+    label_set, report = sl.build_label_set(with_deviation, annotations())
+    assert se.validate_label_set(label_set) == []
+    assert report["single_reviewer_deviation"]["changelog_version"] == "1.1"
     payload = crosswalk()
     payload["mappings"][0]["reviewer2"] = " "
     with pytest.raises(sl.SealedError, match="dois revisores"):

@@ -417,6 +417,8 @@ RESOURCES_SECTIONS = (
 )
 H07_TOOL = ROOT / "tools" / "sealed_labels.py"
 H07_PACKAGE = ROOT / "docs" / "research" / "H07-PACKAGE.md"
+H07_DRAFT = ROOT / "preregistration" / "crosswalk-manc-mcns.draft.json"
+H07_DRAFT_METRICS = ROOT / "artifacts" / "reports" / "H07-CROSSWALK-DRAFT.json"
 H07_TOKENS = (
     "dupla revisão",
     "segundo revisor",
@@ -2156,7 +2158,13 @@ def check_dataset_inventory() -> tuple[list[str], int]:
 def check_h07_blocked() -> tuple[list[str], int]:
     label = "H07"
     failures: list[str] = []
-    for path in (H07_TOOL, H07_PACKAGE, ROOT / "tests" / "test_sealed_labels.py"):
+    for path in (
+        H07_TOOL,
+        H07_PACKAGE,
+        ROOT / "tests" / "test_sealed_labels.py",
+        H07_DRAFT,
+        H07_DRAFT_METRICS,
+    ):
         if not path.exists():
             failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
     if failures:
@@ -2173,6 +2181,34 @@ def check_h07_blocked() -> tuple[list[str], int]:
     spec = importlib.util.spec_from_file_location("sealed_labels_module", H07_TOOL)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
+    draft = json.loads(H07_DRAFT.read_text(encoding="utf-8"))
+    draft_failures = module.validate_crosswalk(draft, H07_DRAFT.name)
+    for failure in draft_failures:
+        failures.append(f"{label}: rascunho inválido: {failure}")
+    if any(not mapping.get("provenance", {}).get("source_sha256") for mapping in draft.get("mappings", [])):
+        failures.append(f"{label}: rascunho com mapeamento sem proveniência")
+    if any(mapping.get("provenance", {}).get("support_neurons", 0) < 1 for mapping in draft.get("mappings", [])):
+        failures.append(f"{label}: rascunho com mapeamento sem suporte de neurônios")
+    draft_metrics = json.loads(H07_DRAFT_METRICS.read_text(encoding="utf-8"))
+    draft_digest = hashlib.sha256(H07_DRAFT.read_bytes()).hexdigest()
+    if draft_metrics.get("crosswalk_sha256") != draft_digest:
+        failures.append(f"{label}: sha256 do rascunho diverge das métricas")
+    changelog = (ROOT / "preregistration" / "CHANGELOG.md").read_text(encoding="utf-8")
+    lowered = changelog.lower()
+    if "| 1.1 |" not in changelog or not ("revisão única" in lowered or "revisor humano único" in lowered):
+        failures.append(f"{label}: desvio de revisor único não registrado no changelog 1.1")
+    for tool_path in (
+        ROOT / "tools" / "topology_features.py",
+        ROOT / "tools" / "adapter_manc.py",
+        ROOT / "tools" / "adapter_mcns.py",
+        ROOT / "tools" / "edge_transform.py",
+        ROOT / "tools" / "run.py",
+    ):
+        text = tool_path.read_text(encoding="utf-8").lower()
+        if "crosswalk-manc-mcns" in text or "labels.json" in text or "target-labels" in text:  # firewall-allow
+            failures.append(
+                f"{label}: {tool_path.name} referencia artefato avaliativo (proibido em features/tuning)"
+            )
     mapping = {
         "source_type": "S1",
         "target_type": "T1",
@@ -2199,8 +2235,9 @@ def check_h07_blocked() -> tuple[list[str], int]:
     else:
         index = plan_lines.index(h07_line)
         note = " ".join(plan_lines[index:index + 25]).lower()
-        if "bloqueio" not in note or "segundo revisor" not in note:
-            failures.append(f"{label}: item do plano sem nota de bloqueio/segundo revisor")
+        pending_tokens = ("segundo revisor", "revisão final", "revisor único")
+        if "bloqueio" not in note or not any(token in note for token in pending_tokens):
+            failures.append(f"{label}: item do plano sem nota de bloqueio/pendência humana")
     return failures, len(H07_TOKENS)
 
 

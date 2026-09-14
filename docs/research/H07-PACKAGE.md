@@ -47,11 +47,34 @@ descreve a ferramenta pronta, o checklist da curadoria e o bloqueio.
   --circular-types <tipos> --ambiguous-types <tipos> --conflicting-types <tipos>
 ```
 
+## 3b. Rascunho do crosswalk (decisão 2b executada)
+
+- `preregistration/crosswalk-manc-mcns.draft.json` construído **somente** da
+  coluna `mancType` das anotações públicas auditadas do MCNS (`male-cns:v1.0`,
+  LIT-0079/D07; arquivo com sha256 `2177e246…`), com proveniência individual por
+  correspondência (arquivo, colunas, suporte de neurônios, contagens de
+  multiplicidade).
+- Números: **4.217** correspondências tipo-a-tipo cobrindo **4.182** tipos do
+  MCNS e **3.893** tipos do MANC; kinds: 3.734 one-to-one, 429 one-to-many, 22
+  many-to-one, 32 many-to-many; 19 grupos many-to-one e 137 tipos do MANC que
+  se dividem em mais de um tipo do MCNS.
+- Circularidade (decisão 4): todos os 4.182 tipos do alvo entram em
+  `circular_types` e na sensibilidade obrigatória; `ambiguous_types` e
+  `conflicting_types` vazios. K=10 mantido (decisão 5a).
+- Desvio de revisor único registrado no `CHANGELOG.md` versão 1.1 (decisão 1b),
+  com motivo, impacto e hash do rascunho
+  `4ca34aabe20964df4d9dac5384f6dd7ce28ca2a6a6b039382ee9395ff860446f`.
+- Garantia de não-leakage: crosswalk e rótulos não são lidos por adapters,
+  features, transformador de arestas nem pelo contrato de run (checado no
+  validador); nada de ID por neurônio no rascunho.
+
 ## 4. Estado do bloqueio
 
-- Segundo revisor humano: **ausente**.
-- Crosswalk curado: **não existe** (nenhum mapeamento manual foi criado).
-- Custodiante independente: **não designado** (acumulação procedimental, já
-  declarada no G2/R07/G3).
-- Próximo passo: decisão humana sobre o segundo revisor (ou registro formal de
-  desvio com limitação declarada, com emenda ao pré-registro pelo changelog).
+- Revisor único: **decisão 1b registrada** no changelog 1.1 (desvio formal com
+  limitação declarada); segundo revisor transferido para verificação futura, se
+  houver pessoa independente antes de M08.
+- Rascunho do crosswalk: **pronto**, aguardando **revisão final e assinatura**
+  do responsável (decisão 2b); nenhuma materialização selada foi feita.
+- Custodiante: acumulado pelo responsável com limitação declarada (decisão 3b).
+- Próximo passo: revisar/assinar o rascunho; depois materializar o label set em
+  `data/sealed/` com `tools/sealed_labels.py` e seguir para H08.

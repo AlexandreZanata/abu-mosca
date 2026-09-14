@@ -1460,15 +1460,17 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: lista por node ID não sai da zona selada.
   - Dependências: D08, H04, R07; execução pelo custodiante.
   - Orçamento: IA baixa + dupla revisão humana; sem GPU.
-  - Bloqueio (2026-09-14, executor): ferramenta do custodiante pronta
-    (`tools/sealed_labels.py` com dupla revisão obrigatória, regra
-    muitos-para-um, exclusões e relatório agregado sem IDs; 6 testes) e
-    checklist em `docs/research/H07-PACKAGE.md`, mas a materialização real está
-    bloqueada: (a) **segundo revisor humano ausente** (limitação do D08), (b)
-    crosswalk MANC→MCNS ainda não curado por humanos, (c) custodiante
-    independente não designado; nenhum mapeamento manual foi criado e nenhuma
-    lista por node ID saiu da zona selada; requer decisão humana (indicar
-    segundo revisor ou registrar desvio pelo changelog).
+  - Bloqueio (2026-09-14, executor): decisões humanas registradas — 1b desvio
+    de revisor único no `CHANGELOG.md` 1.1 (com motivo, impacto e hash), 2b
+    rascunho do crosswalk a partir de fonte pública auditada (`mancType` do
+    MCNS; 4.217 correspondências, proveniência individual), 3b custódia
+    acumulada com limitação, 4 circularidade total e exclusões vazias, 5a K=10;
+    ferramenta `tools/sealed_labels.py` aceita o desvio declarado e permanece
+    com 6 testes; **falta a revisão final e a assinatura humanas do rascunho**
+    (`preregistration/crosswalk-manc-mcns.draft.json`, sha256 `4ca34aab…`) para
+    materializar o label set em `data/sealed/`; nenhum mapeamento foi assinado,
+    nenhuma lista por node ID saiu da selada e crosswalk/rótulos seguem fora de
+    features e tuning (checado no validador).
 
 - [ ] **H08 — Processar releases completas e medir recursos.**
   - Objetivo: gerar snapshots canônicos reproduzíveis no hardware-alvo.

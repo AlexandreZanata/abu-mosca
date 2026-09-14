@@ -9,6 +9,7 @@ confirmatória (`docs/PROTOCOLO-EXECUCAO.md`).
 |---|---|---|---|---|---|
 | 2026-09-14 | 1.0-draft | IA executora (R07) | minuta inicial; nenhuma análise rodada | `preregistration/REGISTRY.md` | — |
 | 2026-09-14 | 1.0 | Alexandre Zanata (revisor humano único) | assinatura do pré-registro como está; três papéis acumulados com limitação declarada; nenhum artefato congelado alterado | hash do pacote `9411af0ca15501b253934f5e2134d978a95526dcf2c4cb7923a677a685f658b1` | confirmatória |
+| 2026-09-14 | 1.1 | Alexandre Zanata (revisor humano único) | desvio formal: H07 materializará o crosswalk MANC→MCNS com revisão única (D08 tinha um revisor), com revisão final e assinatura do responsável; mitigação: revisão final humana, circularidade obrigatória em sensibilidade e transferência para revisor independente antes de M08, se disponível. Impacto científico: risco de viés de mapeamento permanece registrado e o crosswalk não entra como feature nem como tuning. | hash do pacote inalterado; crosswalk rascunho `4ca34aabe20964df4d9dac5384f6dd7ce28ca2a6a6b039382ee9395ff860446f` | confirmatória (desvio) |
 
 ## Regras
 

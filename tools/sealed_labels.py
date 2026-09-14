@@ -70,7 +70,9 @@ def validate_crosswalk(payload: dict, label: str = "crosswalk") -> list[str]:
         if not reviewer1 or not reviewer2:
             failures.append(f"{item}: dois revisores são obrigatórios")
         elif reviewer1.lower() == reviewer2.lower():
-            failures.append(f"{item}: revisores devem ser distintos (dupla revisão)")
+            deviation = payload.get("single_reviewer_deviation") if isinstance(payload, dict) else None
+            if not isinstance(deviation, dict) or not deviation.get("changelog_version") or not deviation.get("note"):
+                failures.append(f"{item}: revisores devem ser distintos (dupla revisão)")
         sources = mapping.get("sources")
         if not isinstance(sources, list) or not sources:
             failures.append(f"{item}: fonte/proveniência obrigatória em 'sources'")
@@ -124,6 +126,7 @@ def build_label_set(
     mapping_kinds: dict[str, int] = {}
     for mapping in crosswalk["mappings"]:
         mapping_kinds[mapping["kind"]] = mapping_kinds.get(mapping["kind"], 0) + 1
+    deviation = crosswalk.get("single_reviewer_deviation")
     many_to_one = sorted(
         target_type for target_type in crosswalk_targets
         if sum(1 for mapping in crosswalk["mappings"] if mapping["target_type"] == target_type) > 1
@@ -137,6 +140,7 @@ def build_label_set(
     }
     report = {
         "crosswalk_version": crosswalk["crosswalk_version"],
+        "single_reviewer_deviation": deviation,
         "dataset_pair": crosswalk.get("dataset_pair"),
         "mappings": len(crosswalk["mappings"]),
         "mapping_kinds": mapping_kinds,
