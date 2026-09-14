@@ -415,6 +415,23 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+EDGE_TOOL = ROOT / "tools" / "edge_transform.py"
+EDGE_PRIMARY = ROOT / "configs" / "edge-primary.json"
+EDGE_VARIANTS = ROOT / "configs" / "edge-variants.json"
+EDGE_REPORT = ROOT / "artifacts" / "reports" / "H06-EDGES-VARIANTES.md"
+EDGE_METRICS = ROOT / "artifacts" / "reports" / "H06-EDGES-VARIANTES.json"
+EDGE_TOKENS = (
+    "peso zero",
+    "self-loops",
+    "isolados",
+    "conservação",
+    "threshold",
+    "symmetrized",
+    "log1p",
+    "pré-registro",
+    "sem usar nenhuma estatística do alvo",
+    "limitaç",
+)
 TOPOLOGY_TOOL = ROOT / "tools" / "topology_features.py"
 OPAQUE_TOOL = ROOT / "tools" / "opaque_ids.py"
 TOPOLOGY_REPORT = ROOT / "artifacts" / "reports" / "H05-FEATURES-TOPO.md"
@@ -2124,6 +2141,67 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_edge_transform() -> tuple[list[str], int]:
+    label = "H06"
+    failures: list[str] = []
+    for path in (
+        EDGE_TOOL,
+        EDGE_PRIMARY,
+        EDGE_VARIANTS,
+        EDGE_REPORT,
+        EDGE_METRICS,
+        ROOT / "tests" / "test_edge_transform.py",
+    ):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+
+    report = EDGE_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in EDGE_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+
+    spec = importlib.util.spec_from_file_location("edge_module", EDGE_TOOL)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    primary = json.loads(EDGE_PRIMARY.read_text(encoding="utf-8"))
+    if module.validate_config(primary):
+        failures.append(f"{label}: configuração primária inválida")
+    if primary.get("direction") != "directed" or primary.get("weight") != "raw":
+        failures.append(f"{label}: primária deve ser dirigida e com peso bruto")
+    variants = json.loads(EDGE_VARIANTS.read_text(encoding="utf-8"))
+    names = [item["variant"] for item in variants.get("variants", [])]
+    if len(names) < 8 or len(set(names)) != len(names):
+        failures.append(f"{label}: variantes pré-registradas incompletas ou duplicadas")
+    for item in variants.get("variants", []):
+        if module.validate_config(item):
+            failures.append(f"{label}: variante inválida '{item.get('variant')}'")
+    metrics = json.loads(EDGE_METRICS.read_text(encoding="utf-8"))
+    for variant in ("primary", "binary", "log1p", "symmetrized"):
+        if variant not in metrics:
+            failures.append(f"{label}: métricas ausentes para variante '{variant}'")
+    primary_metrics = metrics.get("primary", {})
+    for side in ("source_manc_100k", "target_mcns_100k"):
+        side_metrics = primary_metrics.get(side, {})
+        if side_metrics.get("weight_in") != side_metrics.get("weight_out"):
+            failures.append(f"{label}: conservação primária falhou em '{side}'")
+    symmetrized = metrics.get("symmetrized", {})
+    for side in ("source_manc_100k", "target_mcns_100k"):
+        if symmetrized.get(side, {}).get("weight_in") != symmetrized.get(side, {}).get("weight_out"):
+            failures.append(f"{label}: conservação da simetrização falhou em '{side}'")
+
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(EDGE_TOKENS)
+
+
 def check_topology_features() -> tuple[list[str], int]:
     label = "H05"
     failures: list[str] = []
@@ -3328,6 +3406,7 @@ def main() -> int:
     adapter_target_failures, adapter_target_tokens = check_adapter_target()
     sealed_evaluator_failures, sealed_evaluator_tokens = check_sealed_evaluator()
     topology_failures, topology_tokens = check_topology_features()
+    edge_transform_failures, edge_transform_tokens = check_edge_transform()
     failures += (
         ref_failures
         + path_failures
@@ -3364,6 +3443,7 @@ def main() -> int:
         + adapter_target_failures
         + sealed_evaluator_failures
         + topology_failures
+        + edge_transform_failures
     )
 
     if failures:
@@ -3502,6 +3582,10 @@ def main() -> int:
     print(
         f"OK: features topology-only H05 com {topology_tokens} tokens, IDs opacos "
         f"e fit/transform separado"
+    )
+    print(
+        f"OK: semântica de arestas H06 com {edge_transform_tokens} tokens, "
+        f"primária conservada e variantes pré-registradas"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

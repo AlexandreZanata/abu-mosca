@@ -1,0 +1,13 @@
+{
+  "preregistered": ["primary", "binary", "log1p", "threshold_2", "threshold_5", "threshold_10", "symmetrized", "drop_self_loops"],
+  "variants": [
+    {"variant": "primary", "direction": "directed", "weight": "raw", "threshold": {"weight_min": 0, "rule": "keep"}, "self_loops": "keep"},
+    {"variant": "binary", "direction": "directed", "weight": "binary", "threshold": {"weight_min": 0, "rule": "keep"}, "self_loops": "keep"},
+    {"variant": "log1p", "direction": "directed", "weight": "log1p", "threshold": {"weight_min": 0, "rule": "keep"}, "self_loops": "keep"},
+    {"variant": "threshold_2", "direction": "directed", "weight": "raw", "threshold": {"weight_min": 2, "rule": "drop_below"}, "self_loops": "keep"},
+    {"variant": "threshold_5", "direction": "directed", "weight": "raw", "threshold": {"weight_min": 5, "rule": "drop_below"}, "self_loops": "keep"},
+    {"variant": "threshold_10", "direction": "directed", "weight": "raw", "threshold": {"weight_min": 10, "rule": "drop_below"}, "self_loops": "keep"},
+    {"variant": "symmetrized", "direction": "symmetrized", "weight": "raw", "threshold": {"weight_min": 0, "rule": "keep"}, "self_loops": "keep"},
+    {"variant": "drop_self_loops", "direction": "directed", "weight": "raw", "threshold": {"weight_min": 0, "rule": "keep"}, "self_loops": "drop"}
+  ]
+}

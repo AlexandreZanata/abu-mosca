@@ -8,6 +8,7 @@ nodes, edges, multiedges, peso zero, self-loops, missingness e proveniência.
 
 import argparse
 import json
+import math
 import re
 import sys
 from pathlib import Path
@@ -154,11 +155,12 @@ def validate_graph(payload: dict, label: str = "grafo") -> list[str]:
         weight = edge.get("weight")
         weighted = graph.get("weighted") if isinstance(graph, dict) else None
         if weight is not None and (
-            not isinstance(weight, int)
-            or isinstance(weight, bool)
+            isinstance(weight, bool)
+            or not isinstance(weight, (int, float))
+            or not math.isfinite(weight)
             or weight < 0
         ):
-            failures.append(f"{item}: 'weight' deve ser inteiro ≥ 0 ou null")
+            failures.append(f"{item}: 'weight' deve ser número finito ≥ 0 ou null")
         if weighted is True and weight is None:
             failures.append(f"{item}: grafo ponderado exige 'weight' inteiro")
         if weighted is False and weight is not None:

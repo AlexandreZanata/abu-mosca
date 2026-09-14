@@ -29,9 +29,10 @@ round-trip ficam em `tools/graph_contract.py`; a fixture dirigida/ponderada em
 
 - `source` e `target`: IDs de node existentes; a direção é sempre
   `source → target` e o grafo declara `directed`.
-- `weight`: inteiro ≥ 0 (unidade declarada em `graph.weight_units`, por padrão
-  contagem de sinapses); `NaN`/`Inf` são proibidos pelo schema; peso zero é
-  válido e **preservado** (não é descartado silenciosamente).
+- `weight`: número finito ≥ 0 (unidade declarada em `graph.weight_units`, por
+  padrão contagem de sinapses; variantes podem declarar `binary` ou
+  `log1p_synapse_count`); `NaN`/`Inf` são proibidos; peso zero é válido e
+  **preservado** (não é descartado silenciosamente).
 - `attributes`/`missing`: mesma regra dos nodes para atributos de aresta.
 - Multiedges: permitidas; a agregação é declarada em `graph.aggregation`:
   - `none`: multiedges permanecem separadas;

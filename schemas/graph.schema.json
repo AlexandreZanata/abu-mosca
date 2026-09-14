@@ -85,7 +85,7 @@
         "properties": {
           "source": {"type": "string", "pattern": "^n[0-9a-f]{16}$"},
           "target": {"type": "string", "pattern": "^n[0-9a-f]{16}$"},
-          "weight": {"type": ["integer", "null"], "minimum": 0},
+          "weight": {"type": ["number", "null"], "minimum": 0},
           "attributes": {"type": "object"},
           "missing": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
         }

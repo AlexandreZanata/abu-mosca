@@ -36,7 +36,8 @@ def test_multiedge_conserva_soma():
     "mutacao, esperado",
     [
         (lambda d: d["edges"][0].update(weight=-1), "weight"),
-        (lambda d: d["edges"][0].update(weight=5.0), "weight"),
+        (lambda d: d["edges"][0].update(weight=float("nan")), "weight"),
+        (lambda d: d["edges"][0].update(weight=float("inf")), "weight"),
         (lambda d: d["edges"][0].update(weight=None), None),
         (lambda d: d["graph"].update(allow_self_loops=False), "self-loop"),
         (lambda d: d["edges"][0].update(target="n" + "0" * 16), "inexistente"),

@@ -1,0 +1,7 @@
+{
+  "variant": "primary",
+  "direction": "directed",
+  "weight": "raw",
+  "threshold": {"weight_min": 0, "rule": "keep"},
+  "self_loops": "keep"
+}

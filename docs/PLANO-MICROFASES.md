@@ -1412,7 +1412,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   B04/H08, e o clipping ±8 deve ser reavaliado em H06/S06 sem alterar o
   pré-registro; commit d589a4c35e4e623435258db6f58ac2610d8b9983.
 
-- [ ] **H06 — Fixar semântica de arestas, thresholds e variantes.**
+- [x] **H06 — Fixar semântica de arestas, thresholds e variantes.**
   - Objetivo: separar decisões necessárias de ablações futuras.
   - Entregas: transformador de edges, configuração primária e variantes
     pré-registradas para direção, peso, log de peso, threshold e reciprocidade.
@@ -1422,6 +1422,33 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não escolher threshold observando métrica no alvo.
   - Dependências: H02, H03, H05, R07.
   - Orçamento: IA baixa; CPU.
+  Evidência (2026-09-14, executor): arquivos `tools/edge_transform.py`
+  (transformador com validação de configuração, conservação de peso, regras
+  explícitas para peso zero, self-loops e componentes isolados, e registro de
+  `config_sha256` na proveniência), `configs/edge-primary.json` (primária do
+  pré-registro: dirigida, peso bruto, threshold `keep`, self-loops preservados)
+  e `configs/edge-variants.json` (8 variantes pré-registradas: binary, log1p,
+  threshold 2/5/10, symmetrized, drop_self_loops),
+  `tests/test_edge_transform.py` (15 casos) e `artifacts/reports/H06-EDGES-VARIANTES.md`
+  + `.json` com o efeito de cada variante nas amostras de 100k arestas da fonte
+  e do alvo; fontes/versões: H02/H03/H05, R07 assinado, contrato H01 (ampliado
+  para aceitar peso número finito ≥ 0, necessário para `log1p`, mantendo
+  proibição de `NaN`/`Inf`), Python 3.12.2 (stdlib), sem GPU e sem dados
+  selados; comandos e testes: aplicação das 8 variantes nas duas amostras
+  (primária conserva `peso_entrada = peso_saída`; threshold_2/5/10 na fonte
+  descartam 743.775/655.842/564.147 do peso; symmetrized funde 376 pares na
+  fonte e 3.354 no alvo conservando o total), `.venv/bin/python -m pytest
+  tests/ -q` (128 passaram; 15 novos), nova checagem H06 no
+  `validate_research.py` com smoke negativo (token, conservação, variante
+  ausente e ID cru), `python3 tools/validate_plan.py` e
+  `git diff --cached --check`; resultado: decisões necessárias (primária)
+  separadas das ablações (variantes), conservação/agregação testadas, escolhas
+  aplicadas igualmente aos dois lados sem estatística do alvo, e regras de
+  zero/self-loop/isolados explícitas; recursos medidos: CPU apenas, aplicação
+  das variantes em segundos por amostra, sem GPU; decisão/limitação: nenhum
+  threshold foi escolhido olhando o alvo (variantes fixas no pré-registro) e a
+  ampliação do contrato H01 está documentada em `GRAPH-CONTRACT.md`; commit
+  ea63e7faa0f0c1ba4922ef2265360d3cf6129208.
 
 - [ ] **H07 — Materializar crosswalk e conjuntos avaliativos sob custódia.**
   - Objetivo: transformar a decisão ontológica em arquivos imutáveis de scoring.
