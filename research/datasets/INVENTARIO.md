@@ -63,8 +63,10 @@ Campos obrigatórios do inventário e dos cards (identificadores estáveis):
 
 ### CAND-05 — MAOL
 - Card: `research/datasets/cards/MAOL.md`
-- Status: não confirmado
-- Pendências: todos os campos CAMPO-01 a CAMPO-16; auditoria em D06.
+- Status: auditado (D06)
+- Pendências: reconciliar contagens (página, paper e neuPrint v1.1), definir uso
+  da lamina subcontada e formatos/tamanhos/checksums por arquivo
+  (`não confirmado`).
 
 ### CAND-06 — MCNS
 - Card: `research/datasets/cards/MCNS.md`

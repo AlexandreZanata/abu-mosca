@@ -683,7 +683,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   explícita; arquivos não relacionados preservados fora do commit; commit
   72d7dd081c3b2be4151a4431888e3a74345460b3.
 
-- [ ] **D06 — Auditar MAOL release por release.**
+- [x] **D06 — Auditar MAOL release por release.**
   - Objetivo: verificar se o candidato de lobo óptico sustenta comparação local.
   - Entregas: dataset card e claims oficiais.
   - Aceite: confirma expansão do acrônimo, espécime, região, cobertura,
@@ -691,6 +691,25 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não inferir campos pelo nome do projeto.
   - Dependências: D01, L02.
   - Orçamento: IA baixa; web; amostra até 100 MB.
+  Evidência (2026-09-14, executor): arquivos `research/datasets/cards/MAOL.md`
+  (auditado em D06), `research/datasets/INVENTARIO.md` (CAND-05 auditado),
+  `research/literature/LEDGER.tsv` (LIT-0076 e LIT-0077),
+  `research/literature/QUERY-LOG.tsv` (leituras oficiais registradas) e esta
+  linha; fontes/versões: página oficial Janelia do Optic Lobe (v1.1), Nern et
+  al. 2025 (10.1038/s41586-025-08746-0) e API do GitHub do repositório
+  `reiserlab/male-drosophila-visual-system-connectome` (CC-BY-4.0), acesso
+  2026-09-14; Python 3.12.2 (stdlib); comandos e testes:
+  `python3 tools/validate_research.py` (card auditado coberto pelo smoke de
+  D02), `python3 tools/validate_plan.py`, `git diff --cached --check` e
+  `git status --porcelain`; resultado: MAOL confirmado como conectoma do lobo
+  óptico **direito** de macho adulto, >50.000 neurônios e >700 tipos, CC BY 4.0,
+  neuPrint `optic-lobe:v1.1` (52.445 neurônios e 6.484.936 conexões), lamina
+  ausente/subcontada e 7 fontes atômicas (6 `confirmado` e 1 `não encontrado`);
+  nenhum download; recursos: 21,8 MB de RAM e 0,09 s no validador, sem GPU e com
+  teto de 100 MB não utilizado; decisão/limitação: MAOL permanece `candidato`,
+  sem confundir com o lobo óptico feminino do FAFB e com formatos/checksums por
+  arquivo ainda não confirmados; arquivos não relacionados preservados fora do
+  commit; commit 5418a3e3e5ee45f3979ea3d32f23b5ac39fdc94c.
 
 - [ ] **D07 — Auditar MCNS release por release.**
   - Objetivo: verificar se o candidato de sistema nervoso central sustenta os
