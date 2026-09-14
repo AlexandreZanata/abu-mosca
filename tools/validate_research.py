@@ -415,6 +415,19 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+B05_TOOL = ROOT / "tools" / "mlp_control.py"
+B05_REPORT = ROOT / "artifacts" / "reports" / "B05-MLP.md"
+B05_METRICS = ROOT / "artifacts" / "reports" / "B05-MLP.json"
+B05_TOKENS = (
+    "mlp",
+    "mesmas features",
+    "source-fit",
+    "não linearidade",
+    "smoke",
+    "overfit",
+    "determinístico",
+    "sem nenhum dado do alvo",
+)
 B04_TOOL = ROOT / "tools" / "artisanal_features.py"
 B04_REPORT = ROOT / "artifacts" / "reports" / "B04-ARTESANAL.md"
 B04_METRICS = ROOT / "artifacts" / "reports" / "B04-ARTESANAL.json"
@@ -2295,6 +2308,75 @@ def check_b04_artisanal() -> tuple[list[str], int]:
     return failures, len(B04_TOKENS)
 
 
+def check_b05_mlp() -> tuple[list[str], int]:
+    label = "B05"
+    failures: list[str] = []
+    for path in (B05_TOOL, B05_REPORT, B05_METRICS, ROOT / "tests" / "test_mlp_control.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    report = B05_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in B05_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+    source = B05_TOOL.read_text(encoding="utf-8")
+    for token in ("male-cns", "data/sealed", "target_labels", "crosswalk"):  # firewall-allow
+        if token in source:
+            failures.append(f"{label}: MLP de controle não pode referenciar o alvo ('{token}')")
+    metrics = json.loads(B05_METRICS.read_text(encoding="utf-8"))
+    if metrics.get("schema") != "b05-mlp-control":
+        failures.append(f"{label}: schema do relatório divergente")
+    if list(metrics.get("features", [])) != [
+        "in_degree",
+        "out_degree",
+        "weighted_in",
+        "weighted_out",
+        "reciprocal_weight_ratio",
+        "reciprocal_count_ratio",
+        "clustering_undirected",
+        "feedforward_paths",
+        "bottleneck_ratio",
+        "successor_out_degree_mean",
+        "predecessor_in_degree_mean",
+    ]:
+        failures.append(f"{label}: MLP deve usar as mesmas features de B04")
+    results = metrics.get("results", {})
+    if set(results) != {"s", "m", "l"}:
+        failures.append(f"{label}: configs divergentes (esperado s/m/l)")
+    for name, data in results.items():
+        value = float(data.get("median_macro_recall@1", -1))
+        if not 0.0 <= value <= 1.0:
+            failures.append(f"{label}: macro fora de [0,1] em '{name}'")
+        if len(data.get("per_seed", [])) != 3:
+            failures.append(f"{label}: config '{name}' sem as 3 seeds do pré-registro")
+    if list(metrics.get("seeds", [])) != [297979363399525401, 1699981902186354598, 3729859090210297070]:
+        failures.append(f"{label}: seeds divergentes do pré-registro")
+    params = {name: int(data.get("n_params", -1)) for name, data in results.items()}
+    if not 80_000 <= params.get("s", -1) <= 130_000:
+        failures.append(f"{label}: config 's' fora do budget ~100k")
+    if not 400_000 <= params.get("m", -1) <= 600_000:
+        failures.append(f"{label}: config 'm' fora do budget ~500k")
+    if not 1_000_000 <= params.get("l", -1) <= 3_000_000:
+        failures.append(f"{label}: config 'l' fora da faixa pareada 1-3M")
+    if str(metrics.get("hyperparameters", {}).get("device", "")) != "cpu":
+        failures.append(f"{label}: dispositivo deve ser cpu nesta fase")
+    for entry in metrics.get("predictions", []):
+        if not re.fullmatch(r"[0-9a-f]{64}", str(entry.get("sha256", ""))):
+            failures.append(f"{label}: predição sem hash válido")
+    if len(metrics.get("predictions", [])) != 9:
+        failures.append(f"{label}: esperado 9 pacotes de predições (3 configs x 3 seeds)")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(B05_TOKENS)
+
+
 def check_b03_source_baselines() -> tuple[list[str], int]:
     label = "B03"
     failures: list[str] = []
@@ -3998,6 +4080,7 @@ def main() -> int:
     b02_failures, b02_tokens = check_b02_calibration()
     b03_failures, b03_tokens = check_b03_source_baselines()
     b04_failures, b04_tokens = check_b04_artisanal()
+    b05_failures, b05_tokens = check_b05_mlp()
     failures += (
         ref_failures
         + path_failures
@@ -4043,6 +4126,7 @@ def main() -> int:
         + b02_failures
         + b03_failures
         + b04_failures
+        + b05_failures
     )
 
     if failures:
@@ -4216,6 +4300,10 @@ def main() -> int:
     print(
         f"OK: estatísticas artesanais B04 com {b04_tokens} tokens, ablação por "
         f"família e invariância a IDs"
+    )
+    print(
+        f"OK: MLP de controle B05 com {b05_tokens} tokens, 3 budgets e "
+        f"mesmas features de B04"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

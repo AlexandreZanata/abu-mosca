@@ -1,0 +1,229 @@
+{
+  "configs": {
+    "l": {
+      "budget": "pareado-provisorio-1-3M",
+      "hidden": [
+        1024,
+        768
+      ]
+    },
+    "m": {
+      "budget": "~500k",
+      "hidden": [
+        512,
+        512
+      ]
+    },
+    "s": {
+      "budget": "~100k",
+      "hidden": [
+        256,
+        128
+      ]
+    }
+  },
+  "feature_version": "1.0",
+  "features": [
+    "in_degree",
+    "out_degree",
+    "weighted_in",
+    "weighted_out",
+    "reciprocal_weight_ratio",
+    "reciprocal_count_ratio",
+    "clustering_undirected",
+    "feedforward_paths",
+    "bottleneck_ratio",
+    "successor_out_degree_mean",
+    "predecessor_in_degree_mean"
+  ],
+  "hyperparameters": {
+    "batch": 1024,
+    "device": "cpu",
+    "epochs": 50,
+    "lr": 0.001
+  },
+  "label_meta": {
+    "classes_k_min": 525,
+    "nodes_labeled": 15304,
+    "types_total": 2448
+  },
+  "nodes_used": 14847,
+  "peak_rss_mib": 5131.9,
+  "predictions": [
+    {
+      "config": "s",
+      "path": "runs/b05/predictions-mlp-s-seed0.json",
+      "seed_index": 0,
+      "sha256": "96f3b17b27c5dfc908a36877ebdf959fe483351fc08ae2c92726c14cf3b85b1d"
+    },
+    {
+      "config": "s",
+      "path": "runs/b05/predictions-mlp-s-seed1.json",
+      "seed_index": 1,
+      "sha256": "2d9e919d68af13143107975d5dfe47ba4c5c90330815d44167eaa27b8838d073"
+    },
+    {
+      "config": "s",
+      "path": "runs/b05/predictions-mlp-s-seed2.json",
+      "seed_index": 2,
+      "sha256": "ae232d9af024d1b9e23f34e4cec17294018fdcdf195df5c08a29c002de58497a"
+    },
+    {
+      "config": "m",
+      "path": "runs/b05/predictions-mlp-m-seed0.json",
+      "seed_index": 0,
+      "sha256": "5516dd8ca04b4da44a1d50c9cce9e375187b9fcca3574f060a57d449fafbd65e"
+    },
+    {
+      "config": "m",
+      "path": "runs/b05/predictions-mlp-m-seed1.json",
+      "seed_index": 1,
+      "sha256": "b2f33920366bf1409218c6c20ede99e3de9b0e0da5c97be2c74b9ed7b184916b"
+    },
+    {
+      "config": "m",
+      "path": "runs/b05/predictions-mlp-m-seed2.json",
+      "seed_index": 2,
+      "sha256": "240bc5153abc8946e64d4fbe0dca4b0ea8531d7082b5dc4219fa0733868ab74e"
+    },
+    {
+      "config": "l",
+      "path": "runs/b05/predictions-mlp-l-seed0.json",
+      "seed_index": 0,
+      "sha256": "5a9ae36bb553c7f56478bc73861a63c5df3998be89b719f4fd682c84601496e7"
+    },
+    {
+      "config": "l",
+      "path": "runs/b05/predictions-mlp-l-seed1.json",
+      "seed_index": 1,
+      "sha256": "d39ffd82ca42741bd1cd0de06a9a303646a68da212d8678b72569d0baf86c00a"
+    },
+    {
+      "config": "l",
+      "path": "runs/b05/predictions-mlp-l-seed2.json",
+      "seed_index": 2,
+      "sha256": "df126bb4db5e5d68fcc40ee5bf013b7ac3512ca25ae3d8d665dfa0df4a75c5eb"
+    }
+  ],
+  "results": {
+    "l": {
+      "budget": "pareado-provisorio-1-3M",
+      "hidden": [
+        1024,
+        768
+      ],
+      "median_macro_recall@1": 0.579626,
+      "n_params": 1198599,
+      "per_seed": [
+        {
+          "macro_recall@1": 0.579626,
+          "micro_recall@1": 0.577855,
+          "seed_index": 0
+        },
+        {
+          "macro_recall@1": 0.58112,
+          "micro_recall@1": 0.576282,
+          "seed_index": 1
+        },
+        {
+          "macro_recall@1": 0.576238,
+          "micro_recall@1": 0.575024,
+          "seed_index": 2
+        }
+      ]
+    },
+    "m": {
+      "budget": "~500k",
+      "hidden": [
+        512,
+        512
+      ],
+      "median_macro_recall@1": 0.554048,
+      "n_params": 535047,
+      "per_seed": [
+        {
+          "macro_recall@1": 0.554048,
+          "micro_recall@1": 0.55961,
+          "seed_index": 0
+        },
+        {
+          "macro_recall@1": 0.555326,
+          "micro_recall@1": 0.554577,
+          "seed_index": 1
+        },
+        {
+          "macro_recall@1": 0.551316,
+          "micro_recall@1": 0.552375,
+          "seed_index": 2
+        }
+      ]
+    },
+    "s": {
+      "budget": "~100k",
+      "hidden": [
+        256,
+        128
+      ],
+      "median_macro_recall@1": 0.472795,
+      "n_params": 102919,
+      "per_seed": [
+        {
+          "macro_recall@1": 0.476455,
+          "micro_recall@1": 0.493866,
+          "seed_index": 0
+        },
+        {
+          "macro_recall@1": 0.472795,
+          "micro_recall@1": 0.486631,
+          "seed_index": 1
+        },
+        {
+          "macro_recall@1": 0.460429,
+          "micro_recall@1": 0.482542,
+          "seed_index": 2
+        }
+      ]
+    }
+  },
+  "schema": "b05-mlp-control",
+  "seconds": 294.42,
+  "seeds": [
+    297979363399525401,
+    1699981902186354598,
+    3729859090210297070
+  ],
+  "split": {
+    "classes": 519,
+    "train": 11668,
+    "val": 3179
+  },
+  "stats_source_fit": {
+    "mean": [
+      159.1318992115187,
+      166.10215975317107,
+      829.4950291395269,
+      900.9792595131985,
+      0.16824915841205357,
+      0.2927287023192785,
+      0.38387149091281053,
+      38496.765598217346,
+      0.3324355818517081,
+      379.2824739436343,
+      369.0365604213454
+    ],
+    "std": [
+      149.3814121919466,
+      117.66998959206852,
+      1352.2787921389588,
+      1020.2581975136635,
+      0.11545365363729612,
+      0.13629890429180508,
+      0.14471319999337395,
+      82713.80164395236,
+      0.11435803083447586,
+      102.29635389994779,
+      106.16990661054645
+    ]
+  },
+  "torch_version": "2.14.0+cu130"
+}

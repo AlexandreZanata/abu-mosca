@@ -1737,7 +1737,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   pares é o teto do extrator; commit
   e6e1d5b8537771bd951f65f86615b408e5a4fb6f.
 
-- [ ] **B05 — Implementar o MLP de controle.**
+- [x] **B05 — Implementar o MLP de controle.**
   - Objetivo: separar ganho do encoder de ganho causado apenas por não linearidade.
   - Entregas: MLP sobre as mesmas features, budgets de aproximadamente 100k,
     500k e tamanho pareado ao encoder quando possível.
@@ -1746,6 +1746,32 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: MLP não recebe embedding pré-calculado com alvo.
   - Dependências: B03, B04, R04.
   - Orçamento: IA baixa; GPU smoke/piloto.
+  Evidência (2026-09-14, executor; modo exploratório e somente na fonte):
+  arquivos `tools/mlp_control.py` (MLP sobre as 11 features de B04, split e
+  seeds iguais aos de B03, z-score source-fit, mesmo avaliador de B01, CPU
+  determinística), `tests/test_mlp_control.py` (7 casos: contagem exata,
+  budgets, smoke, overfit ≥0,95, determinismo, mesmas features/source-fit e
+  run mínimo ponta a ponta) e `artifacts/reports/B05-MLP.md` + `.json`;
+  resultados na mesma partição de B03/B04 (14.847 nodes, 519 classes):
+  config s (102.919 params) mediana macro Recall@1 0,472795, config m
+  (535.047) 0,554048 e config l (1.198.599, pareado-provisório na faixa
+  1–3M do encoder) 0,579626, contra 0,383676 do probe artesanal e 0,149547
+  do degree-only; fontes/versões: snapshot H08, propriedades públicas do
+  MANC, B01/B03/B04 e R04/R07, Python 3.12.2 com torch do lock R02, sem GPU
+  e sem qualquer dado do alvo; comandos e testes: `python3
+  tools/mlp_control.py --snapshot runs/h08/source --properties
+  data/raw/spikes/manc_neuron_properties.feather --out-dir runs/b05 --report
+  artifacts/reports/B05-MLP.json` (294,4 s; pico 5.132 MiB),
+  `.venv/bin/python -m pytest tests/ -q` (181 testes), nova checagem B05 no
+  `validate_research.py` (budgets, seeds do pré-registro, mesmas features de
+  B04, 9 predições hashadas e proibição de referências ao alvo; smoke
+  negativo: seeds corrompidas reprovam como esperado) e `python3
+  tools/validate_plan.py`; resultado: controle não linear pronto para
+  confrontar a GNN, com ganho sobre o probe isolando o efeito da não
+  linearidade; recursos medidos: CPU apenas, sem downloads; decisão/
+  limitação: resultados internos à fonte e sem claim de transferência; o
+  pareamento definitivo com o encoder aguarda M02; commit
+  6540da2e5ee9e4fb2f00b34d9fc0a9a520c7bf34.
 
 - [ ] **B06 — Implementar Node2Vec/DeepWalk com caveat transdutivo.**
   - Objetivo: medir baselines clássicos sem fingir alinhamento entre espaços.
