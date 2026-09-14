@@ -1756,6 +1756,7 @@ def check_gate_g2() -> tuple[list[str], int, str]:
 
     start = next((i for i, line in enumerate(lines) if line.startswith("## Assinaturas")), None)
     signature_lines = lines[start:] if start is not None else []
+    signature_block = "\n".join(signature_lines)
     for field in GATE_G2_SIGNATURE_FIELDS:
         value = field_value(signature_lines, field)
         if value is None:
@@ -1765,6 +1766,8 @@ def check_gate_g2() -> tuple[list[str], int, str]:
             failures.append(f"{label}: assinatura '{field}' preenchida antes da revisão humana")
         if approved and "a preencher" in value.lower():
             failures.append(f"{label}: assinatura '{field}' ainda pendente com decisão GO")
+    if approved and "2026-09-14" not in signature_block:
+        failures.append(f"{label}: assinaturas sem data da revisão humana")
 
     known_lit = set(re.findall(r"^(LIT-\d{4})\t", LIT_LEDGER.read_text(encoding="utf-8"), re.M))
     refs = sorted(set(re.findall(r"LIT-\d{4}", text)))

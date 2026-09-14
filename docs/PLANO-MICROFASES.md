@@ -856,7 +856,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   armazenamento externo para o bulk; commit
   ca50f4b26fa97651f4e781ac4cd0ce43de2d2105.
 
-- [ ] **G2 — Aprovar dados e par do MVP.**
+- [x] **G2 — Aprovar dados e par do MVP.**
   - Objetivo: decidir `GO`, `NO-GO` ou `REFORMULAR` antes do download completo.
   - Entregas: `docs/gates/G2-DADOS.md`, cards congelados e papéis dos datasets.
   - Aceite: licença/acesso, comparabilidade, target, cobertura, recursos,
@@ -865,12 +865,24 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     mesmo connectoma; produzir relatório de inviabilidade/reformulação.
   - Dependências: D01–D10.
   - Orçamento: pacote por IA baixa; revisão humana científica e de termos.
-  - Pacote preparado (2026-09-14, executor): `docs/gates/G2-DADOS.md` com 9
-    critérios (5 `NÃO VERIFICADO` para parecer humano e 4 `PASS` medidos), 10
-    arquivos congelados por SHA-256 e releases fixados; decisão `AGUARDAR`,
-    pois `GO`/`NO-GO`/`REFORMULAR` dependem da revisão humana científica e de
-    termos (PROTOCOLO); bloqueio mantido com `[ ]` até a decisão; commit
-    b6224b552b9cd8efd35a424d848f940fc3095236.
+  Evidência (2026-09-14, executor): pacote `docs/gates/G2-DADOS.md` com 9
+  critérios, 10 arquivos congelados por SHA-256 e releases fixados; decisão
+  humana `GO` registrada em 2026-09-14 por Alexandre Zanata (revisor único
+  acumulando responsável científico e termos/licenças; limitação declarada),
+  aprovando DEC-SEL-01 a DEC-SEL-04 (MVP MANC `manc:v1.2.1` → MCNS
+  `male-cns:v1.0`; reservas BANC `v888` e FlyWire `v783`; matriz de fallback;
+  MAOL excluído e hemibrain comparador); o executor apenas registrou a decisão;
+  fontes/versões: D08/D09/D10 e LIT-0001/0002/0006/0009/0010/0015/0019/0023/
+  0060/0074/0078/0079, acessos 2026-09-14; comandos e testes: `python3
+  tools/validate_research.py` (checagem G2 com smoke negativo e hashes
+  conferidos), `python3 tools/validate_plan.py` e `git diff --cached --check`;
+  resultado: `GO` condicionado liberando apenas R01–R08, sem download integral
+  antes de G3, treino, unseal ou leitura de `data/sealed`; recursos medidos: 0
+  download nesta fase, sem GPU; decisão/limitação: revisor único (segundo
+  revisor do crosswalk segue obrigatório antes de H07), armazenamento externo e
+  SHA-256 local do MCNS antes do bulk, alvo confirmatório BANC intocado, e a
+  limitação de revisor único deve constar do pré-registro em R07; commit
+  29ded3a2c5fe6d3dc0d3f84871479ddefbe8ae04.
 
 ## Nível 1 — infraestrutura, dados e MVP confirmatório
 

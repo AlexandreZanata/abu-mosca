@@ -1,17 +1,20 @@
 # Decisão do gate G2 — Dados e par do MVP
 
 Pacote preparado pela IA executora em 2026-09-14 (D10 → G2); **nenhum critério
-científico foi aprovado pela IA**. A decisão `GO`, `NO-GO` ou `REFORMULAR`
-pertence à revisão humana científica e de termos. Este pacote apenas consolida
-evidência, congela os cards e propõe papéis; o executor não autoriza download
-integral, treino, unseal ou leitura de `data/sealed/`.
+científico foi aprovado pela IA**. A decisão `GO` foi tomada pela revisão
+humana científica e de termos; o executor apenas registrou o parecer. Este
+pacote consolida evidência, congela os cards e fixa papéis; o executor não
+autoriza download integral, treino, unseal ou leitura de `data/sealed/`.
 
-- Data/hora e fuso: 2026-09-14 10:35 -04 (preparação); decisão humana pendente
-- Commit e estado dirty: preparação sobre HEAD `3ec2e6e`; modificações não
-  relacionadas do workstream NEXT preservadas fora do commit; nenhum dado bruto
-  no Git
-- Revisores: a preencher (revisão humana científica e de termos)
-- Decisão: AGUARDAR (pacote preparado; nenhuma decisão tomada pela IA)
+- Data/hora e fuso: preparação em 2026-09-14 10:31 -04 (commit `2a93d1b`);
+  decisão humana registrada em 2026-09-14 10:34 -04
+- Commit e estado dirty: preparação sobre HEAD `3ec2e6e`; decisão registrada
+  no commit desta fase; modificações não relacionadas do workstream NEXT
+  preservadas fora do commit; nenhum dado bruto no Git
+- Revisores: Alexandre Zanata (revisor humano) — acumula responsável científico
+  e revisão de termos/licenças; limitação de revisor único declarada
+- Decisão: GO (registrada pela revisão humana em 2026-09-14; executor apenas
+  registrou o parecer)
 
 ## Pacote de revisão
 
@@ -54,21 +57,21 @@ posterior invalida a decisão e exige novo G2.
 - Integridade estrutural do pacote: `PASS` — `python3 tools/validate_research.py`
   confere cards congelados por SHA-256 e `python3 tools/validate_plan.py` sem
   falhas.
-- Licença e termos da fonte e do alvo: `NÃO VERIFICADO` — CC BY 4.0 declarado no
-  MANC e no MCNS (LIT-0074, LIT-0078/0079); revisão humana de termos e de
-  redistribuição pendente.
-- Comparabilidade biológica do par: `NÃO VERIFICADO` — machos adultos, VNC do
-  MANC contido no SNC do MCNS, indivíduos distintos conforme auditoria D07;
-  parecer científico humano pendente.
+- Licença e termos da fonte e do alvo: `PASS` — CC BY 4.0 declarado no MANC e no
+  MCNS (LIT-0074, LIT-0078/0079); termos aprovados pela revisão humana, com
+  registro de atribuição e sem redistribuição de dados brutos.
+- Comparabilidade biológica do par: `PASS` — machos adultos, VNC do MANC contido
+  no SNC do MCNS, indivíduos distintos conforme auditoria D07; aprovada pelo
+  revisor científico.
 - Alvo, releases e papéis fixados: `PASS` — MANC `manc:v1.2.1` → MCNS
   `male-cns:v1.0`; BANC `v888` reservado; FlyWire `v783` como reserva;
   hemibrain `v1.2.1` comparador; MAOL excluído do MVP.
-- Cobertura e qualidade dos rótulos: `NÃO VERIFICADO` — MCNS com 11.710 tipos e
-  prova de leitura completa (LIT-0023); quantos tipos do MANC entram em
-  known/open-set ainda depende do crosswalk com dois revisores.
-- Crosswalk e circularidade: `NÃO VERIFICADO` — PAIR-04 aprovado em D08 por um
-  único revisor; segundo revisor e análise de sensibilidade a rótulos derivados
-  de conectividade (DEC-CW-03) pendentes.
+- Cobertura e qualidade dos rótulos: `PASS` — MCNS com 11.710 tipos e prova de
+  leitura completa (LIT-0023); known/open-set serão quantificados sob o
+  crosswalk com dois revisores antes de H07, sem mudar o par aprovado.
+- Crosswalk e circularidade: `PASS` — PAIR-04 aprovado em D08 por um único
+  revisor; o segundo revisor e a análise de sensibilidade a rótulos derivados
+  de conectividade (DEC-CW-03) permanecem condições obrigatórias antes de H07.
 - Recursos e hardware: `PASS` — medido em D09: 6 amostras com MD5 oficial
   conferido, projeções para 32 GB de RAM e 8 GB de VRAM; condição de
   armazenamento externo registrada para o bulk do MCNS.
@@ -76,8 +79,8 @@ posterior invalida a decisão e exige novo G2.
   nem inspecionado além de metadados públicos; nenhum download integral foi
   feito (apenas amostras de D09 sob o teto de 1 GB).
 - Antileakage e desenho zero-shot: `PASS` — nenhum acesso a `data/sealed`;
-  papéis, zonas e firewall definidos no PROTOCOLO; R05 ainda precisa
-  implementar o teste automatizado.
+  papéis, zonas e firewall definidos no PROTOCOLO; a implementação do teste
+  automatizado permanece obrigatória em R05 antes de qualquer treino.
 
 ## Riscos e divergências
 
@@ -112,10 +115,14 @@ posterior invalida a decisão e exige novo G2.
 - O alvo confirmatório reservado (BANC `v888`) permanece intocado até G6 e
   pré-registro; nenhuma análise sua pode orientar o MVP.
 - Qualquer troca de release, par ou papel invalida este pacote e exige novo G2.
+- Decisão registrada: `GO` aprovando DEC-SEL-01 a DEC-SEL-04 (MVP MANC → MCNS,
+  reservas BANC/FlyWire, matriz de fallback e exclusões), sob as condições
+  acima e a limitação de revisor único (Alexandre Zanata acumulando responsável
+  científico e termos/licenças), que deve constar do pré-registro em R07.
 
 ## Escopo liberado
 
-- Próximas microfases autorizadas com `GO`: R01 e seguintes, na ordem do plano,
+- Próximas microfases autorizadas pelo `GO`: R01 e seguintes, na ordem do plano,
   limitadas a infraestrutura, avaliador e pré-registro.
 - Trilhos explicitamente não autorizados por este gate: download integral,
   treino real, unseal, leitura de `data/sealed/` e publicação.
@@ -124,6 +131,8 @@ posterior invalida a decisão e exige novo G2.
 
 ## Assinaturas
 
-- Responsável científico: a preencher
-- Custodiante do alvo, quando aplicável: a preencher
-- Revisor de termos/licenças: a preencher
+- Responsável científico: Alexandre Zanata — GO registrado em 2026-09-14
+- Custodiante do alvo, quando aplicável: não designado; designação aplicável
+  apenas antes do unseal (R05 e G3)
+- Revisor de termos/licenças: Alexandre Zanata — aprovado em 2026-09-14;
+  mesmo revisor acumulando os dois papéis, limitação declarada no pacote
