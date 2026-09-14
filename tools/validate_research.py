@@ -26,6 +26,7 @@ GLOSSARY = RESEARCH / "GLOSSARIO.md"
 CLAIMS = RESEARCH / "CLAIMS.md"
 RISKS = RESEARCH / "RISCOS.md"
 ESTIMAND = RESEARCH / "PERGUNTA-E-ESTIMANDO.md"
+EQUIVALENCE = RESEARCH / "EQUIVALENCIA.md"
 
 ESTIMAND_SECTIONS = (
     "Estimando",
@@ -37,7 +38,30 @@ ESTIMAND_SECTIONS = (
     "Vocabulário restrito",
 )
 RESTRICTED_TERMS = ("universal", "função", "cross-individual")
-PHASE_TOKEN_RE = re.compile(r"\b([CLDRHBMS])(\d{2})\b|\bG(\d)\b")
+
+EQUIVALENCE_SECTIONS = (
+    "## 1. Alvo primário",
+    "## 2. Hierarquia avaliativa",
+    "## 3. Relações e classificação epistêmica",
+    "## 4. Cardinalidade e correspondências",
+    "## 5. Regras para casos-limite",
+    "## 6. Regras de crosswalk",
+    "## 7. Decisões pendentes",
+    "## 8. Limites deste documento",
+)
+EQUIVALENCE_RELATIONS = ("EQ-01", "EQ-02", "EQ-03", "EQ-04", "EQ-05")
+RELATION_CLASSIFICATIONS = ("gold label", "proxy", "hipótese", "fora do escopo")
+PENDING_DECISION = "AGUARDANDO DECISÃO HUMANA"
+EQUIVALENCE_CASES = (
+    "one-to-one",
+    "multi-instance",
+    "unknown",
+    "tipos ausentes",
+    "tipos ambíguos",
+    "singleton",
+    "rótulos conflitantes",
+)
+PHASE_REF_RE = re.compile(r"\b(?:[CLDRHBMS]\d{2}|G\d)\b")
 
 REQUIRED_GLOSSARY_TERMS = (
     "fonte",
@@ -65,7 +89,7 @@ RISK_STATUSES = {"aberto", "em detalhamento", "mitigado com artefato", "aceito c
 CLAIM_TYPES = {"hipótese", "capacidade de dado", "literatura", "método"}
 
 ENTRY_RE = r"^- \*\*{prefix}-(\d{{{width}}}) — (.+?)\*\*$"
-FIELD_RE = r"^\s+- {field}: (.+)$"
+FIELD_RE = r"^\s*- {field}: (.+)$"
 PATH_RE = re.compile(r"`((?:docs|tools)/[A-Za-z0-9_./-]+\.(?:md|py|yaml))`")
 ID_RE = re.compile(r"\b([A-Z])(\d{1,2})\b")
 
@@ -91,6 +115,29 @@ def field_value(block: list[str], field: str) -> str | None:
         if match:
             return match.group(1).strip().rstrip(". ")
     return None
+
+
+def parse_heading_blocks(text: str, pattern: str) -> list[tuple[str, list[str]]]:
+    regex = re.compile(pattern)
+    blocks: list[tuple[str, list[str]]] = []
+    current: tuple[str, list[str]] | None = None
+    for line in text.splitlines():
+        if line.startswith("## "):
+            current = None
+            continue
+        match = regex.match(line)
+        if match:
+            current = (match.group(1), [])
+            blocks.append(current)
+        elif current is not None:
+            current[1].append(line)
+    return blocks
+
+
+def phase_refs(text: str) -> set[str]:
+    refs = {ref for ref in expand_ranges(text) if PHASE_REF_RE.fullmatch(ref)}
+    refs.update(PHASE_REF_RE.findall(text))
+    return refs
 
 
 def check_entries(
@@ -226,18 +273,78 @@ def check_estimand() -> tuple[list[str], int]:
             failures.append(f"{label}: termo restrito '{term}' fora da seção de vocabulário restrito")
 
     known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
-    refs = set(expand_ranges(text))
-    for phase, number, gate in PHASE_TOKEN_RE.findall(text):
-        refs.add(f"{phase}{number}" if phase else f"G{gate}")
+    refs = phase_refs(text)
     for ref in sorted(ref for ref in refs if ref not in known):
         failures.append(f"{label}: referência de fase inexistente '{ref}'")
     return failures, len(refs)
 
 
+def check_equivalence() -> tuple[list[str], int]:
+    label = EQUIVALENCE.name
+    if not EQUIVALENCE.exists():
+        return [f"{label}: arquivo ausente"], 0
+    text = EQUIVALENCE.read_text(encoding="utf-8")
+    flat = " ".join(text.split())
+    failures: list[str] = []
+    for section in EQUIVALENCE_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for phrase in (
+        "não é equivalência confirmada",
+        "nunca é usado como feature de entrada",
+    ):
+        if phrase not in flat:
+            failures.append(f"{label}: regra obrigatória ausente ('{phrase}')")
+    for case in EQUIVALENCE_CASES:
+        if case not in flat:
+            failures.append(f"{label}: caso obrigatório ausente ('{case}')")
+
+    relations = parse_heading_blocks(text, r"^### (EQ-\d{2}) — (.+)$")
+    seen_rel = set()
+    for rel_id, block in relations:
+        seen_rel.add(rel_id)
+        if rel_id not in EQUIVALENCE_RELATIONS:
+            failures.append(f"{label}: relação inesperada {rel_id}")
+        for field in ("Definição operacional", "Classificação proposta", "Condição de validade", "Status"):
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {rel_id} sem campo '{field}'")
+        classification = field_value(block, "Classificação proposta")
+        if classification is not None and not classification.startswith(RELATION_CLASSIFICATIONS):
+            failures.append(f"{label}: {rel_id} classificação inválida '{classification}'")
+    for rel_id in EQUIVALENCE_RELATIONS:
+        if rel_id not in seen_rel:
+            failures.append(f"{label}: relação obrigatória ausente {rel_id}")
+
+    decisions = parse_heading_blocks(text, r"^### (DEC-EQ-\d{2}) — (.+)$")
+    seen_dec = {dec_id for dec_id, _ in decisions}
+    for number in range(1, 10):
+        dec_id = f"DEC-EQ-{number:02d}"
+        if dec_id not in seen_dec:
+            failures.append(f"{label}: decisão obrigatória ausente {dec_id}")
+    for dec_id, block in decisions:
+        if field_value(block, "Status") != PENDING_DECISION:
+            failures.append(f"{label}: {dec_id} deveria estar '{PENDING_DECISION}'")
+        if field_value(block, "Decisão") is None:
+            failures.append(f"{label}: {dec_id} sem campo 'Decisão'")
+        if field_value(block, "Recomendação") is None:
+            failures.append(f"{label}: {dec_id} sem campo 'Recomendação'")
+
+    for line in text.splitlines():
+        match = re.match(r"^\s*- Status: (.+?)\s*$", line)
+        if match and match.group(1).strip().rstrip(".") != PENDING_DECISION:
+            failures.append(f"{label}: status '{match.group(1).strip()}' não é pendência humana")
+
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    refs = phase_refs(text)
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(decisions)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
-    for path in (GLOSSARY, CLAIMS, RISKS, ESTIMAND):
+    for path in (GLOSSARY, CLAIMS, RISKS, ESTIMAND, EQUIVALENCE):
         if not path.exists():
             continue
         for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -263,7 +370,8 @@ def main() -> int:
     ref_failures, refs = check_phase_refs(entries_by_file)
     path_failures, paths = check_paths()
     estimand_failures, estimand_refs = check_estimand()
-    failures += ref_failures + path_failures + estimand_failures
+    equivalence_failures, equivalence_decisions = check_equivalence()
+    failures += ref_failures + path_failures + estimand_failures + equivalence_failures
 
     if failures:
         for failure in failures:
@@ -274,6 +382,7 @@ def main() -> int:
     print(f"OK: CLAIMS.md com {claim_count} claims, todos com status e evidência")
     print(f"OK: RISCOS.md com {risk_count} riscos, todos com campos completos")
     print(f"OK: PERGUNTA-E-ESTIMANDO.md com seções obrigatórias e {estimand_refs} referências de fase")
+    print(f"OK: EQUIVALENCIA.md com 5 relações e {equivalence_decisions} decisões pendentes de revisão humana")
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
     return 0

@@ -34,9 +34,10 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Entregas: validação de links/IDs/campos, prova de que `.local/` e dados/runs
     estão ignorados, registro `docs/gates/BASELINE-PLANEJAMENTO.md` e primeiro
     commit local `fase C00: congelar baseline de planejamento`.
-  - Aceite: existem 81 microfases e 9 gates com seis campos cada; links atuais
-    resolvem; `git diff --check` passa; `.local/PROMPT-CONTINUAR.md` existe e
-    `git check-ignore` confirma que não integra o commit; após o commit o status
+  - Aceite: existem 81 microfases/9 gates no plano principal e 69 microfases/12
+    gates no NEXT, todos com seis campos; links atuais resolvem;
+    `git diff --check` passa; ambos os prompts `.local/` existem e
+    `git check-ignore` confirma que não integram o commit; após o commit o status
     rastreável está limpo.
   - Proibições: não executar pesquisa, baixar dados, instalar dependências ou
     incluir o prompt privado no Git.
@@ -120,6 +121,14 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     confirmada e não usar correspondência no input se ela pontua o output.
   - Dependências: C01, C02.
   - Orçamento: IA baixa + revisão humana obrigatória; sem GPU.
+  Bloqueio (2026-09-14, executor): pacote preparado em
+  `docs/research/EQUIVALENCIA.md` (hierarquia T0–T4, relações EQ-01–EQ-05 e
+  decisões DEC-EQ-01–DEC-EQ-09, todas `AGUARDANDO DECISÃO HUMANA`); fase mantida
+  `[ ]` porque o orçamento C03 exige revisão humana obrigatória e o protocolo
+  reserva ao revisor humano aprovar “mesmo tipo” e crosswalk; validação
+  estrutural com smoke negativo em `tools/validate_research.py` (14,2 MB de RAM,
+  0,07 s, sem GPU); próxima ação humana: revisar as 9 decisões; commit
+  3533c2a70e51c68d0d3897143c9bbf3520957e3c.
 
 - [ ] **C04 — Fixar desfechos, sucesso, nulidade e falsificação provisórios.**
   - Objetivo: impedir que a conclusão seja escolhida depois do resultado.
@@ -1102,7 +1111,8 @@ exploratório. Uma afirmação confirmatória nova exige alvo reservado e intoca
   - Entregas: `docs/gates/G8-ENCERRAMENTO.md`, índice dos artefatos, custos totais,
     questões abertas e próximos estudos que não sejam vendidos como concluídos.
   - Aceite: estado de todas as fases, desvios, datasets, runs, claims, publicação
-    e preservação é reconciliado; prompt local de continuação é aposentado.
+    e preservação é reconciliado; prompt principal é aposentado. O NEXT não abre
+    automaticamente: seu handoff começa em `docs/PLANO-MICROFASES-NEXT.md`.
   - Proibições: gate não depende de resultado positivo.
   - Dependências: P01–P09 executadas ou formalmente encerradas conforme G7.
   - Orçamento: IA baixa + aprovação humana final.
