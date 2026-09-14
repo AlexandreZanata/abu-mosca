@@ -11,7 +11,7 @@ IGNORED_SENTINELS = (
     "data/raw/source/sentinela_fonte.feather",
     "data/raw/target-public/sentinela_alvo.parquet",
     "data/raw/spikes/sentinela_spike.npy",
-    "data/sealed/target-labels/sentinela_selado.csv",
+    "data/sealed/target-labels/sentinela_selado.csv",  # firewall-allow
     "runs/sentinela_run/manifest.json",
     "checkpoints/sentinela.ckpt",
     "outputs/sentinela.out",
@@ -30,7 +30,7 @@ LAYOUT_DIRS = (
     "data/raw/target-public",
     "data/raw/spikes",
     "data/manifests",
-    "data/sealed/target-labels",
+    "data/sealed/target-labels",  # firewall-allow
     "artifacts/reports",
     "artifacts/frozen",
     "runs",

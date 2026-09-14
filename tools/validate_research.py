@@ -415,6 +415,32 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+FIREWALL_DOC = ROOT / "docs" / "research" / "FIREWALL.md"
+FIREWALL_TOOL = ROOT / "tools" / "firewall.py"
+FIREWALL_SECTIONS = (
+    "## 1. Zonas e princípios",
+    "## 2. Permissões e custódia",
+    "## 3. Scanner de referências e dependências",
+    "## 4. Barreiras de runtime",
+    "## 5. Inventário selado: apenas hashes",
+    "## 6. Testes antileakage",
+    "## 7. Procedimento de unseal e invalidação",
+    "## 8. Limitações",
+)
+FIREWALL_TOKENS = (
+    "custodiante",
+    "auditoria",
+    "scanner",
+    "firewall-allow",
+    "hashes",
+    "unseal",
+    "invalidação",
+    "logs",
+    "colunas",
+    "700",
+    "subprocesso",
+    "pipeline público",
+)
 RUN_CONTRACT_DOC = ROOT / "docs" / "research" / "RUN-CONTRACT.md"
 RUN_CONFIG_SCHEMA = ROOT / "schemas" / "run-config.schema.json"
 RUN_MANIFEST_SCHEMA = ROOT / "schemas" / "run-manifest.schema.json"
@@ -541,7 +567,7 @@ DATA_MANAGEMENT_TOKENS = (
     "data/raw/source",
     "data/raw/target-public",
     "data/raw/spikes",
-    "data/sealed",
+    "data/sealed",  # firewall-allow
     "data/manifests",
     "artifacts/reports",
     "artifacts/frozen",
@@ -556,7 +582,7 @@ DATA_MANAGEMENT_TOKENS = (
     "check_data_hygiene.py",
 )
 GITIGNORE_REQUIRED = (
-    "data/sealed/",
+    "data/sealed/",  # firewall-allow
     "*.token",
     "tokens/",
     "!/data/manifests/**",
@@ -1849,6 +1875,45 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_firewall_phase() -> tuple[list[str], int]:
+    label = "R05"
+    failures: list[str] = []
+    for path in (FIREWALL_DOC, FIREWALL_TOOL, ROOT / "tests" / "test_firewall.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+
+    doc = FIREWALL_DOC.read_text(encoding="utf-8")
+    for section in FIREWALL_SECTIONS:
+        if section not in doc:
+            failures.append(f"{label}: FIREWALL.md sem seção '{section}'")
+    for token in FIREWALL_TOKENS:
+        if token.lower() not in doc.lower():
+            failures.append(f"{label}: FIREWALL.md sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(doc)
+    if leak:
+        failures.append(f"{label}: FIREWALL.md com possível ID cru ('{leak.group(0)}')")
+
+    spec = importlib.util.spec_from_file_location("firewall_module", FIREWALL_TOOL)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    violations = module.scan_forbidden_references()
+    for violation in violations:
+        failures.append(f"{label}: referência proibida sem marca: {violation}")
+    sealed = module.SEALED_ROOT
+    if not sealed.is_dir():
+        failures.append(f"{label}: zona selada ausente '{sealed.relative_to(ROOT)}'")
+    else:
+        for path in (sealed, sealed / "target-labels"):  # firewall-allow
+            if path.exists() and (path.stat().st_mode & 0o777) != 0o700:
+                failures.append(f"{label}: permissões de '{path.relative_to(ROOT)}' não são 700")
+    gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
+    if "data/sealed/" not in gitignore:  # firewall-allow
+        failures.append(f"{label}: data/sealed/ deve continuar ignorado pelo Git")  # firewall-allow
+    return failures, len(FIREWALL_TOKENS)
+
+
 def check_run_contract() -> tuple[list[str], int]:
     label = "R04"
     failures: list[str] = []
@@ -2394,6 +2459,7 @@ def main() -> int:
     environment_failures, environment_tokens = check_environment_phase()
     provenance_failures, provenance_manifests = check_provenance_phase()
     run_contract_failures, run_contract_tokens = check_run_contract()
+    firewall_failures, firewall_tokens = check_firewall_phase()
     failures += (
         ref_failures
         + path_failures
@@ -2420,6 +2486,7 @@ def main() -> int:
         + environment_failures
         + provenance_failures
         + run_contract_failures
+        + firewall_failures
     )
 
     if failures:
@@ -2519,6 +2586,10 @@ def main() -> int:
     print(
         f"OK: contrato de run R04 com {run_contract_tokens} tokens, fixture "
         f"determinística e RUN-MANIFEST"
+    )
+    print(
+        f"OK: firewall R05 com {firewall_tokens} tokens, scanner limpo e selado "
+        f"com permissões restritas"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

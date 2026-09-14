@@ -1037,7 +1037,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   run interrompido sem manifesto exige limpeza manual para preservar a
   imutabilidade; commit 71f81864305110854c44feb947c8e82903971add.
 
-- [ ] **R05 — Implementar o firewall do alvo e teste antileakage.**
+- [x] **R05 — Implementar o firewall do alvo e teste antileakage.**
   - Objetivo: impedir acesso acidental do executor aos labels e crosswalk
     avaliativo do alvo.
   - Entregas: layout de zonas, permissões/processo de custódia, scanner de
@@ -1050,6 +1050,33 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     mensagens de debug.
   - Dependências: R01, R04, C05.
   - Orçamento: IA baixa + revisão de segurança metodológica; sem GPU.
+  Evidência (2026-09-14, executor): arquivos `tools/firewall.py` (scanner de
+  referências, trilha de auditoria para `open`/`os.listdir`/`os.scandir`,
+  abertura guardada, filtro de log por caminho/coluna e inventário só com
+  hashes), `docs/research/FIREWALL.md` (8 seções: zonas, permissões/custódia,
+  scanner, barreiras de runtime, inventário, testes, unseal/invalidação e
+  limitações) e `tests/test_firewall.py` (7 casos, incluindo auditoria e
+  pipeline público em subprocesso); permissões `700` aplicadas a
+  `data/sealed/` e `data/sealed/target-labels/`; marcas `firewall-allow` nos
+  pontos legítimos de `tools/check_data_hygiene.py` e
+  `tools/validate_research.py`; fontes/versões: R01/R04, C05, PROTOCOLO
+  (zonas e firewall) e fases H07/G3/M08, Python 3.12.2 (stdlib, sem
+  dependência nova), sem download e sem GPU; comandos e testes: `.venv/bin/python
+  -m pytest tests/ -q` (49 passaram em 4,83 s; 7 novos), `python3
+  tools/firewall.py scan` (limpo) e `inventory` (`count=0`),
+  `python3 tools/validate_research.py` (nova checagem R05 com smoke negativo de
+  seção/token/ID cru e smoke de permissões: 755 reprova, 700 aprova),
+  `python3 tools/validate_plan.py` e `git diff --cached --check`; resultado: o
+  pipeline público roda com o firewall armado sem tocar o selado, tentativas
+  sentinela de abrir/listar são bloqueadas, logs com caminho ou coluna proibidos
+  falham, inventário expõe apenas hashes e o repositório não tem referências
+  proibidas fora das marcas; recursos medidos: CPU apenas, suíte em 4,83 s, sem
+  GPU e sem dados brutos; decisão/limitação: usuário único torna a separação
+  procedural (limitação declarada), a revisão de segurança metodológica fica
+  para o G3, a lista final de colunas proibidas virá do schema selado de H07 e o
+  hook de auditoria é permanente por processo (usado no avaliador/subprocesso,
+  não na sessão do executor); commit
+  a9b8a2dccd7ad19d77db9c13ca28cf5662952bca.
 
 - [ ] **R06 — Especificar o plano estatístico e avaliador selado.**
   - Objetivo: definir cálculo, incerteza e outputs antes de observar o alvo.
