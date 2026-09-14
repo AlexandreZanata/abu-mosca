@@ -654,7 +654,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   preservados fora do commit; commit
   45f784d84118221f17a35a65a4133f1354047918.
 
-- [ ] **D05 — Auditar MANC release por release.**
+- [x] **D05 — Auditar MANC release por release.**
   - Objetivo: verificar comparabilidade do cordão nervoso e suas anotações.
   - Entregas: dataset card e claims oficiais.
   - Aceite: registra sexo, tecido, cobertura, direção/peso de arestas, tipos e
@@ -663,6 +663,25 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     anatômica explícita.
   - Dependências: D01, L02.
   - Orçamento: IA baixa; web; amostra até 100 MB.
+  Evidência (2026-09-14, executor): arquivos `research/datasets/cards/MANC.md`
+  (auditado em D05), `research/datasets/INVENTARIO.md` (CAND-04 auditado),
+  `research/literature/LEDGER.tsv` (LIT-0074 e LIT-0075),
+  `research/literature/QUERY-LOG.tsv` (leituras oficiais registradas) e esta
+  linha; fontes/versões: página oficial Janelia do MANC (v1.2.1), Takemura et
+  al. 2024 (10.7554/eLife.97769), Marin et al. 2024 (10.7554/eLife.97766),
+  Cheong et al. 2024 (10.7554/eLife.96084) e API do GitHub de
+  `natverse/malevnc` (GPL-3.0), acesso 2026-09-14; Python 3.12.2 (stdlib);
+  comandos e testes: `python3 tools/validate_research.py` (card auditado
+  coberto pelo smoke de D02), `python3 tools/validate_plan.py`,
+  `git diff --cached --check` e `git status --porcelain`; resultado: card do
+  MANC com 7 fontes atômicas (6 `confirmado` e 1 `não encontrado`), ~23.000
+  neurônios, VNC completo de macho, CC BY 4.0, releases v1.0/v1.2, acessos
+  neuPrint/malevnc/bucket flat e crosswalks EM-LM via NeuronBridge; nenhum
+  download; recursos: 21,8 MB de RAM e 0,09 s no validador, sem GPU e com teto
+  de 100 MB não utilizado; decisão/limitação: MANC permanece `candidato`, cobre
+  apenas o VNC e seu uso em benchmark com cérebro exige hipótese anatômica
+  explícita; arquivos não relacionados preservados fora do commit; commit
+  72d7dd081c3b2be4151a4431888e3a74345460b3.
 
 - [ ] **D06 — Auditar MAOL release por release.**
   - Objetivo: verificar se o candidato de lobo óptico sustenta comparação local.

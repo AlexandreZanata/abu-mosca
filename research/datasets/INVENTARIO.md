@@ -57,8 +57,9 @@ Campos obrigatórios do inventário e dos cards (identificadores estáveis):
 
 ### CAND-04 — MANC
 - Card: `research/datasets/cards/MANC.md`
-- Status: não confirmado
-- Pendências: todos os campos CAMPO-01 a CAMPO-16; auditoria em D05.
+- Status: auditado (D05)
+- Pendências: formatos/tamanhos/checksums por arquivo (`não confirmado`) e
+  granularidade de tipos para harmonização (C03/D08).
 
 ### CAND-05 — MAOL
 - Card: `research/datasets/cards/MAOL.md`
