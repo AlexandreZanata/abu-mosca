@@ -205,6 +205,32 @@ LIT_LEDGER_COLUMNS = (
 )
 LIT_TRIAGE_STATUSES = ("triagem", "incluido", "excluido", "pendente_fulltext")
 LIT_CANDIDATES = ("FlyWire/FAFB", "hemibrain", "BANC", "MANC", "MAOL", "MCNS")
+LIT_DATASET_EXTRA = ("múltiplos", "geral", "—")
+ALIGNMENT = ROOT / "research" / "literature" / "ALIGNMENT.md"
+ALIGNMENT_SECTIONS = (
+    "## 1. Estado e escopo",
+    "## 2. Métodos",
+    "## 3. Síntese para o zero-shot",
+    "## 4. Limitações",
+)
+ALIGNMENT_FIELDS = (
+    "Referência",
+    "Input",
+    "Âncoras/rótulos",
+    "Supervisão",
+    "Caráter",
+    "Datasets",
+    "Código/licença",
+    "Métrica",
+    "Inadequações ao zero-shot",
+    "Status",
+)
+ALIGNMENT_SUPERVISIONS = (
+    "não supervisionado",
+    "supervisionado",
+    "auto-supervisionado",
+    "híbrido",
+)
 LIT_ID_RE = re.compile(r"^LIT-\d{4}$")
 LIT_QUERY_LOG = ROOT / "research" / "literature" / "QUERY-LOG.tsv"
 LIT_QUERY_LOG_COLUMNS = (
@@ -874,14 +900,15 @@ def check_literature_ledger() -> tuple[list[str], int, int]:
         if query_id not in LIT_QUERIES:
             failures.append(f"{label}:{number}: query_id inválido '{query_id}'")
         dataset = row[index["dataset"]]
-        if dataset not in LIT_CANDIDATES:
+        if dataset not in LIT_CANDIDATES and dataset not in LIT_DATASET_EXTRA:
             failures.append(f"{label}:{number}: dataset inesperado '{dataset}'")
         elif status == "incluido":
             if not row[index["doi"]].strip() and not row[index["url"]].strip():
                 failures.append(f"{label}:{number}: incluído sem DOI nem URL")
             if row[index["claim_atomico"]].strip() in ("", "—"):
                 failures.append(f"{label}:{number}: incluído sem claim_atomico")
-            per_candidate_included[dataset] += 1
+            if dataset in LIT_CANDIDATES:
+                per_candidate_included[dataset] += 1
     for candidate, count in per_candidate_included.items():
         if count == 0:
             failures.append(f"{label}: candidato sem fonte oficial incluída: {candidate}")
@@ -905,6 +932,76 @@ def check_literature_ledger() -> tuple[list[str], int, int]:
     return failures, len(rows) - 1, max(len(log_rows) - 1, 0)
 
 
+def _ledger_rows() -> list[list[str]]:
+    if not LIT_LEDGER.exists():
+        return []
+    return [
+        line.split("\t")
+        for line in LIT_LEDGER.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+
+
+def check_alignment_review() -> tuple[list[str], int]:
+    label = "ALIGNMENT.md"
+    if not ALIGNMENT.exists():
+        return [f"{label}: arquivo ausente em research/literature/"], 0
+    text = ALIGNMENT.read_text(encoding="utf-8")
+    failures: list[str] = []
+    for section in ALIGNMENT_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+
+    rows = _ledger_rows()
+    known_lit: set[str] = set()
+    if len(rows) >= 2 and "lit_id" in rows[0]:
+        index = rows[0].index("lit_id")
+        known_lit = {row[index] for row in rows[1:] if len(row) > index}
+
+    blocks = parse_heading_blocks(text, r"^### (ALN-\d{2}) — (.+)$")
+    if len(blocks) < 5:
+        failures.append(f"{label}: esperados ao menos 5 métodos (achados {len(blocks)})")
+    for aln_id, block in blocks:
+        for field in ALIGNMENT_FIELDS:
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {aln_id} sem campo '{field}'")
+        reference = field_value(block, "Referência") or ""
+        ref_ids = sorted(set(re.findall(r"LIT-\d{4}", reference)))
+        if not ref_ids:
+            failures.append(f"{label}: {aln_id} sem referência LIT-*")
+        for lit_id in ref_ids:
+            if known_lit and lit_id not in known_lit:
+                failures.append(f"{label}: {aln_id} referencia ledger inexistente '{lit_id}'")
+        supervision = field_value(block, "Supervisão")
+        anchors = (field_value(block, "Âncoras/rótulos") or "").lower()
+        if supervision is not None:
+            if not supervision.startswith(ALIGNMENT_SUPERVISIONS):
+                failures.append(f"{label}: {aln_id} supervisão inválida '{supervision}'")
+            if supervision.startswith("supervisionado") and anchors.startswith("nenhuma"):
+                failures.append(f"{label}: {aln_id} supervisionado não pode declarar 'nenhuma' âncora")
+            if (
+                supervision.startswith("não supervisionado")
+                and "semente" in anchors
+                and "nenhuma" not in anchors
+            ):
+                failures.append(f"{label}: {aln_id} não supervisionado não pode depender de sementes")
+
+    if len(rows) >= 2 and "query_id" in rows[0] and "fase" in rows[0]:
+        qi, fi = rows[0].index("query_id"), rows[0].index("fase")
+        queries = {
+            row[qi] for row in rows[1:] if len(row) > max(qi, fi) and row[fi] == "L03"
+        }
+        for query in ("Q1", "Q2"):
+            if query not in queries:
+                failures.append(f"{label}: ledger sem consulta {query} em L03")
+
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    refs = phase_refs(text)
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(blocks)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
@@ -920,6 +1017,7 @@ def check_paths() -> tuple[list[str], int]:
         INFEASIBLE,
         GATE_G0,
         LIT_PROTOCOL,
+        ALIGNMENT,
     ):
         if not path.exists():
             continue
@@ -953,6 +1051,7 @@ def main() -> int:
     gate_failures, gate_criteria, gate_state = check_gate_package()
     lit_failures, lit_queries = check_literature_protocol()
     ledger_failures, ledger_rows, query_log_rows = check_literature_ledger()
+    alignment_failures, alignment_methods = check_alignment_review()
     failures += (
         ref_failures
         + path_failures
@@ -964,6 +1063,7 @@ def main() -> int:
         + gate_failures
         + lit_failures
         + ledger_failures
+        + alignment_failures
     )
 
     if failures:
@@ -1003,6 +1103,10 @@ def main() -> int:
         f"OK: research/literature/LEDGER.tsv com {ledger_rows} registros, "
         f"{query_log_rows} consultas no QUERY-LOG e {len(LIT_CANDIDATES)} "
         f"candidatos com fonte incluída"
+    )
+    print(
+        f"OK: research/literature/ALIGNMENT.md com {alignment_methods} métodos "
+        f"e supervisão classificada"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

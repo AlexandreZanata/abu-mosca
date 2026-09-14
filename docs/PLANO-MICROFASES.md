@@ -323,7 +323,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   revisão humana em G1; arquivos não relacionados preservados fora do commit;
   commit 581ae8d299f2182df1a36d31cdc1a992914071db.
 
-- [ ] **L03 — Revisar neuron matching e graph alignment.**
+- [x] **L03 — Revisar neuron matching e graph alignment.**
   - Objetivo: identificar métodos, supervisão, pressupostos e baselines publicados.
   - Entregas: `research/literature/ALIGNMENT.md` e entradas no ledger.
   - Aceite: para cada método registra input, uso de âncoras/rótulos, caráter
@@ -332,6 +332,28 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não chamar método supervisionado de baseline não supervisionado.
   - Dependências: L01, L02.
   - Orçamento: IA baixa; sem GPU.
+  Evidência (2026-09-14, executor): arquivos `research/literature/ALIGNMENT.md`,
+  `research/literature/LEDGER.tsv` (LIT-0026 a LIT-0032),
+  `research/literature/QUERY-LOG.tsv` (consultas Q1/Q2),
+  `tools/validate_research.py` (funções de L03) e esta linha; fontes/versões:
+  buscas de 2026-09-14 verificadas em fontes primárias — Costa 2016
+  (10.1016/j.neuron.2016.06.012), Clements 2024 (10.1186/s12859-024-05732-7),
+  Pedigo 2022 (10.1162/netn_a_00287), Fishkind 2019
+  (10.1016/j.patcog.2018.09.014), Heimann 2018 (10.1145/3269206.3271788), Zhang
+  e Tong 2016 (10.1145/2939672.2939766) e Stürner 2024
+  (10.1101/2024.06.04.596633); Python 3.12.2 (stdlib); comandos e testes:
+  `python3 tools/validate_research.py` com smoke negativo inline (campo ausente,
+  supervisão inválida, supervisão/âncora inconsistente, LIT inexistente, consulta
+  Q1/Q2 ausente e seção ausente), `python3 tools/validate_plan.py`,
+  `git diff --cached --check` e `git status --porcelain`; resultado: 6 métodos
+  (NBLAST, NeuronBridge, bisected GM, SGM, REGAL e FINAL) com input, âncoras,
+  supervisão, caráter, datasets, código/licença, métrica e inadequações; nenhum
+  método transdutivo apresentado como zero-shot; 32 registros no ledger e 16
+  consultas no log; recursos: 16,4 MB de RAM e 0,07 s no validador, sem GPU;
+  decisão/limitação: licenças de código marcadas como não verificadas quando a
+  fonte não as declarava, nenhuma métrica reproduzida e revisão humana em G1;
+  arquivos não relacionados preservados fora do commit; commit
+  22c58cae53b12ad7d3693cc1f412370de22ed1c0.
 
 - [ ] **L04 — Revisar predição de tipo por conectividade e morfologia.**
   - Objetivo: testar a plausibilidade e a circularidade da hipótese biológica.
