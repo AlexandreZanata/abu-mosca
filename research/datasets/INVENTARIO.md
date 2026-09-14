@@ -70,8 +70,9 @@ Campos obrigatórios do inventário e dos cards (identificadores estáveis):
 
 ### CAND-06 — MCNS
 - Card: `research/datasets/cards/MCNS.md`
-- Status: não confirmado
-- Pendências: todos os campos CAMPO-01 a CAMPO-16; auditoria em D07.
+- Status: auditado (D07)
+- Pendências: reconciliar contagens (resumo vs PMC/preprint), checksums por
+  arquivo (`não encontrado`) e harmonização com FlyWire/MAOL (C03/D08).
 
 ## 4. Regras de preenchimento
 

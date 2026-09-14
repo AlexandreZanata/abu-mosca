@@ -711,7 +711,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   arquivo ainda não confirmados; arquivos não relacionados preservados fora do
   commit; commit 5418a3e3e5ee45f3979ea3d32f23b5ac39fdc94c.
 
-- [ ] **D07 — Auditar MCNS release por release.**
+- [x] **D07 — Auditar MCNS release por release.**
   - Objetivo: verificar se o candidato de sistema nervoso central sustenta os
     experimentos propostos.
   - Entregas: dataset card e claims oficiais.
@@ -720,6 +720,28 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não fundir releases ou indivíduos por semelhança de nome.
   - Dependências: D01, L02.
   - Orçamento: IA baixa; web; amostra até 100 MB.
+  Evidência (2026-09-14, executor): arquivos `research/datasets/cards/MCNS.md`
+  (auditado em D07), `research/datasets/INVENTARIO.md` (CAND-06 auditado),
+  `research/literature/LEDGER.tsv` (LIT-0078 e LIT-0079),
+  `research/literature/QUERY-LOG.tsv` (leituras oficiais registradas) e esta
+  linha; fontes/versões: páginas oficiais do Male CNS (Janelia e
+  janelia-flyem.github.io/male-cns/download) e Berg et al. 2026
+  (10.1016/j.cell.2026.08.015), acesso 2026-09-14; Python 3.12.2 (stdlib);
+  comandos e testes: `python3 tools/validate_research.py` (card auditado coberto
+  pelo smoke de D02), `python3 tools/validate_plan.py`,
+  `git diff --cached --check` e `git status --porcelain`; resultado: MCNS
+  confirmado como SNC completo de macho único (cérebro, lobos ópticos e VNC,
+  conectivo cervical intacto), releases v0.9/v1.0 (v1.0 em 2026-06-08), CC-BY
+  4.0, bulk Feather com tamanhos por arquivo (anotações 13 MB; conectividade
+  1,1 GB; sin-partners 6,8 GB com schema confirmado), esqueletos SWC/precomputed
+  e neo4j; contagens 166.700/11.710 (publicado) vs 166.691/11.691 (PMC/preprint)
+  registradas como conflitantes; 7 fontes atômicas (5 `confirmado`, 1
+  `conflitante` e 1 `não encontrado`); nenhum download; recursos: 21,8 MB de RAM
+  e 0,09 s no validador, sem GPU e com teto de 100 MB não utilizado; decisão/
+  limitação: MCNS permanece `candidato`, sem fundir releases ou indivíduos por
+  semelhança de nome (MANC é outro espécime) e com checksums por arquivo ainda
+  não encontrados; arquivos não relacionados preservados fora do commit; commit
+  57148f8dcb9b7894200129fc1924caa1a339cf7f.
 
 - [ ] **D08 — Auditar ontologias, crosswalks e independência dos rótulos.**
   - Objetivo: saber se “mesmo tipo” pode ser pontuado sem circularidade indevida.
