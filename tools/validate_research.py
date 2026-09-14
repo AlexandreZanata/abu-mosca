@@ -357,6 +357,44 @@ GATE_G1_SIGNATURE_FIELDS = (
     "Custodiante do alvo, quando aplicável",
     "Revisor de literatura/novidade",
 )
+DATASETS_INVENTORY = ROOT / "research" / "datasets" / "INVENTARIO.md"
+DATASET_CARDS_DIR = ROOT / "research" / "datasets" / "cards"
+INVENTORY_SECTIONS = (
+    "## 1. Estado e escopo",
+    "## 2. Esquema congelado",
+    "## 3. Inventário dos candidatos",
+    "## 4. Regras de preenchimento",
+    "## 5. Limitações",
+)
+INVENTORY_FIELDS = (
+    "Release",
+    "Indivíduo/sexo/estágio/tecido",
+    "Cobertura",
+    "IDs",
+    "Tipos",
+    "Proveniência dos rótulos",
+    "Neurotransmissores",
+    "Regiões",
+    "Edges",
+    "Skeletons",
+    "Crosswalks",
+    "Licença",
+    "API/dump",
+    "Formato",
+    "Tamanho",
+    "Checksum",
+)
+INVENTORY_CANDIDATES = tuple(f"CAND-{number:02d}" for number in range(1, 7))
+CARD_SECTIONS = (
+    "## Identidade e proveniência",
+    "## Acesso e licença",
+    "## Conteúdo confirmado",
+    "## Riscos para comparação",
+    "## Verificação local mínima",
+    "## Veredito",
+    "## Fontes atômicas",
+)
+FABRICATION_RE = re.compile(r":\s*`?confirmado", re.I)
 LIT_ID_RE = re.compile(r"^LIT-\d{4}$")
 LIT_QUERY_LOG = ROOT / "research" / "literature" / "QUERY-LOG.tsv"
 LIT_QUERY_LOG_COLUMNS = (
@@ -1468,6 +1506,64 @@ def check_gate_g1() -> tuple[list[str], int, str]:
     return failures, len(criteria), state
 
 
+def check_dataset_inventory() -> tuple[list[str], int]:
+    label = "INVENTARIO.md"
+    if not DATASETS_INVENTORY.exists():
+        return [f"{label}: arquivo ausente em research/datasets/"], 0
+    text = DATASETS_INVENTORY.read_text(encoding="utf-8")
+    flat = " ".join(text.split()).lower()
+    failures: list[str] = []
+    for section in INVENTORY_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for field in INVENTORY_FIELDS:
+        if field.lower() not in flat:
+            failures.append(f"{label}: campo obrigatório ausente ('{field}')")
+    fabrication = FABRICATION_RE.search(text)
+    if fabrication:
+        failures.append(f"{label}: valor 'confirmado' sem auditoria ('{fabrication.group(0)}')")
+
+    blocks = parse_heading_blocks(text, r"^### (CAND-\d{2}) — (.+)$")
+    seen: set[str] = set()
+    for cand_id, block in blocks:
+        seen.add(cand_id)
+        if cand_id not in INVENTORY_CANDIDATES:
+            failures.append(f"{label}: candidato inesperado {cand_id}")
+        card = field_value(block, "Card")
+        status = field_value(block, "Status")
+        if card is None:
+            failures.append(f"{label}: {cand_id} sem campo 'Card'")
+        else:
+            card_path = ROOT / card.strip("`")
+            if not card_path.exists():
+                failures.append(f"{label}: {cand_id} aponta card ausente '{card}'")
+            else:
+                card_text = card_path.read_text(encoding="utf-8")
+                for section in CARD_SECTIONS:
+                    if section not in card_text:
+                        failures.append(f"{card_path.name}: seção do modelo ausente '{section}'")
+                if "não confirmado" not in card_text:
+                    failures.append(f"{card_path.name}: sem marcação 'não confirmado'")
+                card_fabrication = FABRICATION_RE.search(card_text)
+                if card_fabrication:
+                    failures.append(
+                        f"{card_path.name}: valor 'confirmado' sem auditoria ('{card_fabrication.group(0)}')"
+                    )
+        if status is None:
+            failures.append(f"{label}: {cand_id} sem campo 'Status'")
+        elif status != "não confirmado":
+            failures.append(f"{label}: {cand_id} deve permanecer 'não confirmado' em D01 (status '{status}')")
+    for cand_id in INVENTORY_CANDIDATES:
+        if cand_id not in seen:
+            failures.append(f"{label}: candidato obrigatório ausente {cand_id}")
+
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    refs = phase_refs(text)
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(blocks)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
@@ -1489,6 +1585,7 @@ def check_paths() -> tuple[list[str], int]:
         METHODS,
         NOVELTY,
         GATE_G1,
+        DATASETS_INVENTORY,
     ):
         if not path.exists():
             continue
@@ -1528,6 +1625,7 @@ def main() -> int:
     methods_failures, methods_count = check_methods_matrix()
     novelty_failures, novelty_gaps = check_novelty()
     gate_g1_failures, gate_g1_criteria, gate_g1_state = check_gate_g1()
+    inventory_failures, inventory_candidates = check_dataset_inventory()
     failures += (
         ref_failures
         + path_failures
@@ -1545,6 +1643,7 @@ def main() -> int:
         + methods_failures
         + novelty_failures
         + gate_g1_failures
+        + inventory_failures
     )
 
     if failures:
@@ -1608,6 +1707,10 @@ def main() -> int:
     print(
         f"OK: G1-LITERATURA.md com decisão {gate_g1_state}, {gate_g1_criteria} "
         f"critérios, snapshot conferido e estado do plano coerente"
+    )
+    print(
+        f"OK: research/datasets/INVENTARIO.md com {inventory_candidates} candidatos "
+        f"e cards não confirmados"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

@@ -534,7 +534,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
 
 ### Auditoria de datasets
 
-- [ ] **D01 — Congelar esquema de dataset card e inventário de candidatos.**
+- [x] **D01 — Congelar esquema de dataset card e inventário de candidatos.**
   - Objetivo: comparar datasets pelos mesmos critérios.
   - Entregas: cópias versionadas do modelo para cada candidato e
     `research/datasets/INVENTARIO.md` com campos obrigatórios e status vazio.
@@ -544,6 +544,23 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: campos desconhecidos permanecem `não confirmado`.
   - Dependências: G1.
   - Orçamento: IA baixa; sem GPU.
+  Evidência (2026-09-14, executor): arquivos `research/datasets/INVENTARIO.md`,
+  `research/datasets/cards/FLYWIRE-FAFB.md`, `HEMIBRAIN.md`, `BANC.md`,
+  `MANC.md`, `MAOL.md` e `MCNS.md` (cópias versionadas de
+  `docs/templates/DATASET-CARD.md` com status `não confirmado`),
+  `tools/validate_research.py` (funções de D01) e esta linha; fontes/versões:
+  apenas documentos internos (modelo de dataset card e G1 aprovado), nenhuma
+  fonte externa consultada, Python 3.12.2 (stdlib); comandos e testes:
+  `python3 tools/validate_research.py` com smoke negativo inline (card ausente,
+  status confirmado, seção ausente, valor fabricado, campo ausente e candidato
+  ausente), `python3 tools/validate_plan.py`, `git diff --cached --check` e
+  `git status --porcelain`; resultado: 16 campos congelados (CAMPO-01 a
+  CAMPO-16), 6 candidatos com cards vazios e status `não confirmado`, nenhum
+  dado de dataset declarado e nenhuma licença avaliada; recursos: 21,3 MB de RAM
+  e 0,09 s no validador, sem GPU; decisão/limitação: esquema congelado e campos
+  desconhecidos permanecem `não confirmado`; as auditorias D02–D07 preenchem um
+  card por vez com fonte primária; arquivos não relacionados preservados fora do
+  commit; commit 77a5196d85b9a44dff6f051e215c2169cf3c7881.
 
 - [ ] **D02 — Auditar FlyWire/FAFB release por release.**
   - Objetivo: registrar apenas capacidades verificadas desse candidato.
