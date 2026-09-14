@@ -106,6 +106,50 @@ THREAT_STATUSES = ("aberto", "em mitigação", "mitigado com artefato")
 THREAT_PROHIBITION = "sem teste ou artefato"
 RSK_ID_RE = re.compile(r"RSK-\d{3}")
 
+LADDER = RESEARCH / "ESCADA-DE-CLAIMS.md"
+INFEASIBLE = RESEARCH / "RELATORIO-INVIABILIDADE-ESQUELETO.md"
+LADDER_SECTIONS = (
+    "## 1. Regras gerais",
+    "## 2. Níveis de evidência e linguagem",
+    "## 3. Saídas negativas",
+    "## 4. Proibições e limitações",
+)
+LADDER_LEVELS = ("NIV-01", "NIV-02", "NIV-03", "NIV-04", "NIV-05")
+LADDER_TOKENS = (
+    "sinal topológico",
+    "transferência entre dois datasets",
+    "cross-individual",
+    "multi-connectome",
+    "potencialmente novo",
+    "resultado negativo",
+    "benchmark inviável",
+)
+LADDER_RULES = (
+    "não promete paper",
+    "nem causalidade",
+    "seeds não são indivíduos",
+    "dois espécimes independentes",
+)
+LADDER_LEVEL_FIELDS = (
+    "Alegação permitida",
+    "Evidência mínima",
+    "Fase de decisão",
+    "Não autoriza",
+    "Claims relacionados",
+    "Status",
+)
+LADDER_STATUSES = ("bloqueado", "liberado com evidência")
+INFEASIBLE_SECTIONS = (
+    "## Decisão",
+    "## Evidência que motivou",
+    "## O que foi refutado",
+    "## O que permanece aberto",
+    "## Reformulação proposta",
+    "## Publicação negativa",
+    "## Limitações",
+)
+CLM_ID_RE = re.compile(r"CLM-\d{3}")
+
 ESTIMAND_SECTIONS = (
     "Estimando",
     "Hipótese primária",
@@ -529,10 +573,71 @@ def check_threats() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_claim_ladder() -> tuple[list[str], int]:
+    label = LADDER.name
+    if not LADDER.exists():
+        return [f"{label}: arquivo ausente"], 0
+    text = LADDER.read_text(encoding="utf-8")
+    flat = " ".join(text.split()).lower()
+    failures: list[str] = []
+    for section in LADDER_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for token in LADDER_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: nível/token obrigatório ausente ('{token}')")
+    for rule in LADDER_RULES:
+        if rule not in flat:
+            failures.append(f"{label}: regra obrigatória ausente ('{rule}')")
+
+    blocks = parse_heading_blocks(text, r"^### (NIV-\d{2}) — (.+)$")
+    seen: set[str] = set()
+    for niv_id, block in blocks:
+        seen.add(niv_id)
+        if niv_id not in LADDER_LEVELS:
+            failures.append(f"{label}: nível inesperado {niv_id}")
+        for field in LADDER_LEVEL_FIELDS:
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {niv_id} sem campo '{field}'")
+        status = field_value(block, "Status")
+        if status is not None and status not in LADDER_STATUSES:
+            failures.append(f"{label}: {niv_id} status inválido '{status}'")
+        if status == "liberado com evidência":
+            evidence = field_value(block, "Evidência congelada")
+            if evidence is None or "a preencher" in evidence.lower():
+                failures.append(f"{label}: {niv_id} liberado sem campo 'Evidência congelada'")
+    for niv_id in LADDER_LEVELS:
+        if niv_id not in seen:
+            failures.append(f"{label}: nível obrigatório ausente {niv_id}")
+
+    if not INFEASIBLE.exists():
+        failures.append(f"{INFEASIBLE.name}: arquivo ausente")
+    else:
+        skeleton = INFEASIBLE.read_text(encoding="utf-8")
+        for section in INFEASIBLE_SECTIONS:
+            if section not in skeleton:
+                failures.append(f"{INFEASIBLE.name}: seção ausente '{section}'")
+        if "A preencher" not in skeleton:
+            failures.append(f"{INFEASIBLE.name}: esqueleto sem marcadores 'A preencher'")
+
+    known_claims = (
+        {entry_id for entry_id, _, _ in parse_entries(CLAIMS, "CLM", 3)} if CLAIMS.exists() else set()
+    )
+    for clm in sorted(set(CLM_ID_RE.findall(text))):
+        if known_claims and clm not in known_claims:
+            failures.append(f"{label}: referencia claim inexistente '{clm}'")
+
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    refs = phase_refs(text)
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(blocks)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
-    for path in (GLOSSARY, CLAIMS, RISKS, ESTIMAND, EQUIVALENCE, OUTCOMES, THREATS):
+    for path in (GLOSSARY, CLAIMS, RISKS, ESTIMAND, EQUIVALENCE, OUTCOMES, THREATS, LADDER, INFEASIBLE):
         if not path.exists():
             continue
         for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -561,6 +666,7 @@ def main() -> int:
     equivalence_failures, equivalence_decisions, equivalence_approved = check_equivalence()
     outcomes_failures, outcomes_tokens = check_outcomes()
     threat_failures, threats = check_threats()
+    ladder_failures, levels = check_claim_ladder()
     failures += (
         ref_failures
         + path_failures
@@ -568,6 +674,7 @@ def main() -> int:
         + equivalence_failures
         + outcomes_failures
         + threat_failures
+        + ladder_failures
     )
 
     if failures:
@@ -590,6 +697,10 @@ def main() -> int:
     print(
         f"OK: AMEACAS-A-VALIDADE.md com {threats} ameaças cobrindo os "
         f"{len(THREAT_TOPICS)} temas exigidos"
+    )
+    print(
+        f"OK: ESCADA-DE-CLAIMS.md com {levels} níveis e esqueleto de "
+        f"inviabilidade com {len(INFEASIBLE_SECTIONS)} seções"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

@@ -202,7 +202,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   relacionados preservados fora do commit; commit
   aef8c11cee0dd61e5fa9ab890924632350ab4380.
 
-- [ ] **C06 — Criar contrato de claims e saídas negativas.**
+- [x] **C06 — Criar contrato de claims e saídas negativas.**
   - Objetivo: limitar a linguagem final ao nível de evidência alcançado.
   - Entregas: `docs/research/ESCADA-DE-CLAIMS.md` e esqueleto do relatório de
     inviabilidade/reformulação.
@@ -212,6 +212,24 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não prometer paper, novidade ou causalidade.
   - Dependências: C02–C05.
   - Orçamento: IA baixa; sem GPU.
+  Evidência (2026-09-14, executor): arquivos
+  `docs/research/ESCADA-DE-CLAIMS.md`,
+  `docs/research/RELATORIO-INVIABILIDADE-ESQUELETO.md`,
+  `tools/validate_research.py` (funções de C06) e esta linha; fontes/versões:
+  apenas documentos internos (CLAIMS de C01, estimando de C02, equivalência
+  aprovada em C03, desfechos de C04 e ameaças de C05), nenhuma fonte externa,
+  Python 3.12.2 (stdlib); comandos e testes: `python3 tools/validate_research.py`
+  com smoke negativo inline (nível ausente, status inválido, liberação sem
+  evidência congelada, proibição removida, claim inexistente, esqueleto sem
+  marcadores e seção do esqueleto ausente), `python3 tools/validate_plan.py`,
+  `git diff --cached --check` e `git status --porcelain`; resultado: 5 níveis
+  (sinal topológico, transferência entre dois datasets, cross-individual,
+  multi-connectome e potencialmente novo) todos `bloqueado`, saídas negativas e
+  benchmark inviável previstos e esqueleto com 7 seções não preenchidas;
+  recursos: 15,1 MB de RAM e 0,07 s no validador, sem GPU; decisão/limitação:
+  contrato de linguagem provisório, sem dados, nenhum nível liberado e revisão
+  humana em G0; arquivos não relacionados preservados fora do commit; commit
+  42259a2fbfcdb0d3b47578a605c347a5eb191219.
 
 - [ ] **G0 — Aprovar o contrato científico provisório.**
   - Objetivo: decidir se a pergunta é testável antes de buscar confirmação.
