@@ -48,10 +48,14 @@ EQUIVALENCE_SECTIONS = (
     "## 6. Regras de crosswalk",
     "## 7. Decisões pendentes",
     "## 8. Limites deste documento",
+    "## 9. Aprovação humana",
 )
+APPROVAL_FIELDS = ("Data", "Aprovador", "Escopo")
 EQUIVALENCE_RELATIONS = ("EQ-01", "EQ-02", "EQ-03", "EQ-04", "EQ-05")
 RELATION_CLASSIFICATIONS = ("gold label", "proxy", "hipótese", "fora do escopo")
 PENDING_DECISION = "AGUARDANDO DECISÃO HUMANA"
+APPROVED_STATUS = "APROVADO"
+ALLOWED_EQUIVALENCE_STATUSES = (PENDING_DECISION, APPROVED_STATUS)
 EQUIVALENCE_CASES = (
     "one-to-one",
     "multi-instance",
@@ -279,10 +283,10 @@ def check_estimand() -> tuple[list[str], int]:
     return failures, len(refs)
 
 
-def check_equivalence() -> tuple[list[str], int]:
+def check_equivalence() -> tuple[list[str], int, int]:
     label = EQUIVALENCE.name
     if not EQUIVALENCE.exists():
-        return [f"{label}: arquivo ausente"], 0
+        return [f"{label}: arquivo ausente"], 0, 0
     text = EQUIVALENCE.read_text(encoding="utf-8")
     flat = " ".join(text.split())
     failures: list[str] = []
@@ -299,6 +303,7 @@ def check_equivalence() -> tuple[list[str], int]:
         if case not in flat:
             failures.append(f"{label}: caso obrigatório ausente ('{case}')")
 
+    statuses: set[str] = set()
     relations = parse_heading_blocks(text, r"^### (EQ-\d{2}) — (.+)$")
     seen_rel = set()
     for rel_id, block in relations:
@@ -311,6 +316,11 @@ def check_equivalence() -> tuple[list[str], int]:
         classification = field_value(block, "Classificação proposta")
         if classification is not None and not classification.startswith(RELATION_CLASSIFICATIONS):
             failures.append(f"{label}: {rel_id} classificação inválida '{classification}'")
+        status = field_value(block, "Status")
+        if status is not None:
+            statuses.add(status)
+            if status not in ALLOWED_EQUIVALENCE_STATUSES:
+                failures.append(f"{label}: {rel_id} status inválido '{status}'")
     for rel_id in EQUIVALENCE_RELATIONS:
         if rel_id not in seen_rel:
             failures.append(f"{label}: relação obrigatória ausente {rel_id}")
@@ -321,9 +331,15 @@ def check_equivalence() -> tuple[list[str], int]:
         dec_id = f"DEC-EQ-{number:02d}"
         if dec_id not in seen_dec:
             failures.append(f"{label}: decisão obrigatória ausente {dec_id}")
+    approved = 0
     for dec_id, block in decisions:
-        if field_value(block, "Status") != PENDING_DECISION:
-            failures.append(f"{label}: {dec_id} deveria estar '{PENDING_DECISION}'")
+        status = field_value(block, "Status")
+        if status is not None:
+            statuses.add(status)
+            if status not in ALLOWED_EQUIVALENCE_STATUSES:
+                failures.append(f"{label}: {dec_id} status inválido '{status}'")
+            if status == APPROVED_STATUS:
+                approved += 1
         if field_value(block, "Decisão") is None:
             failures.append(f"{label}: {dec_id} sem campo 'Decisão'")
         if field_value(block, "Recomendação") is None:
@@ -331,14 +347,31 @@ def check_equivalence() -> tuple[list[str], int]:
 
     for line in text.splitlines():
         match = re.match(r"^\s*- Status: (.+?)\s*$", line)
-        if match and match.group(1).strip().rstrip(".") != PENDING_DECISION:
-            failures.append(f"{label}: status '{match.group(1).strip()}' não é pendência humana")
+        if match:
+            status = match.group(1).strip().rstrip(".")
+            if status not in ALLOWED_EQUIVALENCE_STATUSES:
+                failures.append(f"{label}: status '{status}' não permitido")
+
+    if APPROVED_STATUS in statuses:
+        section = re.search(r"## 9\. Aprovação humana\n(.*?)(?=\n## |\Z)", text, re.S)
+        if section is None:
+            failures.append(f"{label}: status APROVADO sem seção de aprovação humana")
+        else:
+            approval_lines = section.group(1).splitlines()
+            for field in APPROVAL_FIELDS:
+                if field_value(approval_lines, field) is None:
+                    failures.append(f"{label}: aprovação humana sem campo '{field}'")
+            approver = field_value(approval_lines, "Aprovador")
+            if approver is not None and not any(
+                word in approver.lower() for word in ("humano", "revisor")
+            ):
+                failures.append(f"{label}: aprovador não identificado como humano/revisor: '{approver}'")
 
     known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
     refs = phase_refs(text)
     for ref in sorted(ref for ref in refs if ref not in known):
         failures.append(f"{label}: referência de fase inexistente '{ref}'")
-    return failures, len(decisions)
+    return failures, len(decisions), approved
 
 
 def check_paths() -> tuple[list[str], int]:
@@ -370,7 +403,7 @@ def main() -> int:
     ref_failures, refs = check_phase_refs(entries_by_file)
     path_failures, paths = check_paths()
     estimand_failures, estimand_refs = check_estimand()
-    equivalence_failures, equivalence_decisions = check_equivalence()
+    equivalence_failures, equivalence_decisions, equivalence_approved = check_equivalence()
     failures += ref_failures + path_failures + estimand_failures + equivalence_failures
 
     if failures:
@@ -382,7 +415,10 @@ def main() -> int:
     print(f"OK: CLAIMS.md com {claim_count} claims, todos com status e evidência")
     print(f"OK: RISCOS.md com {risk_count} riscos, todos com campos completos")
     print(f"OK: PERGUNTA-E-ESTIMANDO.md com seções obrigatórias e {estimand_refs} referências de fase")
-    print(f"OK: EQUIVALENCIA.md com 5 relações e {equivalence_decisions} decisões pendentes de revisão humana")
+    print(
+        f"OK: EQUIVALENCIA.md com 5 relações e {equivalence_decisions} decisões "
+        f"({equivalence_approved} aprovadas por humano)"
+    )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
     return 0

@@ -110,7 +110,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   arquivos não relacionados preservados fora do commit; commit
   cb5094be70b42beeb89e8ea740bb879d08e0bcc8.
 
-- [ ] **C03 — Definir “neurônio equivalente” e a hierarquia avaliativa.**
+- [x] **C03 — Definir “neurônio equivalente” e a hierarquia avaliativa.**
   - Objetivo: escolher targets cientificamente defensáveis antes de ver scores.
   - Entregas: `docs/research/EQUIVALENCIA.md` com target primário, targets
     secundários, casos one-to-one, multi-instance, unknown e regras de crosswalk.
@@ -129,6 +129,22 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   estrutural com smoke negativo em `tools/validate_research.py` (14,2 MB de RAM,
   0,07 s, sem GPU); próxima ação humana: revisar as 9 decisões; commit
   3533c2a70e51c68d0d3897143c9bbf3520957e3c.
+  Evidência (2026-09-14, executor + revisor humano): arquivos
+  `docs/research/EQUIVALENCIA.md` (status de EQ-01–EQ-05 e DEC-EQ-01–DEC-EQ-09
+  aprovados; seção 9 com data, aprovador e escopo), `tools/validate_research.py`
+  (validação de aprovação humana) e esta linha; fontes/versões: decisão do
+  revisor humano registrada na sessão de 2026-09-14 (aprovação integral, sem
+  exceções) e documentos internos, nenhuma fonte externa, Python 3.12.2
+  (stdlib); comandos e testes: `python3 tools/validate_research.py` com smoke
+  negativo inline (APROVADO sem seção de aprovação, aprovador não humano, campo
+  de aprovação ausente e status inválido), `python3 tools/validate_plan.py`,
+  `git diff --cached --check` e `git status --porcelain`; resultado: 9 decisões
+  aprovadas por humano, 5 relações com classificação aprovada, 36 caminhos e 65
+  referências de fase válidos; recursos: 14,0 MB de RAM e 0,06 s no validador,
+  sem GPU; decisão/limitação: aprovação integral mantém H1 definida e congela as
+  regras do MVP; a validação é estrutural e não substitui julgamento científico;
+  arquivos não relacionados preservados fora do commit; commit
+  40552405b9e5447c8790cb5052c54dc76beae5e4.
 
 - [ ] **C04 — Fixar desfechos, sucesso, nulidade e falsificação provisórios.**
   - Objetivo: impedir que a conclusão seja escolhida depois do resultado.
