@@ -199,18 +199,6 @@
       "uncertain": false
     },
     {
-      "label": "20A.22A",
-      "manc_neurons": 817,
-      "mcns_neurons": 817,
-      "uncertain": true
-    },
-    {
-      "label": "20B.21B.22B",
-      "manc_neurons": 32,
-      "mcns_neurons": 30,
-      "uncertain": true
-    },
-    {
       "label": "21A",
       "manc_neurons": 419,
       "mcns_neurons": 419,
@@ -221,43 +209,31 @@
       "manc_neurons": 441,
       "mcns_neurons": 645,
       "uncertain": false
-    },
-    {
-      "label": "24B.25B",
-      "manc_neurons": 50,
-      "mcns_neurons": 43,
-      "uncertain": true
-    },
-    {
-      "label": "26X",
-      "manc_neurons": 18,
-      "mcns_neurons": 18,
-      "uncertain": true
-    },
-    {
-      "label": "27X",
-      "manc_neurons": 58,
-      "mcns_neurons": 243,
-      "uncertain": true
     }
   ],
-  "classes_k_min_both": 40,
-  "crosswalk_sha256": "fdb8dbc8e0844dfc52b984fd629ec23d22540d3ecc8782c96ae9d547e28e1bbe",
+  "classes_k_min_both": 35,
+  "crosswalk_sha256": "2dc94f8a2845d7c6e75cea9f63286b00f1ae21c259a5053357292eb9ca9d28df",
   "excluded_labels": [
+    "20A.22A",
+    "20B.21B.22B",
     "21X",
+    "24B.25B",
+    "26X",
+    "27X",
     "TBD",
     "ausentes"
+  ],
+  "excluded_uncertain_labels": [
+    "20A.22A",
+    "20B.21B.22B",
+    "24B.25B",
+    "26X",
+    "27X"
   ],
   "file": "crosswalk-hemilineage.draft.json",
   "k_min": 10,
   "shared_labels": 41,
   "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
   "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
-  "uncertain_labels": [
-    "20A.22A",
-    "20B.21B.22B",
-    "24B.25B",
-    "26X",
-    "27X"
-  ]
+  "uncertain_labels": []
 }

@@ -19,6 +19,7 @@ import pyarrow.feather as feather
 
 ROOT = Path(__file__).resolve().parent.parent
 K_MIN = 10
+EXCLUDED_LABELS = ("20A.22A", "20B.21B.22B", "24B.25B", "26X", "27X")
 MANC_DATASET, MANC_RELEASE = "MANC", "manc:v1.2.1"
 MCNS_DATASET, MCNS_RELEASE = "MCNS", "male-cns:v1.0"
 MANC_SHA = "data/raw/spikes/manc_neuron_properties.feather"
@@ -60,7 +61,10 @@ def build(manc_path: Path, mcns_path: Path, reviewer: str, changelog_version: st
     manc_counts: Counter = Counter(filter(None, (normalize(v) for v in manc["hemilineage"].to_pylist())))
     mcns_counts: Counter = Counter(filter(None, (normalize(v) for v in mcns["trumanHl"].to_pylist())))
     shared = sorted(set(manc_counts) & set(mcns_counts))
-    both = [label for label in shared if manc_counts[label] >= K_MIN and mcns_counts[label] >= K_MIN]
+    both = [
+        label for label in shared
+        if manc_counts[label] >= K_MIN and mcns_counts[label] >= K_MIN and label not in EXCLUDED_LABELS
+    ]
     if not both:
         raise CrosswalkError("nenhuma hemilinhagem com K≥10 nos dois lados")
     uncertain = [label for label in both if is_uncertain(label)]
@@ -88,7 +92,7 @@ def build(manc_path: Path, mcns_path: Path, reviewer: str, changelog_version: st
             }
         )
     crosswalk = {
-        "crosswalk_version": "hemilineage-draft-1.0",
+        "crosswalk_version": "hemilineage-2.0-draft",
         "dataset_pair": [MANC_DATASET, MCNS_DATASET],
         "single_reviewer_deviation": {
             "changelog_version": changelog_version,
@@ -100,6 +104,7 @@ def build(manc_path: Path, mcns_path: Path, reviewer: str, changelog_version: st
         "shared_labels": len(shared),
         "classes_k_min_both": len(both),
         "uncertain_labels": uncertain,
+        "excluded_uncertain_labels": list(EXCLUDED_LABELS),
         "excluded_labels": sorted(set(shared) - set(both)) + ["TBD", "ausentes"],
         "classes": [
             {

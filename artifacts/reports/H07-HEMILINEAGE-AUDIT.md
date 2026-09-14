@@ -18,21 +18,24 @@ Executada em 2026-09-14. Sem consultar scores. Fontes locais auditadas: MANC
 ## 2. Proveniência da classe (independência da conectividade)
 
 - **MANC (documentado):** Marin et al. 2024 (eLife reviewed preprint 97766,
-  acesso 2026-09-14) declara que a hemilinhagem é origem de desenvolvimento
-  (“based on their developmental origin, i.e., hemilineage”) e descreve a
-  identificação por imagens light-level, feixes de trato somático e NBLAST
-  morfológico, com previsões de neurotransmissor para confirmar — **não pela
-  conectividade sináptica usada como entrada do modelo**. No MANC, o tipo
-  sistemático usa conectividade, mas o campo de hemilinhagem não.
-- **MCNS (`trumanHl`, não confirmado):** o campo segue a nomenclatura de
-  hemilinhagem de Truman (desenvolvimento), mas o método de atribuição não foi
-  verificado em fonte primária acessível nesta auditoria (paper Cell pago e
-  preprint não consultado em detalhe). **Não é possível afirmar independência
-  suficiente do lado do alvo.**
-- Consequência (condição 5 do responsável): o desfecho por hemilinhagem **não é
-  materializado como confirmatório** enquanto essa prova não existir; a
-  alternativa é declará-lo inconclusivo. NBLAST/coclustering/propagação devem
-  ser registrados separadamente se surgirem como evidência.
+  acesso 2026-09-14): hemilinhagem é origem de desenvolvimento, atribuída por
+  imagens light-level, feixes de trato somático e NBLAST morfológico, com
+  previsões de neurotransmissor para confirmar — não pela conectividade
+  sináptica do modelo.
+- **MCNS (PMC12636603, acesso 2026-09-14):** o preprint declara, em Methods
+  (“Hemilineage”): “Hemilineage annotations were transferred from the
+  FAFB/FlyWire, hemibrain, and MANC datasets according to cross-matched neuron
+  types. Unmatched types and many:1 matches were reviewed as described in
+  Schlegel et al.”; e a Fig. 1i descreve o casamento como “a combination of
+  spatial transforms + NBLAST and connectivity co-clustering”.
+- Consequência: a **semântica** do rótulo é de desenvolvimento, mas a
+  **atribuição no alvo** é transferência (propagação) via correspondência que inclui NBLAST
+  (morfologia) e co-clustering de conectividade — ou seja, **a independência em
+  relação à conectividade usada como entrada não está demonstrada**; a
+  atribuição é putativa e também não é independente de morfologia.
+- Condição 5 do responsável: sem demonstração suficiente, o desfecho **não é
+  materializado como confirmatório** (inconclusivo), salvo justificativa humana
+  explícita registrada no changelog.
 
 ## 3. Pacote preparado (para assinatura, status minuta)
 

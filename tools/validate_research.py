@@ -2273,14 +2273,17 @@ def check_h07_blocked() -> tuple[list[str], int]:
     hemi_draft = json.loads(H07_HEMI_DRAFT.read_text(encoding="utf-8"))
     if hemi_metrics.get("k_min") != 10 or hemi_metrics.get("classes_k_min_both", 0) < 1:
         failures.append(f"{label}: cobertura K=10 da hemilinhagem ausente ou inválida")
-    if hemi_metrics.get("classes_k_min_both") != len(hemi_draft.get("mappings", [])):
+    if hemi_metrics.get("classes_k_min_both") != len(hemi_draft.get("mappings", [])) or hemi_metrics.get("classes_k_min_both", 0) < 30:
         failures.append(f"{label}: rascunho de hemilinhagem divergente das métricas")
+    for label in ("20A.22A", "20B.21B.22B", "24B.25B", "26X", "27X"):
+        if any(mapping["source_type"] == label for mapping in hemi_draft.get("mappings", [])):
+            failures.append(f"{label}: rótulo incerto não pode constar do crosswalk")
     if hemi_metrics.get("shared_labels", 0) < hemi_metrics.get("classes_k_min_both", 0):
         failures.append(f"{label}: interseção de hemilinhagem inconsistente")
-    if not hemi_metrics.get("uncertain_labels"):
+    if not (hemi_metrics.get("uncertain_labels") or hemi_metrics.get("excluded_uncertain_labels")):
         failures.append(f"{label}: rótulos incertos de hemilinhagem devem ser listados")
     hemi_report = (ROOT / "artifacts" / "reports" / "H07-HEMILINEAGE-AUDIT.md").read_text(encoding="utf-8")
-    for token in ("não confirmado", "k≥10", "exploratório", "inconclusivo", "trumanhl"):
+    for token in ("pmc12636603", "transferência", "co-clustering", "k≥10", "exploratório", "inconclusivo", "trumanhl"):
         if token.lower() not in " ".join(hemi_report.split()).lower():
             failures.append(f"{label}: auditoria de hemilinhagem sem token '{token}'")
     changelog_text = (ROOT / "preregistration" / "CHANGELOG.md").read_text(encoding="utf-8")

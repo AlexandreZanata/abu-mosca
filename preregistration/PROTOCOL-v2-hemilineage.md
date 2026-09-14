@@ -22,8 +22,10 @@ consultado; nenhum label set foi materializado.
 ## 2. Hipóteses
 
 - H1′: o encoder supera o melhor baseline simples pré-registrado em
-  recuperação macro por hemilinhagem no alvo, sem usar IDs, posição,
-  morfologia, conectividade derivada do alvo ou qualquer estatística do alvo.
+  recuperação macro por hemilinhagem no alvo. O grafo público do alvo pode ser
+  usado **somente em inferência congelada** (topology-only); é proibido usar
+  rótulos, crosswalk, morfologia, posição, IDs, tuning ou estatísticas globais
+  ajustadas no alvo.
 - H0′: após controlar grau, atalhos e incerteza, o encoder não supera o
   baseline por diferença relevante; o desempenho é compatível com estrutura
   trivial, ruído de anotação ou peculiaridades da fonte.
@@ -36,19 +38,22 @@ consultado; nenhum label set foi materializado.
   exige Δ ≥ SESOI, IC excluindo zero e ganho preservado na sensibilidade
   balanceada e no controle pareado por grau (família Holm de 3).
 - Cobertura: classes com **K≥10 nos dois lados**, sem consultar scores —
-  41 rótulos compartilhados, 40 com K≥10 (rascunho `hemilineage-draft-1.0`);
-  cobertura reportada sempre.
-- Exclusões: `TBD`, ausentes e `21X` (K<10) já fora; `20A.22A`, `20B.21B.22B`,
-  `24B.25B`, `26X`, `27X` marcados para decisão explícita na assinatura.
+  41 rótulos compartilhados, **35 classes elegíveis** após exclusões
+  (`crosswalk-hemilineage.draft.json`, versão `hemilineage-2.0-draft`).
+- Exclusões: `TBD`, ausentes, `21X` (K<10) e os cinco incertos
+  (`20A.22A`, `20B.21B.22B`, `24B.25B`, `26X`, `27X`).
 
 ## 4. Independência do rótulo (condição de validade)
 
 - MANC: documentado (Marin et al. 2024): hemilinhagem por origem de
   desenvolvimento (light-level, trato somático, NBLAST morfológico), não por
   conectividade sináptica — independente do trilho topológico.
-- MCNS: **não confirmado** em fonte primária nesta auditoria; até confirmação,
-  o desfecho não pode ser materializado como confirmatório (aplicar
-  inconclusivo).
+- MCNS (PMC12636603): semântica de desenvolvimento, mas atribuição por
+  **transferência via correspondência** (NBLAST + co-clustering de
+  conectividade); independência em relação à conectividade de entrada **não
+  demonstrada** — desfecho **não materializável como confirmatório** (condição
+  5) sem justificativa humana registrada. A independência declarada é em
+  relação à conectividade sináptica, **não** em relação à morfologia.
 - Trilho de morfologia (Experimento C) fica **proibido** para este desfecho,
   pois a atribuição de hemilinhagem usa morfologia no MANC.
 

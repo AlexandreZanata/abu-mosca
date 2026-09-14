@@ -33,17 +33,14 @@ def test_normalizacao_e_intersecao_k_min(tmp_path):
     assert crosswalk["single_reviewer_deviation"]["changelog_version"] == "2.0-draft"
 
 
-def test_rotulos_incertos_marcados(tmp_path):
+def test_rotulos_incertos_excluidos(tmp_path):
     manc = ["20A.22A"] * 10 + ["26X"] * 10 + ["05B"] * 10
     mcns = ["20A.22A"] * 10 + ["26X"] * 10 + ["05B"] * 10
     manc_path, mcns_path = write_tables(tmp_path, manc, mcns)
     crosswalk, metrics = hc.build(manc_path, mcns_path, "A", "2.0-draft")
-    assert set(metrics["uncertain_labels"]) == {"20A.22A", "26X"}
-    assert all(
-        mapping["provenance"]["uncertain_label"] is True
-        for mapping in crosswalk["mappings"]
-        if mapping["source_type"] in metrics["uncertain_labels"]
-    )
+    labels = [mapping["source_type"] for mapping in crosswalk["mappings"]]
+    assert labels == ["05B"]
+    assert set(metrics["excluded_uncertain_labels"]) == {"20A.22A", "26X", "20B.21B.22B", "24B.25B", "27X"}
 
 
 def test_sem_ids_de_neuronio(tmp_path):
