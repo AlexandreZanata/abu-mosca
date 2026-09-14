@@ -1293,7 +1293,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   ficam para H08 sem mudar o schema, e a amostra dourada não substitui o grafo
   completo; commit 45239ab2298c2ce876825fad5f306140b0233e4c.
 
-- [ ] **H03 — Implementar e validar o adapter público do alvo.**
+- [x] **H03 — Implementar e validar o adapter público do alvo.**
   - Objetivo: converter apenas o grafo/features permitidos do alvo sem tocar
     labels selados.
   - Entregas: adapter separado, testes de schema, amostra dourada sem labels,
@@ -1303,6 +1303,39 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não abrir adapter/arquivo avaliativo “só para conferir”.
   - Dependências: H01, R05.
   - Orçamento: IA baixa; primeiro amostra, depois CPU/RAM conforme D09.
+  Evidência (2026-09-14, executor): arquivos `tools/adapter_mcns.py` (leitura
+  exclusiva de `body_pre`, `body_post`, `weight` com schema exigido de três
+  colunas, recusa de coluna extra/avaliativa, IDs opacos, graus derivados,
+  agregação por soma com conservação e métricas de arquivo completo por
+  coluna), `tests/test_adapter_mcns.py` (5 casos, incluindo integração com o
+  arquivo público e ausência de menção a anotações), amostra dourada
+  `tests/fixtures/mcns-sample-graph.json` (40 nodes/57 edges, sha256
+  `4b30c6e3…`) e `artifacts/reports/H03-ADAPTER-ALVO.md` + `.json`; fontes/
+  versões: MCNS `male-cns:v1.0` (grafo público baixado por `curl` e registrado
+  no manifesto R03 com sha256 `e35da783…` e md5 oficial do GCS `f30e9dcc…`),
+  LIT-0023 para contagens publicadas, contrato H01 e firewall R05, Python
+  3.12.2 com pyarrow/pandas do lock R02, sem GPU; comandos e testes:
+  `.venv/bin/python tools/adapter_mcns.py --weights
+  data/raw/target-public/mcns_connectome_weights.feather --out
+  runs/h03/mcns-sample-graph.json --golden tests/fixtures/mcns-sample-graph.json
+  --metrics artifacts/reports/H03-ADAPTER-ALVO.json` (151.856.684 linhas,
+  soma de pesos 311.833.243, peso mínimo 1, 123 self-loops no arquivo completo,
+  amostra de 100.000 linhas com 38.442 nodes, 0 multiedges e conservação
+  12.750.241), `python3 tools/manifest.py validate --check-files` (4 manifestos
+  válidos com o novo arquivo), `.venv/bin/python -m pytest tests/ -q`
+  (101 testes; 5 novos), nova checagem H03 no `validate_research.py` com smoke
+  negativo (token, peso não conservado, sha divergente do manifesto, atributo
+  proibido, menção a arquivo avaliativo e ID cru), `python3
+  tools/validate_plan.py` e `git diff --cached --check`; resultado: adapter
+  roda sem `data/sealed`, sem anotação e sem qualquer campo avaliativo, com
+  schema público contendo apenas topologia e mesmas invariantes de H02
+  (checksums, IDs únicos, endpoints válidos, pesos ≥ 0, direção conhecida,
+  totais reconciliados/explicados); recursos medidos: 8,2 s de execução, pico
+  de 5.240,9 MiB, CPU apenas, 1,05 GB baixado dentro do teto aprovado;
+  decisão/limitação: contagem exata de nodes únicos do arquivo completo e a
+  flag de self-loops no grafo integral ficam para H08, e o JSON verboso
+  continua candidato a escrita incremental/colunar sem mudar o schema; commit
+  ce7a6152b49d8b443216f9f5671aeeada2dcf041.
 
 - [ ] **H04 — Implementar o adapter selado de avaliação.**
   - Objetivo: permitir pontuação sem expor rótulos por neurônio ao executor.

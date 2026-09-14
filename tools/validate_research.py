@@ -415,6 +415,21 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+TARGET_ADAPTER_TOOL = ROOT / "tools" / "adapter_mcns.py"
+TARGET_ADAPTER_REPORT = ROOT / "artifacts" / "reports" / "H03-ADAPTER-ALVO.md"
+TARGET_ADAPTER_METRICS = ROOT / "artifacts" / "reports" / "H03-ADAPTER-ALVO.json"
+TARGET_ADAPTER_GOLDEN = ROOT / "tests" / "fixtures" / "mcns-sample-graph.json"
+TARGET_ADAPTER_TOKENS = (
+    "adapter",
+    "conserv",
+    "self-loop",
+    "reconcilia",
+    "trilho a",
+    "amostra dourada",
+    "checksum",
+    "data/sealed",  # firewall-allow
+    "limitaç",
+)
 ADAPTER_TOOL = ROOT / "tools" / "adapter_manc.py"
 ADAPTER_REPORT = ROOT / "artifacts" / "reports" / "H02-ADAPTER-FONTE.md"
 ADAPTER_METRICS = ROOT / "artifacts" / "reports" / "H02-ADAPTER-FONTE.json"
@@ -2080,6 +2095,80 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_adapter_target() -> tuple[list[str], int]:
+    label = "H03"
+    failures: list[str] = []
+    for path in (
+        TARGET_ADAPTER_TOOL,
+        TARGET_ADAPTER_REPORT,
+        TARGET_ADAPTER_METRICS,
+        TARGET_ADAPTER_GOLDEN,
+        ROOT / "tests" / "test_adapter_mcns.py",
+    ):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+
+    report = TARGET_ADAPTER_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in TARGET_ADAPTER_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+
+    source = TARGET_ADAPTER_TOOL.read_text(encoding="utf-8")
+    for token in ("body-annotations", "flywireType", "hemibrainType", "annotations"):
+        if token in source:
+            failures.append(f"{label}: adapter menciona arquivo avaliativo ('{token}')")
+
+    spec = importlib.util.spec_from_file_location("target_adapter_module", TARGET_ADAPTER_TOOL)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    golden = json.loads(TARGET_ADAPTER_GOLDEN.read_text(encoding="utf-8"))
+    graph_spec = importlib.util.spec_from_file_location("graph_module", GRAPH_TOOL)
+    graph_module = importlib.util.module_from_spec(graph_spec)
+    graph_spec.loader.exec_module(graph_module)
+    failures += [f"{label}: {f}" for f in graph_module.validate_graph(golden, TARGET_ADAPTER_GOLDEN.name)]
+    if len(golden.get("nodes", [])) != 40:
+        failures.append(f"{label}: amostra dourada fora do tamanho esperado (40 nodes)")
+    if not 40 <= len(golden.get("edges", [])) <= 60:
+        failures.append(f"{label}: amostra dourada com número de arestas inesperado")
+    for node in golden.get("nodes", []):
+        if set(node.get("attributes", {})) & set(module.FORBIDDEN_NODE_ATTRIBUTES):
+            failures.append(f"{label}: atributo proibido no trilho A na amostra dourada")
+
+    metrics = json.loads(TARGET_ADAPTER_METRICS.read_text(encoding="utf-8"))
+    if metrics.get("sample_weight_conserved") is not True:
+        failures.append(f"{label}: peso da amostra não conservado")
+    if not isinstance(metrics.get("rows_full"), int) or metrics["rows_full"] < 100000000:
+        failures.append(f"{label}: métricas sem contagem do arquivo completo")
+    if metrics.get("self_loops_full", 0) < 1:
+        failures.append(f"{label}: self-loops do arquivo completo não registrados")
+    if tuple(metrics.get("columns", ())) != ("body_pre", "body_post", "weight"):
+        failures.append(f"{label}: colunas lidas divergentes do esperado")
+    manifest_path = ROOT / "data" / "manifests" / "mcns-v1.0.json"
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        entry = next(
+            (item for item in manifest["files"] if item["path"].endswith("mcns_connectome_weights.feather")),
+            None,
+        )
+        if entry is not None and metrics.get("input_sha256") != entry["sha256"]:
+            failures.append(f"{label}: sha256 de entrada diverge do manifesto R03")
+    digest = hashlib.sha256(TARGET_ADAPTER_GOLDEN.read_bytes()).hexdigest()
+    if metrics.get("golden_sha256") != digest:
+        failures.append(f"{label}: sha256 da amostra dourada diverge das métricas")
+
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(TARGET_ADAPTER_TOKENS)
+
+
 def check_adapter_source() -> tuple[list[str], int]:
     label = "H02"
     failures: list[str] = []
@@ -3081,6 +3170,7 @@ def main() -> int:
     gate_g3_failures, gate_g3_entries, gate_g3_state = check_gate_g3()
     graph_contract_failures, graph_contract_tokens = check_graph_contract()
     adapter_source_failures, adapter_source_tokens = check_adapter_source()
+    adapter_target_failures, adapter_target_tokens = check_adapter_target()
     failures += (
         ref_failures
         + path_failures
@@ -3114,6 +3204,7 @@ def main() -> int:
         + gate_g3_failures
         + graph_contract_failures
         + adapter_source_failures
+        + adapter_target_failures
     )
 
     if failures:
@@ -3240,6 +3331,10 @@ def main() -> int:
     print(
         f"OK: adapter H02 com {adapter_source_tokens} tokens, amostra dourada e "
         f"peso conservado"
+    )
+    print(
+        f"OK: adapter público do alvo H03 com {adapter_target_tokens} tokens, "
+        f"amostra sem labels e arquivo completo contado"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
