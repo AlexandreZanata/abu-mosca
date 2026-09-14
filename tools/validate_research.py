@@ -66,6 +66,46 @@ OUTCOMES_RULES = (
     "após o unseal",
 )
 
+THREATS = RESEARCH / "AMEACAS-A-VALIDADE.md"
+THREAT_SECTIONS = (
+    "## 1. Estado e escopo",
+    "## 2. Método de classificação",
+    "## 3. Ameaças",
+    "## 4. Controles transversais",
+    "## 5. Mapa para o registro de riscos",
+    "## 6. Limitações",
+)
+THREAT_TOPICS = (
+    "IDs/ordem",
+    "grau",
+    "coordenadas/regiões",
+    "rótulos derivados de conectividade/morfologia",
+    "crosswalk circular",
+    "normalização no alvo",
+    "amostragem de negativos",
+    "duplicação de neurônios",
+    "sexo",
+    "tecido",
+    "cobertura",
+    "reconstrução",
+    "threshold",
+    "tuning pós-unseal",
+)
+THREAT_FIELDS = (
+    "Tema",
+    "Categoria",
+    "Severidade provisória",
+    "Cenário",
+    "Teste de detecção planejado",
+    "Mitigação planejada",
+    "Risco residual",
+    "Status",
+)
+THREAT_SEVERITIES = ("alta", "média", "baixa")
+THREAT_STATUSES = ("aberto", "em mitigação", "mitigado com artefato")
+THREAT_PROHIBITION = "sem teste ou artefato"
+RSK_ID_RE = re.compile(r"RSK-\d{3}")
+
 ESTIMAND_SECTIONS = (
     "Estimando",
     "Hipótese primária",
@@ -439,10 +479,60 @@ def check_outcomes() -> tuple[list[str], int]:
     return failures, len(OUTCOMES_TOKENS)
 
 
+def check_threats() -> tuple[list[str], int]:
+    label = THREATS.name
+    if not THREATS.exists():
+        return [f"{label}: arquivo ausente"], 0
+    text = THREATS.read_text(encoding="utf-8")
+    failures: list[str] = []
+    for section in THREAT_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    if THREAT_PROHIBITION not in text:
+        failures.append(f"{label}: falta a proibição '{THREAT_PROHIBITION}'")
+
+    known_risks = (
+        {entry_id for entry_id, _, _ in parse_entries(RISKS, "RSK", 3)} if RISKS.exists() else set()
+    )
+    blocks = parse_heading_blocks(text, r"^### (AMA-\d{2}) — (.+)$")
+    seen_topics: set[str] = set()
+    for ama_id, block in blocks:
+        for field in THREAT_FIELDS:
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {ama_id} sem campo '{field}'")
+        topic = field_value(block, "Tema")
+        if topic is not None:
+            seen_topics.add(topic)
+            if topic not in THREAT_TOPICS:
+                failures.append(f"{label}: {ama_id} tema inesperado '{topic}'")
+        severity = field_value(block, "Severidade provisória")
+        if severity is not None and severity not in THREAT_SEVERITIES:
+            failures.append(f"{label}: {ama_id} severidade inválida '{severity}'")
+        status = field_value(block, "Status")
+        if status is not None and status not in THREAT_STATUSES:
+            failures.append(f"{label}: {ama_id} status inválido '{status}'")
+        if status == "mitigado com artefato" and field_value(block, "Artefato") is None:
+            failures.append(f"{label}: {ama_id} mitigado sem campo Artefato")
+        related = field_value(block, "Riscos relacionados")
+        if related is not None:
+            for rsk in RSK_ID_RE.findall(related):
+                if known_risks and rsk not in known_risks:
+                    failures.append(f"{label}: {ama_id} referencia risco inexistente '{rsk}'")
+    for topic in THREAT_TOPICS:
+        if topic not in seen_topics:
+            failures.append(f"{label}: tema obrigatório ausente ('{topic}')")
+
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    refs = phase_refs(text)
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(blocks)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
-    for path in (GLOSSARY, CLAIMS, RISKS, ESTIMAND, EQUIVALENCE, OUTCOMES):
+    for path in (GLOSSARY, CLAIMS, RISKS, ESTIMAND, EQUIVALENCE, OUTCOMES, THREATS):
         if not path.exists():
             continue
         for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -470,8 +560,14 @@ def main() -> int:
     estimand_failures, estimand_refs = check_estimand()
     equivalence_failures, equivalence_decisions, equivalence_approved = check_equivalence()
     outcomes_failures, outcomes_tokens = check_outcomes()
+    threat_failures, threats = check_threats()
     failures += (
-        ref_failures + path_failures + estimand_failures + equivalence_failures + outcomes_failures
+        ref_failures
+        + path_failures
+        + estimand_failures
+        + equivalence_failures
+        + outcomes_failures
+        + threat_failures
     )
 
     if failures:
@@ -490,6 +586,10 @@ def main() -> int:
     print(
         f"OK: DESFECHOS-E-FALSIFICACAO.md com {len(OUTCOMES_STATES)} estados e "
         f"{outcomes_tokens} marcadores obrigatórios"
+    )
+    print(
+        f"OK: AMEACAS-A-VALIDADE.md com {threats} ameaças cobrindo os "
+        f"{len(THREAT_TOPICS)} temas exigidos"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

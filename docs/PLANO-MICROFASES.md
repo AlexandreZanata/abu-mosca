@@ -174,7 +174,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   apenas estrutural; arquivos não relacionados preservados fora do commit; commit
   7341d27cc4ff0b53e350787870e7b9c6b094d5d1.
 
-- [ ] **C05 — Modelar ameaças à validade e leakage.**
+- [x] **C05 — Modelar ameaças à validade e leakage.**
   - Objetivo: listar como o estudo poderia acertar pelo motivo errado.
   - Entregas: `docs/research/AMEACAS-A-VALIDADE.md` com severidade, teste de
     detecção, mitigação e risco residual.
@@ -185,6 +185,22 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não classificar risco como mitigado sem teste ou artefato.
   - Dependências: C03, C04.
   - Orçamento: IA baixa + revisão; sem GPU.
+  Evidência (2026-09-14, executor): arquivos
+  `docs/research/AMEACAS-A-VALIDADE.md`, `tools/validate_research.py` (funções
+  de C05) e esta linha; fontes/versões: apenas documentos internos (RISCOS de
+  C01, estimando de C02, equivalência aprovada em C03 e desfechos de C04),
+  nenhuma fonte externa consultada, Python 3.12.2 (stdlib); comandos e testes:
+  `python3 tools/validate_research.py` com smoke negativo inline (tema ausente,
+  mitigação sem artefato, proibição removida, severidade inválida, risco
+  inexistente e seção ausente), `python3 tools/validate_plan.py`,
+  `git diff --cached --check` e `git status --porcelain`; resultado: 14 ameaças
+  cobrindo os 14 temas do aceite, cada uma com severidade, cenário, teste de
+  detecção, mitigação planejada e risco residual `não verificado`; nenhuma
+  classificação `mitigado` sem artefato; recursos: 14,8 MB de RAM e 0,07 s no
+  validador, sem GPU; decisão/limitação: modelo provisório, sem código/dados e
+  sem mitigação executada, severidades a revisar em D01–D10; arquivos não
+  relacionados preservados fora do commit; commit
+  aef8c11cee0dd61e5fa9ab890924632350ab4380.
 
 - [ ] **C06 — Criar contrato de claims e saídas negativas.**
   - Objetivo: limitar a linguagem final ao nível de evidência alcançado.
