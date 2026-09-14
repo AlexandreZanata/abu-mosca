@@ -595,7 +595,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   relacionados preservados fora do commit; commit
   59ec9ef58769512996d5712ec22e4e4a7169501c.
 
-- [ ] **D03 — Auditar hemibrain release por release.**
+- [x] **D03 — Auditar hemibrain release por release.**
   - Objetivo: avaliar o comparador cerebral sem presumir cobertura equivalente.
   - Entregas: dataset card, claims e interfaces de acesso oficiais.
   - Aceite: mesmos critérios de D02, incluindo espécime, cobertura parcial,
@@ -603,6 +603,26 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não tratar sobreposição anatômica como identidade de população.
   - Dependências: D01, L02.
   - Orçamento: IA baixa; web; amostra até 100 MB.
+  Evidência (2026-09-14, executor): arquivos `research/datasets/cards/HEMIBRAIN.md`
+  (auditado em D03), `research/datasets/INVENTARIO.md` (CAND-02 auditado),
+  `research/literature/LEDGER.tsv` (LIT-0070 e LIT-0071),
+  `research/literature/QUERY-LOG.tsv` (leituras oficiais registradas) e
+  `tools/validate_research.py` e esta linha; fontes/versões: Scheffer et al.
+  2020 (10.7554/eLife.57443), página oficial Janelia do hemibrain, GitHub API
+  `connectome-neuprint/neuPrint` (BSD-3-Clause, último push 2023-02-24) e
+  Schlegel et al. 2024 (10.1038/s41586-024-07686-5), acesso 2026-09-14;
+  Python 3.12.2 (stdlib); comandos e testes: `python3 tools/validate_research.py`
+  com a validação de cards auditados já coberta pelo smoke de D02,
+  `python3 tools/validate_plan.py`, `git diff --cached --check` e
+  `git status --porcelain`; resultado: card do hemibrain com 8 fontes atômicas
+  (6 `confirmado`, 1 `não encontrado` e 1 `conflitante` por critério de
+  contagem), fêmea única de 5 dias, cobertura parcial, licença CC BY 4.0,
+  releases v1.0–v1.2, exports CSV e interfaces neuPrint/DVID/Neuroglancer;
+  nenhum download; recursos: 21,8 MB de RAM e 0,09 s no validador, sem GPU e sem
+  download; decisão/limitação: hemibrain permanece `candidato`, contagens de
+  tipos conflitantes entre fontes e sobreposição anatômica com o FlyWire não
+  tratada como identidade de população; arquivos não relacionados preservados
+  fora do commit; commit 04afe8e57d57cee235518b6338b7e693a326e2ea.
 
 - [ ] **D04 — Auditar BANC release por release.**
   - Objetivo: verificar acesso, escopo anatômico e rótulos realmente liberados.

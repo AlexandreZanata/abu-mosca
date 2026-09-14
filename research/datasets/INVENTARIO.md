@@ -44,8 +44,9 @@ Campos obrigatórios do inventário e dos cards (identificadores estáveis):
 
 ### CAND-02 — hemibrain
 - Card: `research/datasets/cards/HEMIBRAIN.md`
-- Status: não confirmado
-- Pendências: todos os campos CAMPO-01 a CAMPO-16; auditoria em D03.
+- Status: auditado (D03)
+- Pendências: checksum e tamanho do export (`não encontrado`), escolha entre
+  releases v1.2 e v1.2.1 e harmonização de tipos com o FlyWire (C03/D08).
 
 ### CAND-03 — BANC
 - Card: `research/datasets/cards/BANC.md`
