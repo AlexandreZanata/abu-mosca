@@ -30,3 +30,13 @@ run_date	query_id	base	string_exata	filtros	periodo	idioma	n_resultados	export_f
 2026-09-14	Q7	websearch	connectome embedding representation learning deep learning connectomes DOI	sem filtros	sem recorte	en	6	sem export	n/a	executor IA	Confirma connectome embedding em conectoma humano e distincao de escala (LIT-0045)
 2026-09-14	Q4	websearch	GraphSAGE inductive representation learning Hamilton 2017 arXiv 1706.02216	sem filtros	sem recorte	en	4	sem export	n/a	executor IA	Confirma carater indutivo e trabalho futuro para grafos dirigidos (LIT-0043)
 2026-09-14	Q4	websearch	MagNet neural network directed graphs NeurIPS 2021 arXiv Zhang	sem filtros	sem recorte	en	5	sem export	n/a	executor IA	Confirma suporte a grafos dirigidos e limitacoes de escala (LIT-0044)
+2026-09-14	Q4	websearch	node2vec Grover Leskovec 2016 KDD DOI scalable feature learning networks	sem filtros	sem recorte	en	5	sem export	n/a	executor IA	Confirma DOI e parametros p e q (LIT-0049)
+2026-09-14	Q4	websearch	DeepWalk Perozzi 2014 KDD DOI online learning social representations	sem filtros	sem recorte	en	5	sem export	n/a	executor IA	Confirma DOI e treino online/paralelizavel (LIT-0050)
+2026-09-14	Q4	websearch	Graph Isomorphism Network GIN Xu 2019 ICLR arXiv 1810.00826 DOI	sem filtros	sem recorte	en	5	sem export	n/a	executor IA	Confirma DOI e resultado de expressividade WL (LIT-0051)
+2026-09-14	Q4	websearch	Graph Attention Networks Velickovic 2018 ICLR arXiv 1710.10903 DOI	sem filtros	sem recorte	en	4	sem export	n/a	executor IA	Confirma DOI e aplicabilidade indutiva (LIT-0052)
+2026-09-14	Q4	websearch	Relational Graph Convolutional Networks R-GCN Schlichtkrull 2018 DOI arXiv 1703.06103	sem filtros	sem recorte	en	4	sem export	n/a	executor IA	Confirma DOI ESWC e implementacao esparsa (LIT-0053)
+2026-09-14	Q4	websearch	Graphormer Ying 2021 NeurIPS arXiv 2106.05234 DOI transformers graphs	sem filtros	sem recorte	en	4	sem export	n/a	executor IA	Confirma DOI e custo de atencao densa (LIT-0054)
+2026-09-14	Q4	websearch	pytorch_geometric github license MIT PyG	sem filtros	sem recorte	en	3	sem export	n/a	executor IA	Confirma licenca MIT e release 2.8.0 (LIT-0055)
+2026-09-14	Q4	websearch	dmlc dgl github license Apache deep graph library	sem filtros	sem recorte	en	3	sem export	n/a	executor IA	Confirma licenca Apache-2.0 e escala (LIT-0056)
+2026-09-14	Q4	websearch	networkx github license BSD-3-clause	sem filtros	sem recorte	en	3	sem export	n/a	executor IA	Confirma licenca BSD-3-Clause (LIT-0057)
+2026-09-14	Q4	websearch	Sussman 2012 adjacency spectral embedding arXiv 1207.0477 theory	sem filtros	sem recorte	en	0	sem export	n/a	executor IA	FALHA descartada: limite de taxa 429; ASE coberto por LIT-0033 e LIT-0028

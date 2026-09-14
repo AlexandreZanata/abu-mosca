@@ -285,6 +285,44 @@ SSL_FAMILY_FIELDS = (
 SSL_CEM_FIELDS = ("Referência", "Input", "Resultado relatado", "Limitação", "Status")
 SSL_GFM_FIELDS = ("Referência", "Alegação", "Risco/limitação", "Status")
 SSL_RULES = ("não assume transformer superior", "não são comparáveis sem alinhamento")
+METHODS = ROOT / "research" / "literature" / "METHODS.md"
+METHODS_SECTIONS = (
+    "## 1. Estado e escopo",
+    "## 2. Matriz de métodos",
+    "## 3. Notas de execução e licenças",
+    "## 4. Limitações",
+)
+METHODS_IDS = tuple(f"M-{number:02d}" for number in range(1, 16))
+METHODS_TOPICS = (
+    "Random",
+    "Majority",
+    "Degree-only",
+    "Handcrafted",
+    "Node2Vec",
+    "DeepWalk",
+    "Espectral",
+    "MLP",
+    "GraphSAGE",
+    "GIN",
+    "GAT",
+    "Relacional",
+    "Transformer",
+    "NBLAST",
+    "NeuronBridge",
+)
+METHODS_FIELDS = (
+    "Referência",
+    "Parâmetros",
+    "Complexidade",
+    "Dependências",
+    "Licença",
+    "Manutenção",
+    "Suporte sparse/sampling",
+    "Estimativa 8 GB",
+    "Incompatibilidades",
+    "Status",
+)
+METHODS_RULE = "nenhum pacote foi instalado"
 LIT_ID_RE = re.compile(r"^LIT-\d{4}$")
 LIT_QUERY_LOG = ROOT / "research" / "literature" / "QUERY-LOG.tsv"
 LIT_QUERY_LOG_COLUMNS = (
@@ -1213,6 +1251,57 @@ def check_ssl_review() -> tuple[list[str], int]:
     return failures, len(families)
 
 
+def check_methods_matrix() -> tuple[list[str], int]:
+    label = "METHODS.md"
+    if not METHODS.exists():
+        return [f"{label}: arquivo ausente em research/literature/"], 0
+    text = METHODS.read_text(encoding="utf-8")
+    flat = " ".join(text.split()).lower()
+    failures: list[str] = []
+    for section in METHODS_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for topic in METHODS_TOPICS:
+        if topic.lower() not in flat:
+            failures.append(f"{label}: método obrigatório ausente ('{topic}')")
+    if METHODS_RULE not in flat:
+        failures.append(f"{label}: falta a proibição '{METHODS_RULE}'")
+
+    rows = _ledger_rows()
+    known_lit = _known_lit_ids(rows)
+
+    blocks = parse_heading_blocks(text, r"^### (M-\d{2}) — (.+)$")
+    seen: set[str] = set()
+    for method_id, block in blocks:
+        seen.add(method_id)
+        if method_id not in METHODS_IDS:
+            failures.append(f"{label}: método inesperado {method_id}")
+        for field in METHODS_FIELDS:
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {method_id} sem campo '{field}'")
+        reference = field_value(block, "Referência") or ""
+        for lit_id in sorted(set(re.findall(r"LIT-\d{4}", reference))):
+            if known_lit and lit_id not in known_lit:
+                failures.append(f"{label}: {method_id} referencia ledger inexistente '{lit_id}'")
+    for method_id in METHODS_IDS:
+        if method_id not in seen:
+            failures.append(f"{label}: método obrigatório ausente {method_id}")
+
+    if len(rows) >= 2 and "query_id" in rows[0] and "fase" in rows[0]:
+        qi, fi = rows[0].index("query_id"), rows[0].index("fase")
+        queries = {
+            row[qi] for row in rows[1:] if len(row) > max(qi, fi) and row[fi] == "L06"
+        }
+        if "Q4" not in queries:
+            failures.append(f"{label}: ledger sem consulta Q4 em L06")
+
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    refs = phase_refs(text)
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(blocks)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
@@ -1231,6 +1320,7 @@ def check_paths() -> tuple[list[str], int]:
         ALIGNMENT,
         CELL_TYPE,
         SSL_REVIEW,
+        METHODS,
     ):
         if not path.exists():
             continue
@@ -1267,6 +1357,7 @@ def main() -> int:
     alignment_failures, alignment_methods = check_alignment_review()
     cell_type_failures, cell_type_modalities = check_cell_type_review()
     ssl_failures, ssl_families = check_ssl_review()
+    methods_failures, methods_count = check_methods_matrix()
     failures += (
         ref_failures
         + path_failures
@@ -1281,6 +1372,7 @@ def main() -> int:
         + alignment_failures
         + cell_type_failures
         + ssl_failures
+        + methods_failures
     )
 
     if failures:
@@ -1332,6 +1424,10 @@ def main() -> int:
     print(
         f"OK: research/literature/SSL-GRAFOS.md com {ssl_families} famílias "
         f"SSL, connectome embedding e alegações de GFM"
+    )
+    print(
+        f"OK: research/literature/METHODS.md com {methods_count} métodos e "
+        f"estimativas para 8 GB"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

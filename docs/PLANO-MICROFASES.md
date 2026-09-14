@@ -424,7 +424,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   G1; arquivos não relacionados preservados fora do commit; commit
   6a253668348f0ade2206bce2cae74d4174440ba8.
 
-- [ ] **L06 — Montar matriz de métodos, baselines e implementações auditáveis.**
+- [x] **L06 — Montar matriz de métodos, baselines e implementações auditáveis.**
   - Objetivo: transformar literatura em opções realmente executáveis.
   - Entregas: `research/literature/METHODS.md` com random, degree, handcrafted,
     Node2Vec, DeepWalk, espectral, MLP, GraphSAGE, GIN, GAT, relacional,
@@ -435,6 +435,31 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não instalar nem executar pacotes nesta fase.
   - Dependências: L03–L05.
   - Orçamento: IA baixa; sem GPU.
+  Evidência (2026-09-14, executor): arquivos `research/literature/METHODS.md`,
+  `research/literature/LEDGER.tsv` (LIT-0049 a LIT-0057),
+  `research/literature/QUERY-LOG.tsv` (consultas Q4) e
+  `tools/validate_research.py` (funções de L06) e esta linha; fontes/versões:
+  buscas de 2026-09-14 verificadas em fontes primárias — node2vec
+  (10.1145/2939672.2939754), DeepWalk (10.1145/2623330.2623732), GIN
+  (10.48550/arXiv.1810.00826), GAT (10.48550/arXiv.1710.10903), R-GCN
+  (10.1007/978-3-319-93417-4_38), Graphormer (10.48550/arXiv.2106.05234), PyG
+  (MIT, release 2.8.0), DGL (Apache-2.0) e NetworkX (BSD-3-Clause), além de
+  LIT-0026, LIT-0027, LIT-0028, LIT-0033 e LIT-0043 já no ledger; Python 3.12.2
+  (stdlib); comandos e testes: `python3 tools/validate_research.py` com smoke
+  negativo inline (método ausente, campo ausente, proibição removida, LIT
+  inexistente, consulta Q4 ausente, tópico ausente e seção ausente),
+  `python3 tools/validate_plan.py`, `git diff --cached --check` e
+  `git status --porcelain`; resultado: 15 métodos (random, majority, degree-only,
+  handcrafted, Node2Vec, DeepWalk, espectral, MLP, GraphSAGE, GIN, GAT,
+  relacional, Transformer pequeno, NBLAST e NeuronBridge) com parâmetros,
+  complexidade, dependências, licença, manutenção, suporte sparse/sampling,
+  estimativa conservadora para 8 GB e incompatibilidades; nenhum pacote foi
+  instalado ou executado; 57 registros no ledger e 41 consultas no log; recursos:
+  17,4 MB de RAM e 0,08 s no validador, sem GPU; decisão/limitação: estimativas
+  não medidas, licenças não verificadas ficam marcadas e a matriz não decide o
+  par fonte/alvo (G2); revisão humana em G1; arquivos não relacionados
+  preservados fora do commit; commit
+  c8f8d7907ffbb76c40b6719a0ba71dea2bbdfea7.
 
 - [ ] **L07 — Produzir mapa de lacuna e veredito de novidade provisório.**
   - Objetivo: distinguir contribuição possível de repetição.
