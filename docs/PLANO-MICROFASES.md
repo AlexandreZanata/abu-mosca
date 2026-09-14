@@ -1200,6 +1200,12 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: nenhuma análise real inicia com critério `não verificado`.
   - Dependências: R01–R08.
   - Orçamento: pacote por IA baixa; revisão humana obrigatória.
+  - Pacote preparado (2026-09-14, executor): `docs/gates/G3-PREREGISTRO.md` com
+    10 artefatos hashados (pré-registro assinado, SAP, firewall, schemas,
+    dry run), 8 critérios (7 `PASS` e 1 `NÃO VERIFICADO` para as assinaturas) e
+    decisão `AGUARDAR`; o item permanece `[ ]` até a aprovação humana
+    (científico, estatístico e custodiante); commit
+    f6410231c928f9be8decbf379da3ec41e4bc7d8c.
 
 ### Ingestão e harmonização
 
