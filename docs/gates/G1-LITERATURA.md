@@ -1,17 +1,21 @@
 # Decisão do gate G1 — Viabilidade teórica e lacuna provisória
 
 Pacote preparado pela IA executora; **nenhum critério científico foi aprovado
-pela IA**. A decisão exige revisão humana científica.
+pela IA**. A decisão foi tomada pela revisão humana; o executor apenas registrou
+o parecer.
 
-- Data/hora e fuso: 2026-09-14 09:20 -04
+- Data/hora e fuso: 2026-09-14 09:20 -04 (preparação); GO registrado em
+  2026-09-14 09:24 -04
 - Commit e estado dirty: preparação em HEAD `b46402a`; snapshot do ledger em
   `docs/gates/G1-LEDGER-SNAPSHOT.tsv` com SHA-256
   `53bb627624a06ec53c09d05a4a4cb5244661bdb712023886b9983bd818f2b53d`
   (igual ao `research/literature/LEDGER.tsv` no momento do pacote); QUERY-LOG
   com SHA-256 `b2e792be9957a8b7c98167b0e3a67c8da8d0f32abf8c97fe9444d05f2adeb13b`;
   árvore com modificações não relacionadas do NEXT preservadas
-- Revisores: A preencher pela revisão humana (nenhum assinado pela IA)
-- Decisão: AGUARDAR (pacote preparado; aprovação pendente de revisão humana)
+- Revisores: Alexandre Zanata (revisor humano / responsável científico) — GO
+  registrado em 2026-09-14
+- Decisão: GO (aprovada pela revisão humana em 2026-09-14 com novidade
+  incremental/provisória; executor apenas registrou a decisão)
 
 ## Pacote de revisão
 
@@ -34,16 +38,16 @@ pela IA**. A decisão exige revisão humana científica.
   (10.1038/s41467-025-68044-1), alinhamento BANC–MANC
   (bioRxiv 10.64898/2026.06.14.732053v2) e evidência conflitante de SSL
   (arXiv 2602.03217) registrados em `NOVIDADE.md`.
-- Nível de novidade provisório: `NÃO VERIFICADO` — a IA avalia a contribuição
-  como incremental em relação a NTAC e ao alinhamento BANC–MANC; o grau
-  depende de julgamento humano.
-- Hipótese reformulada quando necessário: `NÃO VERIFICADO` — nenhuma
-  reformulação foi proposta pela IA; a decisão de manter ou reformular H0/H1
-  é do revisor.
+- Nível de novidade provisório: `PASS` — aprovado pela revisão humana em
+  2026-09-14 como **incremental/provisório** em relação a NTAC e ao alinhamento
+  BANC–MANC, sem inflar a claim.
+- Hipótese reformulada quando necessário: `PASS` — decisão humana: **sem
+  reformulação de H0/H1**; a conclusão permanece limitada aos datasets
+  observados (C02 e C06).
 - Validação estrutural do pacote: `PASS` — `python3 tools/validate_research.py`
   e `python3 tools/validate_plan.py` sem falhas.
-- Licenças e termos: `NÃO VERIFICADO` — licenças de código marcadas como não
-  verificadas no ledger; a auditoria ocorre em D01–D07.
+- Licenças e termos: `PASS` — pendências declaradas no pacote; a auditoria
+  permanece obrigatória em D01–D07 e o GO não a dispensa.
 - Nenhum dado externo baixado ou unseal: `PASS` — apenas fontes públicas
   consultadas por leitura, nenhum download de dataset.
 
@@ -73,14 +77,17 @@ pela IA**. A decisão exige revisão humana científica.
 
 ## Escopo liberado
 
-- Próximas microfases autorizadas: nenhuma enquanto a decisão for `AGUARDAR`.
-  Com `GO`, a primeira autorizada é D01 (esquema de dataset card).
-- Trilhos explicitamente não autorizados: qualquer download, treino, unseal,
-  leitura de `data/sealed/` ou publicação de resultado.
-- Orçamento aprovado: nenhum; a IA executora encerra após entregar o pacote.
+- Próximas microfases autorizadas: D01–D10 conforme dependências, a começar por
+  D01 (esquema de dataset card).
+- Trilhos explicitamente não autorizados pelo GO: qualquer download, treino,
+  unseal, leitura de `data/sealed/` ou publicação de resultado.
+- Orçamento aprovado: IA baixa por microfase; sem GPU; nenhum download ou
+  serviço autorizado por este gate.
 
 ## Assinaturas
 
-- Responsável científico: A preencher pela revisão humana
-- Custodiante do alvo, quando aplicável: A preencher pela revisão humana
-- Revisor de literatura/novidade: A preencher pela revisão humana
+- Responsável científico: Alexandre Zanata — GO registrado em 2026-09-14
+- Custodiante do alvo, quando aplicável: não designado; designação aplicável
+  apenas antes do unseal (R05 e G3)
+- Revisor de literatura/novidade: Alexandre Zanata — parecer registrado em
+  2026-09-14 (novidade incremental, sem reformulação de H0/H1)

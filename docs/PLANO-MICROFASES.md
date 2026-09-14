@@ -495,7 +495,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   preservados fora do commit; commit
   946dc2d853bdcec0de3eb261a1d88cf0bedd34e0.
 
-- [ ] **G1 — Aprovar viabilidade teórica e lacuna provisória.**
+- [x] **G1 — Aprovar viabilidade teórica e lacuna provisória.**
   - Objetivo: decidir se vale auditar dados e qual pergunta merece prioridade.
   - Entregas: `docs/gates/G1-LITERATURA.md` e snapshot do ledger.
   - Aceite: revisor confirma cobertura, trabalhos mais próximos, hipótese
@@ -512,6 +512,25 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   `tools/validate_research.py` (21,4 MB de RAM, 0,09 s, sem GPU); próxima ação
   humana: decidir GO/NO-GO/REFORMULAR e assinar; commit
   f83d3cf57c7823e96ef454197eead85e7b0bd964.
+  Evidência (2026-09-14, executor + revisor humano): arquivos
+  `docs/gates/G1-LITERATURA.md` (decisão GO com novidade incremental, 8
+  critérios `PASS` e assinatura de Alexandre Zanata), snapshot
+  `docs/gates/G1-LEDGER-SNAPSHOT.tsv` conferido por SHA-256,
+  `tools/validate_research.py` (estado aprovado do gate) e esta linha;
+  fontes/versões: parecer do revisor humano Alexandre Zanata de 2026-09-14 e
+  documentos internos de L01–L07, nenhuma fonte externa nova, Python 3.12.2
+  (stdlib); comandos e testes: `python3 tools/validate_research.py` com smoke
+  negativo inline (decisão GO com G1 aberto, snapshot divergente, hash ausente,
+  assinatura pendente, critério `NÃO VERIFICADO` com GO e seção ausente),
+  `python3 tools/validate_plan.py`, `git diff --cached --check` e
+  `git status --porcelain`; resultado: GO registrado com novidade
+  incremental/provisória e sem reformulação de H0/H1; D01–D10 autorizadas
+  conforme dependências, sem download, treino, unseal ou leitura de
+  `data/sealed/`; recursos: 21,4 MB de RAM e 0,09 s no validador, sem GPU;
+  decisão/limitação: novidade incremental aprovada pelo revisor, licenças
+  seguem pendentes de auditoria em D01–D07; arquivos não relacionados
+  preservados fora do commit; commit
+  a639f08b94f658950a748df37c94070a23034d11.
 
 ### Auditoria de datasets
 

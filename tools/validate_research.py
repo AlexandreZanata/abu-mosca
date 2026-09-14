@@ -1396,10 +1396,10 @@ def check_novelty() -> tuple[list[str], int]:
     return failures, len(gaps)
 
 
-def check_gate_g1() -> tuple[list[str], int]:
+def check_gate_g1() -> tuple[list[str], int, str]:
     label = "G1-LITERATURA.md"
     if not GATE_G1.exists():
-        return [f"{label}: arquivo ausente"], 0
+        return [f"{label}: arquivo ausente"], 0, "AUSENTE"
     text = GATE_G1.read_text(encoding="utf-8")
     lines = text.splitlines()
     failures: list[str] = []
@@ -1410,8 +1410,10 @@ def check_gate_g1() -> tuple[list[str], int]:
         if field_value(lines, field) is None:
             failures.append(f"{label}: cabeçalho sem campo '{field}'")
     decision = field_value(lines, "Decisão")
-    if decision is None or not decision.startswith("AGUARDAR"):
-        failures.append(f"{label}: decisão deve começar com AGUARDAR enquanto pendente de revisão humana")
+    if decision is None or not decision.startswith(("AGUARDAR", "GO")):
+        failures.append(f"{label}: decisão deve começar com AGUARDAR ou GO")
+    pending = decision is not None and decision.startswith("AGUARDAR")
+    approved = decision is not None and decision.startswith("GO")
 
     if not GATE_G1_SNAPSHOT.exists():
         failures.append(f"{label}: snapshot G1-LEDGER-SNAPSHOT.tsv ausente")
@@ -1427,32 +1429,43 @@ def check_gate_g1() -> tuple[list[str], int]:
     criteria = [line for line in lines if CRITERION_RE.match(line)]
     if len(criteria) < 6:
         failures.append(f"{label}: esperados ao menos 6 critérios no formato do modelo (achados {len(criteria)})")
-    if not any("`NÃO VERIFICADO`" in line for line in criteria):
-        failures.append(f"{label}: nenhum critério marcado 'NÃO VERIFICADO'")
+    if pending and not any("`NÃO VERIFICADO`" in line for line in criteria):
+        failures.append(f"{label}: nenhum critério marcado 'NÃO VERIFICADO' com decisão pendente")
+    if approved and any("`NÃO VERIFICADO`" in line for line in criteria):
+        failures.append(f"{label}: decisão GO com critério ainda 'NÃO VERIFICADO'")
     if any("`FAIL`" in line for line in criteria):
         failures.append(f"{label}: critério FAIL exige decisão REFORMULAR/NO-GO")
 
     start = next((i for i, line in enumerate(lines) if line.startswith("## Assinaturas")), None)
     signature_lines = lines[start:] if start is not None else []
+    signature_block = "\n".join(signature_lines)
     for field in GATE_G1_SIGNATURE_FIELDS:
         value = field_value(signature_lines, field)
         if value is None:
             failures.append(f"{label}: assinatura sem campo '{field}'")
-        elif "a preencher" not in value.lower():
-            failures.append(f"{label}: assinatura '{field}' não pode ser preenchida pela IA")
+            continue
+        if pending and "a preencher" not in value.lower():
+            failures.append(f"{label}: assinatura '{field}' preenchida antes da revisão humana")
+        if approved and "a preencher" in value.lower():
+            failures.append(f"{label}: assinatura '{field}' ainda pendente com decisão GO")
+    if approved and "2026-09-14" not in signature_block:
+        failures.append(f"{label}: assinaturas sem data da revisão humana")
 
     plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
     g1_line = next((line for line in plan_lines if "**G1 —" in line), None)
     if g1_line is None:
         failures.append(f"{label}: item G1 não encontrado no plano")
-    elif not g1_line.startswith("- [ ]"):
+    elif pending and not g1_line.startswith("- [ ]"):
         failures.append(f"{label}: G1 marcado como concluído enquanto a decisão é AGUARDAR")
+    elif approved and g1_line.startswith("- [ ]"):
+        failures.append(f"{label}: decisão GO exige G1 marcado [x] no plano")
 
     known = {item_id for _, item_id in parse_items(plan_lines)}
     refs = phase_refs(text)
     for ref in sorted(ref for ref in refs if ref not in known):
         failures.append(f"{label}: referência de fase inexistente '{ref}'")
-    return failures, len(criteria)
+    state = "GO" if approved else "AGUARDAR"
+    return failures, len(criteria), state
 
 
 def check_paths() -> tuple[list[str], int]:
@@ -1514,7 +1527,7 @@ def main() -> int:
     ssl_failures, ssl_families = check_ssl_review()
     methods_failures, methods_count = check_methods_matrix()
     novelty_failures, novelty_gaps = check_novelty()
-    gate_g1_failures, gate_g1_criteria = check_gate_g1()
+    gate_g1_failures, gate_g1_criteria, gate_g1_state = check_gate_g1()
     failures += (
         ref_failures
         + path_failures
@@ -1593,8 +1606,8 @@ def main() -> int:
         f"máximo três contribuições"
     )
     print(
-        f"OK: G1-LITERATURA.md com decisão AGUARDAR, {gate_g1_criteria} critérios, "
-        f"snapshot do ledger conferido e G1 ainda aberto no plano"
+        f"OK: G1-LITERATURA.md com decisão {gate_g1_state}, {gate_g1_criteria} "
+        f"critérios, snapshot conferido e estado do plano coerente"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
