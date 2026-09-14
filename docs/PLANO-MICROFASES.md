@@ -1460,6 +1460,15 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: lista por node ID não sai da zona selada.
   - Dependências: D08, H04, R07; execução pelo custodiante.
   - Orçamento: IA baixa + dupla revisão humana; sem GPU.
+  - Bloqueio (2026-09-14, executor): ferramenta do custodiante pronta
+    (`tools/sealed_labels.py` com dupla revisão obrigatória, regra
+    muitos-para-um, exclusões e relatório agregado sem IDs; 6 testes) e
+    checklist em `docs/research/H07-PACKAGE.md`, mas a materialização real está
+    bloqueada: (a) **segundo revisor humano ausente** (limitação do D08), (b)
+    crosswalk MANC→MCNS ainda não curado por humanos, (c) custodiante
+    independente não designado; nenhum mapeamento manual foi criado e nenhuma
+    lista por node ID saiu da zona selada; requer decisão humana (indicar
+    segundo revisor ou registrar desvio pelo changelog).
 
 - [ ] **H08 — Processar releases completas e medir recursos.**
   - Objetivo: gerar snapshots canônicos reproduzíveis no hardware-alvo.

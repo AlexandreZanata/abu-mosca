@@ -415,6 +415,18 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+H07_TOOL = ROOT / "tools" / "sealed_labels.py"
+H07_PACKAGE = ROOT / "docs" / "research" / "H07-PACKAGE.md"
+H07_TOKENS = (
+    "dupla revisão",
+    "segundo revisor",
+    "bloquead",
+    "custodiante",
+    "circular",
+    "cobertura",
+    "hashes",
+    "zona selada",
+)
 EDGE_TOOL = ROOT / "tools" / "edge_transform.py"
 EDGE_PRIMARY = ROOT / "configs" / "edge-primary.json"
 EDGE_VARIANTS = ROOT / "configs" / "edge-variants.json"
@@ -2141,6 +2153,57 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_h07_blocked() -> tuple[list[str], int]:
+    label = "H07"
+    failures: list[str] = []
+    for path in (H07_TOOL, H07_PACKAGE, ROOT / "tests" / "test_sealed_labels.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    doc = H07_PACKAGE.read_text(encoding="utf-8")
+    flat = " ".join(doc.split()).lower()
+    for token in H07_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: H07-PACKAGE.md sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(doc)
+    if leak:
+        failures.append(f"{label}: H07-PACKAGE.md com possível ID cru ('{leak.group(0)}')")
+
+    spec = importlib.util.spec_from_file_location("sealed_labels_module", H07_TOOL)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    mapping = {
+        "source_type": "S1",
+        "target_type": "T1",
+        "kind": "one-to-one",
+        "reviewer1": "A",
+        "reviewer2": "B",
+        "sources": ["LIT-0001"],
+    }
+    crosswalk = {"crosswalk_version": "check-1.0", "dataset_pair": ["F", "A"], "mappings": [mapping]}
+    label_set, _ = module.build_label_set(crosswalk, {"b1": "T1"})
+    if label_set["crosswalk"] != {"S1": "T1"}:
+        failures.append(f"{label}: ferramenta não materializa o crosswalk esperado")
+    try:
+        module.build_label_set({**crosswalk, "mappings": [{**mapping, "reviewer2": "A"}]}, {"b1": "T1"})
+    except module.SealedError:
+        pass
+    else:
+        failures.append(f"{label}: ferramenta aceitou revisão única")
+
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    h07_line = next((line for line in plan_lines if "**H07 —" in line), None)
+    if h07_line is None or not h07_line.startswith("- [ ]"):
+        failures.append(f"{label}: H07 deve permanecer [ ] enquanto bloqueada")
+    else:
+        index = plan_lines.index(h07_line)
+        note = " ".join(plan_lines[index:index + 25]).lower()
+        if "bloqueio" not in note or "segundo revisor" not in note:
+            failures.append(f"{label}: item do plano sem nota de bloqueio/segundo revisor")
+    return failures, len(H07_TOKENS)
+
+
 def check_edge_transform() -> tuple[list[str], int]:
     label = "H06"
     failures: list[str] = []
@@ -3407,6 +3470,7 @@ def main() -> int:
     sealed_evaluator_failures, sealed_evaluator_tokens = check_sealed_evaluator()
     topology_failures, topology_tokens = check_topology_features()
     edge_transform_failures, edge_transform_tokens = check_edge_transform()
+    h07_failures, h07_tokens = check_h07_blocked()
     failures += (
         ref_failures
         + path_failures
@@ -3444,6 +3508,7 @@ def main() -> int:
         + sealed_evaluator_failures
         + topology_failures
         + edge_transform_failures
+        + h07_failures
     )
 
     if failures:
@@ -3586,6 +3651,10 @@ def main() -> int:
     print(
         f"OK: semântica de arestas H06 com {edge_transform_tokens} tokens, "
         f"primária conservada e variantes pré-registradas"
+    )
+    print(
+        f"OK: pacote H07 preparado e bloqueado ({h07_tokens} tokens) aguardando "
+        f"segundo revisor humano"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
