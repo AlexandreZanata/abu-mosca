@@ -50,8 +50,10 @@ Campos obrigatórios do inventário e dos cards (identificadores estáveis):
 
 ### CAND-03 — BANC
 - Card: `research/datasets/cards/BANC.md`
-- Status: não confirmado
-- Pendências: todos os campos CAMPO-01 a CAMPO-16; auditoria em D04.
+- Status: auditado (D04)
+- Pendências: arquivos restritos (277/379 exigem pedido), termos do BossDB e do
+  repositório de código, escolha entre v626/v888 e harmonização de tipos com
+  FlyWire/hemibrain (C03/D08).
 
 ### CAND-04 — MANC
 - Card: `research/datasets/cards/MANC.md`

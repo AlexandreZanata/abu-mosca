@@ -624,7 +624,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   tratada como identidade de população; arquivos não relacionados preservados
   fora do commit; commit 04afe8e57d57cee235518b6338b7e693a326e2ea.
 
-- [ ] **D04 — Auditar BANC release por release.**
+- [x] **D04 — Auditar BANC release por release.**
   - Objetivo: verificar acesso, escopo anatômico e rótulos realmente liberados.
   - Entregas: dataset card, claims, formatos e requisitos de acesso.
   - Aceite: distingue anúncio, paper, portal navegável e dump processável; registra
@@ -632,6 +632,27 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: portal visual não conta automaticamente como dataset baixável.
   - Dependências: D01, L02.
   - Orçamento: IA baixa; web; amostra até 100 MB se permitida.
+  Evidência (2026-09-14, executor): arquivos `research/datasets/cards/BANC.md`
+  (auditado em D04), `research/datasets/INVENTARIO.md` (CAND-03 auditado),
+  `research/literature/LEDGER.tsv` (LIT-0072 e LIT-0073),
+  `research/literature/QUERY-LOG.tsv` (leituras oficiais registradas) e esta
+  linha; fontes/versões: Bates et al. 2026 (10.1038/s41586-026-10735-w), API do
+  Harvard Dataverse para `10.7910/DVN/7WTH1N` (v3.0, CC BY 4.0, 379 arquivos,
+  536.062.963.020 bytes, MD5, 277 restritos), API do GitHub de
+  `htem/BANC-project` (sem licença, último push 2026-07-20), wiki oficial do
+  BANC e endpoint CAVE (login Google), acesso 2026-09-14; Python 3.12.2
+  (stdlib) e um agente de exploração para ler o JSON grande; comandos e testes:
+  `python3 tools/validate_research.py` (validação de card auditado coberta pelo
+  smoke de D02), `python3 tools/validate_plan.py`, `git diff --cached --check` e
+  `git status --porcelain`; resultado: card do BANC com 8 fontes atômicas (6
+  `confirmado`, 1 `não encontrado` e 1 `conflitante`), escopo cérebro + VNC de
+  fêmea única, canais de acesso (Dataverse, GCS, Codex, CAVE e BossDB),
+  277/379 arquivos restritos e nenhum download; recursos: 21,8 MB de RAM e
+  0,09 s no validador, sem GPU e com teto de 100 MB não utilizado; decisão/
+  limitação: BANC permanece `candidato`, acesso parcial depende de pedido e o
+  repositório de código não declara licença; arquivos não relacionados
+  preservados fora do commit; commit
+  45f784d84118221f17a35a65a4133f1354047918.
 
 - [ ] **D05 — Auditar MANC release por release.**
   - Objetivo: verificar comparabilidade do cordão nervoso e suas anotações.
