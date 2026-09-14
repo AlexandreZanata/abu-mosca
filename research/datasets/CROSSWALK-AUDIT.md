@@ -1,11 +1,10 @@
-# Auditoria de ontologias, crosswalks e independência de rótulos (pacote para dupla revisão humana)
+# Auditoria de ontologias, crosswalks e independência de rótulos (aprovada em 2026-09-14)
 
-Preparado em 2026-09-14 (D08) pela IA executora. **Nenhuma regra foi aprovada**:
-todas as decisões aguardam dupla revisão humana. Este documento é público e
-contém apenas método, proveniência e agregados; qualquer mapping exato
-necessário fica somente na zona selada `data/sealed/target-labels/`, sob
-custódia. O executor de treino não recebe mapping exato nem associação por
-neurônio do alvo.
+Preparado em 2026-09-14 (D08) pela IA executora e **aprovado pelo revisor
+humano** na mesma data (seção 8). Este documento é público e contém apenas
+método, proveniência e agregados; qualquer mapping exato necessário fica
+somente na zona selada `data/sealed/target-labels/`, sob custódia. O executor
+de treino não recebe mapping exato nem associação por neurônio do alvo.
 
 ## 1. Estado e escopo
 
@@ -43,7 +42,7 @@ neurônio do alvo.
 - Fontes: LIT-0002, LIT-0006, LIT-0038.
 - Risco de circularidade: alto para tipos definidos por conectividade; mitigar
   com análise de sensibilidade ou exclusão de tipos derivados.
-- Status: aguardando dupla revisão humana
+- Status: APROVADO
 
 ### PAIR-02 — FlyWire/FAFB ↔ MCNS
 - Par: cérebro de fêmea (FlyWire) e de macho (MCNS); indivíduos distintos.
@@ -56,7 +55,7 @@ neurônio do alvo.
 - Fontes: LIT-0023, LIT-0038.
 - Risco de circularidade: médio; sinalizar classes cujo rótulo dependa do
   próprio matching.
-- Status: aguardando dupla revisão humana
+- Status: APROVADO
 
 ### PAIR-03 — MCNS ↔ MAOL
 - Par: mesmo espécime; MAOL é a região do lobo óptico direito do volume MCNS.
@@ -70,7 +69,7 @@ neurônio do alvo.
 - Fontes: LIT-0019, LIT-0023, LIT-0078.
 - Risco de circularidade: baixo para anatomia, alto se o par for tratado como
   cross-individual; proibido no MVP.
-- Status: aguardando dupla revisão humana
+- Status: APROVADO
 
 ### PAIR-04 — MCNS ↔ MANC
 - Par: VNC do MCNS e VNC do MANC; indivíduos distintos e sexo masculino em
@@ -84,7 +83,7 @@ neurônio do alvo.
   conectividade e morfologia.
 - Fontes: LIT-0038, LIT-0015, LIT-0079.
 - Risco de circularidade: médio; exigir dois revisores para o mapeamento manual.
-- Status: aguardando dupla revisão humana
+- Status: APROVADO
 
 ### PAIR-05 — MANC ↔ BANC
 - Par: VNC de macho (MANC) e VNC de fêmea (BANC); indivíduos e sexos distintos.
@@ -97,7 +96,7 @@ neurônio do alvo.
 - Fontes: LIT-0060, LIT-0010, LIT-0015.
 - Risco de circularidade: alto se o matching for usado como feature; proibido
   no input.
-- Status: aguardando dupla revisão humana
+- Status: APROVADO
 
 ### PAIR-06 — BANC ↔ FlyWire/FAFB
 - Par: CNS feminino completo (BANC) e cérebro feminino (FlyWire); indivíduos
@@ -109,7 +108,7 @@ neurônio do alvo.
 - Independência do rótulo: parcial; depende do matching morfológico.
 - Fontes: LIT-0010, LIT-0002.
 - Risco de circularidade: médio; exigir dois revisores e sensibilidade.
-- Status: aguardando dupla revisão humana
+- Status: APROVADO
 
 ### PAIR-07 — BANC ↔ MCNS
 - Par: CNSs completos de fêmea e de macho; indivíduos distintos.
@@ -120,7 +119,7 @@ neurônio do alvo.
 - Independência do rótulo: média; anotação manual com conectividade.
 - Fontes: LIT-0010, LIT-0078.
 - Risco de circularidade: médio; sensibilidade para tipos derivados.
-- Status: aguardando dupla revisão humana
+- Status: APROVADO
 
 ## 4. Sinalização de rótulos derivados
 
@@ -148,28 +147,28 @@ neurônio do alvo.
 - Decisão: aceitar os seis passos da seção 2?
 - Opções: (a) aceitar; (b) reformular.
 - Recomendação: (a).
-- Status: aguardando dupla revisão humana
+- Status: APROVADO
 
 ### DEC-CW-02 — Aprovar as propostas por par
 - Decisão: aceitar as interseções/known/open-set propostas para PAIR-01 a
   PAIR-07?
 - Opções: (a) aceitar; (b) ajustar pares.
 - Recomendação: (a), com confirmação de fontes por dois revisores.
-- Status: aguardando dupla revisão humana
+- Status: APROVADO
 
 ### DEC-CW-03 — Regra de rótulos derivados
 - Decisão: aceitar a sinalização e as regras de sensibilidade/exclusão da
   seção 4?
 - Opções: (a) aceitar; (b) endurecer exclusões.
 - Recomendação: (a), com registro por tipo.
-- Status: aguardando dupla revisão humana
+- Status: APROVADO
 
 ### DEC-CW-04 — Selagem e acesso
 - Decisão: confirmar que o mapping exato permanece apenas na zona selada e
   fora do alcance do executor?
 - Opções: (a) confirmar; (b) ajustar fluxo.
 - Recomendação: (a), conforme C03 e PROTOCOLO.
-- Status: aguardando dupla revisão humana
+- Status: APROVADO
 
 ## 7. Limitações
 
@@ -177,6 +176,23 @@ neurônio do alvo.
   baixado e nenhum mapping exato foi criado.
 - A interseção real depende de releases concretas e de harmonização aprovada;
   números por classe entram em D09/D10 após a revisão.
-- Sem dupla revisão humana, a fase permanece `[ ]` e nenhuma correspondência
-  pode ser usada em treino ou avaliação.
+- A aprovação foi registrada por um único revisor humano nesta sessão
+  (limitação declarada na seção 8); um segundo revisor é obrigatório antes de
+  qualquer mapeamento manual ser criado ou validado.
 - Validação: `python3 tools/validate_research.py`.
+
+## 8. Aprovação humana
+
+- Data: 2026-09-14.
+- Aprovador: Alexandre Zanata (revisor humano) — aprovação integral de
+  DEC-CW-01 a DEC-CW-04 e das propostas PAIR-01 a PAIR-07, sem exceções.
+- Escopo: método de auditoria, interseção/known/open-set por par, regra de
+  rótulos derivados (sensibilidade/exclusão) e selagem em
+  `data/sealed/target-labels/`.
+- Decisão: aprovado; o mapping exato permanece selado e fora do alcance do
+  executor de treino, que não recebe mapping exato nem associação por neurônio
+  do alvo.
+- Limitação: apenas um revisor humano assinou; a dupla revisão exigida para
+  mapeamentos manuais permanece pendente e é pré-condição para criar ou validar
+  qualquer correspondência concreta nas fases seguintes. Nenhum mapping exato
+  existe até agora.

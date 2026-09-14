@@ -394,7 +394,12 @@ CROSSWALK_SECTIONS = (
     "## 5. Regras de selagem e acesso",
     "## 6. Decisões pendentes",
     "## 7. Limitações",
+    "## 8. Aprovação humana",
 )
+CROSSWALK_APPROVED = "APROVADO"
+CROSSWALK_PENDING = "aguardando dupla revisão humana"
+ALLOWED_CROSSWALK_STATUSES = (CROSSWALK_PENDING, CROSSWALK_APPROVED)
+CROSSWALK_APPROVAL_FIELDS = ("Data", "Aprovador", "Escopo")
 CROSSWALK_PAIR_FIELDS = (
     "Par",
     "Interseção proposta",
@@ -405,7 +410,6 @@ CROSSWALK_PAIR_FIELDS = (
     "Status",
 )
 CROSSWALK_DEC_FIELDS = ("Decisão", "Opções", "Recomendação", "Status")
-CROSSWALK_PENDING = "aguardando dupla revisão humana"
 CROSSWALK_RULES = (
     "zona selada",
     "dois revisores",
@@ -1609,10 +1613,10 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
-def check_crosswalk_audit() -> tuple[list[str], int]:
+def check_crosswalk_audit() -> tuple[list[str], int, int]:
     label = "CROSSWALK-AUDIT.md"
     if not CROSSWALK.exists():
-        return [f"{label}: arquivo ausente em research/datasets/"], 0
+        return [f"{label}: arquivo ausente em research/datasets/"], 0, 0
     text = CROSSWALK.read_text(encoding="utf-8")
     flat = " ".join(text.split()).lower()
     failures: list[str] = []
@@ -1629,6 +1633,7 @@ def check_crosswalk_audit() -> tuple[list[str], int]:
     rows = _ledger_rows()
     known_lit = _known_lit_ids(rows)
 
+    approved = 0
     pairs = parse_heading_blocks(text, r"^### (PAIR-\d{2}) — (.+)$")
     if len(pairs) < 6:
         failures.append(f"{label}: esperados ao menos 6 pares (achados {len(pairs)})")
@@ -1637,8 +1642,11 @@ def check_crosswalk_audit() -> tuple[list[str], int]:
             if field_value(block, field) is None:
                 failures.append(f"{label}: {pair_id} sem campo '{field}'")
         status = field_value(block, "Status")
-        if status is not None and status != CROSSWALK_PENDING:
-            failures.append(f"{label}: {pair_id} status deve ser '{CROSSWALK_PENDING}'")
+        if status is not None:
+            if status not in ALLOWED_CROSSWALK_STATUSES:
+                failures.append(f"{label}: {pair_id} status inválido '{status}'")
+            if status == CROSSWALK_APPROVED:
+                approved += 1
         sources = field_value(block, "Fontes") or ""
         if not re.search(r"LIT-\d{4}", sources):
             failures.append(f"{label}: {pair_id} sem fontes LIT-*")
@@ -1654,21 +1662,41 @@ def check_crosswalk_audit() -> tuple[list[str], int]:
             if field_value(block, field) is None:
                 failures.append(f"{label}: {dec_id} sem campo '{field}'")
         status = field_value(block, "Status")
-        if status is not None and status != CROSSWALK_PENDING:
-            failures.append(f"{label}: {dec_id} status deve ser '{CROSSWALK_PENDING}'")
+        if status is not None:
+            if status not in ALLOWED_CROSSWALK_STATUSES:
+                failures.append(f"{label}: {dec_id} status inválido '{status}'")
+            if status == CROSSWALK_APPROVED:
+                approved += 1
 
     for line in text.splitlines():
         match = re.match(r"^\s*- Status: (.+?)\s*$", line)
         if match:
             status = match.group(1).strip().rstrip(".")
-            if status != CROSSWALK_PENDING:
-                failures.append(f"{label}: status '{status}' não é pendência humana")
+            if status not in ALLOWED_CROSSWALK_STATUSES:
+                failures.append(f"{label}: status '{status}' não permitido")
+
+    if approved:
+        section = re.search(r"## 8\. Aprovação humana\n(.*?)(?=\n## |\Z)", text, re.S)
+        if section is None:
+            failures.append(f"{label}: status APROVADO sem seção de aprovação humana")
+        else:
+            approval_lines = section.group(1).splitlines()
+            for field in CROSSWALK_APPROVAL_FIELDS:
+                if field_value(approval_lines, field) is None:
+                    failures.append(f"{label}: aprovação humana sem campo '{field}'")
+            approver = field_value(approval_lines, "Aprovador")
+            if approver is not None and not any(
+                word in approver.lower() for word in ("humano", "revisor")
+            ):
+                failures.append(f"{label}: aprovador não identificado como humano/revisor: '{approver}'")
+            if "segundo revisor" not in flat:
+                failures.append(f"{label}: aprovação sem declarar a pendência do segundo revisor")
 
     known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
     refs = phase_refs(text)
     for ref in sorted(ref for ref in refs if ref not in known):
         failures.append(f"{label}: referência de fase inexistente '{ref}'")
-    return failures, len(pairs)
+    return failures, len(pairs), approved
 
 
 def check_paths() -> tuple[list[str], int]:
@@ -1734,7 +1762,7 @@ def main() -> int:
     novelty_failures, novelty_gaps = check_novelty()
     gate_g1_failures, gate_g1_criteria, gate_g1_state = check_gate_g1()
     inventory_failures, inventory_candidates = check_dataset_inventory()
-    crosswalk_failures, crosswalk_pairs = check_crosswalk_audit()
+    crosswalk_failures, crosswalk_pairs, crosswalk_approved = check_crosswalk_audit()
     failures += (
         ref_failures
         + path_failures
@@ -1824,7 +1852,7 @@ def main() -> int:
     )
     print(
         f"OK: research/datasets/CROSSWALK-AUDIT.md com {crosswalk_pairs} pares e "
-        f"decisões pendentes de dupla revisão"
+        f"{crosswalk_approved} status aprovados por humano"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

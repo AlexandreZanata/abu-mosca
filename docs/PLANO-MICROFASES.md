@@ -743,7 +743,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   não encontrados; arquivos não relacionados preservados fora do commit; commit
   57148f8dcb9b7894200129fc1924caa1a339cf7f.
 
-- [ ] **D08 — Auditar ontologias, crosswalks e independência dos rótulos.**
+- [x] **D08 — Auditar ontologias, crosswalks e independência dos rótulos.**
   - Objetivo: saber se “mesmo tipo” pode ser pontuado sem circularidade indevida.
   - Entregas: `research/datasets/CROSSWALK-AUDIT.md` público apenas com método,
     proveniência e agregados; proposta de interseção/known/open-set para cada par;
@@ -764,6 +764,23 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   validação estrutural com smoke negativo em `tools/validate_research.py`
   (21,8 MB de RAM, 0,09 s, sem GPU); próxima ação humana: revisar e assinar as
   decisões; commit c20399bc6da8303dce2cbd6311f50171fea1d071.
+  Evidência (2026-09-14, executor + revisor humano): arquivos
+  `research/datasets/CROSSWALK-AUDIT.md` (status dos 7 pares e das 4 decisões
+  `APROVADO`; seção 8 com data, aprovador e escopo), `tools/validate_research.py`
+  (estado aprovado do crosswalk) e esta linha; fontes/versões: aprovação do
+  revisor humano Alexandre Zanata em 2026-09-14 e documentos internos de
+  C03/D02–D07, nenhuma fonte externa nova, Python 3.12.2 (stdlib); comandos e
+  testes: `python3 tools/validate_research.py` com smoke negativo inline (seção
+  ausente, pendência do segundo revisor não declarada, aprovador não humano,
+  campo ausente e status inválido), `python3 tools/validate_plan.py`,
+  `git diff --cached --check` e `git status --porcelain`; resultado: DEC-CW-01 a
+  DEC-CW-04 e PAIR-01 a PAIR-07 aprovados integralmente, mapping exato selado e
+  ausente do repositório, guarda contra IDs no documento público ativa; recursos:
+  21,8 MB de RAM e 0,09 s no validador, sem GPU; decisão/limitação: aprovação
+  registrada por um único revisor humano; a dupla revisão permanece pré-condição
+  para criar ou validar qualquer mapeamento manual concreto nas fases seguintes;
+  arquivos não relacionados preservados fora do commit; commit
+  11f71a184a01b47dcfc70d47aa53cd44dbaed834.
 
 - [ ] **D09 — Estimar escala e fazer spikes mínimos de acesso.**
   - Objetivo: substituir estimativas vagas por medições sem baixar tudo.
