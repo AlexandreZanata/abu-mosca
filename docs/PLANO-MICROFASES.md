@@ -266,7 +266,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
 
 ### Literatura e novidade
 
-- [ ] **L01 — Pré-especificar a revisão de literatura.**
+- [x] **L01 — Pré-especificar a revisão de literatura.**
   - Objetivo: tornar a busca atualizável e menos suscetível a cherry-picking.
   - Entregas: `research/literature/PROTOCOL.md` com bases, strings, período,
     idiomas, inclusão/exclusão, deduplicação e esquema do ledger.
@@ -276,6 +276,22 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não usar apenas snippets, blogs ou resumos de IA como evidência.
   - Dependências: G0.
   - Orçamento: IA baixa + revisão; sem GPU.
+  Evidência (2026-09-14, executor): arquivos `research/literature/PROTOCOL.md`,
+  `tools/validate_research.py` (funções de L01) e esta linha; fontes/versões:
+  apenas documentos internos (ESCOPO, PROTOCOLO, CLAIMS de C01 e gate G0),
+  nenhuma fonte externa consultada, Python 3.12.2 (stdlib); comandos e testes:
+  `python3 tools/validate_research.py` com smoke negativo inline (consulta
+  ausente, base ausente, campo de consulta ausente, regra de evidência removida,
+  campo de ledger ausente e fase inexistente), `python3 tools/validate_plan.py`,
+  `git diff --cached --check` e `git status --porcelain`; resultado: 7 consultas
+  (Q1–Q7) cobrindo neuron matching, connectome alignment, cell type por
+  conectividade, graph representation learning, cross-animal, morfologia e
+  embeddings de connectomas; 8 bases, janelas W1/W2, critérios de
+  inclusão/exclusão, deduplicação, esquema de ledger/log e runbook para segundo
+  executor; recursos: 15,6 MB de RAM e 0,07 s no validador, sem GPU; decisão/
+  limitação: protocolo pré-especificado, nenhuma busca executada e revisão humana
+  em G1; arquivos não relacionados preservados fora do commit; commit
+  eca334e094c4127ab3d9a979b0ef36086401749e.
 
 - [ ] **L02 — Mapear papers primários dos connectomas candidatos.**
   - Objetivo: localizar releases, papers de dados e estudos comparativos que

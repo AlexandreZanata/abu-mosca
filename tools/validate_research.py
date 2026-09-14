@@ -166,6 +166,50 @@ GATE_SIGNATURE_FIELDS = (
 )
 CRITERION_RE = re.compile(r"^- .+: `(PASS|FAIL|NÃO VERIFICADO)` — .+$")
 
+LIT_PROTOCOL = ROOT / "research" / "literature" / "PROTOCOL.md"
+LIT_SECTIONS = (
+    "## 1. Objetivo e perguntas",
+    "## 2. Bases e ferramentas",
+    "## 3. Strings de busca",
+    "## 4. Período e idiomas",
+    "## 5. Inclusão e exclusão",
+    "## 6. Deduplicação",
+    "## 7. Esquema do ledger",
+    "## 8. Triagem e extração",
+    "## 9. Reprodutibilidade e atualização",
+    "## 10. Regras de evidência",
+)
+LIT_QUERIES = ("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7")
+LIT_QUERY_FIELDS = ("Objetivo", "String", "Bases", "Janela")
+LIT_TOPICS = (
+    "neuron matching",
+    "connectome alignment",
+    "cell type",
+    "graph representation learning",
+    "cross-animal",
+    "morfologia",
+    "embeddings de connectomas",
+)
+LIT_BASES = (
+    "Europe PMC",
+    "PubMed",
+    "arXiv",
+    "bioRxiv",
+    "Semantic Scholar",
+    "OpenAlex",
+    "Crossref",
+    "DBLP",
+)
+LIT_LEDGER_FIELDS = (
+    "lit_id",
+    "query_id",
+    "status_triagem",
+    "motivo_exclusao",
+    "claims_relacionados",
+    "hash_export",
+)
+LIT_RULES = ("apenas para descoberta", "segundo executor", "não prova novidade")
+
 ESTIMAND_SECTIONS = (
     "Estimando",
     "Hipótese primária",
@@ -232,7 +276,7 @@ CLAIM_TYPES = {"hipótese", "capacidade de dado", "literatura", "método"}
 
 ENTRY_RE = r"^- \*\*{prefix}-(\d{{{width}}}) — (.+?)\*\*$"
 FIELD_RE = r"^\s*- {field}: (.+)$"
-PATH_RE = re.compile(r"`((?:docs|tools)/[A-Za-z0-9_./-]+\.(?:md|py|yaml))`")
+PATH_RE = re.compile(r"`((?:docs|tools|research)/[A-Za-z0-9_./-]+\.(?:md|py|yaml))`")
 ID_RE = re.compile(r"\b([A-Z])(\d{1,2})\b")
 
 
@@ -710,6 +754,47 @@ def check_gate_package() -> tuple[list[str], int, str]:
     return failures, len(criteria), state
 
 
+def check_literature_protocol() -> tuple[list[str], int]:
+    label = "PROTOCOL.md"
+    if not LIT_PROTOCOL.exists():
+        return [f"{label}: arquivo ausente em research/literature/"], 0
+    text = LIT_PROTOCOL.read_text(encoding="utf-8")
+    flat = " ".join(text.split()).lower()
+    failures: list[str] = []
+    for section in LIT_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    queries = parse_heading_blocks(text, r"^### (Q\d) — (.+)$")
+    seen: set[str] = set()
+    for query_id, block in queries:
+        seen.add(query_id)
+        if query_id not in LIT_QUERIES:
+            failures.append(f"{label}: consulta inesperada {query_id}")
+        for field in LIT_QUERY_FIELDS:
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {query_id} sem campo '{field}'")
+    for query_id in LIT_QUERIES:
+        if query_id not in seen:
+            failures.append(f"{label}: consulta obrigatória ausente {query_id}")
+    for topic in LIT_TOPICS:
+        if topic.lower() not in flat:
+            failures.append(f"{label}: tema obrigatório ausente ('{topic}')")
+    for base in LIT_BASES:
+        if base.lower() not in flat:
+            failures.append(f"{label}: base obrigatória ausente ('{base}')")
+    for field in LIT_LEDGER_FIELDS:
+        if field.lower() not in flat:
+            failures.append(f"{label}: campo de ledger/log ausente ('{field}')")
+    for rule in LIT_RULES:
+        if rule not in flat:
+            failures.append(f"{label}: regra obrigatória ausente ('{rule}')")
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    refs = phase_refs(text)
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(queries)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
@@ -724,6 +809,7 @@ def check_paths() -> tuple[list[str], int]:
         LADDER,
         INFEASIBLE,
         GATE_G0,
+        LIT_PROTOCOL,
     ):
         if not path.exists():
             continue
@@ -755,6 +841,7 @@ def main() -> int:
     threat_failures, threats = check_threats()
     ladder_failures, levels = check_claim_ladder()
     gate_failures, gate_criteria, gate_state = check_gate_package()
+    lit_failures, lit_queries = check_literature_protocol()
     failures += (
         ref_failures
         + path_failures
@@ -764,6 +851,7 @@ def main() -> int:
         + threat_failures
         + ladder_failures
         + gate_failures
+        + lit_failures
     )
 
     if failures:
@@ -794,6 +882,10 @@ def main() -> int:
     print(
         f"OK: G0-CONTRATO.md com decisão {gate_state}, {gate_criteria} critérios "
         f"e estado do plano coerente"
+    )
+    print(
+        f"OK: research/literature/PROTOCOL.md com {lit_queries} consultas, "
+        f"{len(LIT_TOPICS)} temas e {len(LIT_BASES)} bases"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
