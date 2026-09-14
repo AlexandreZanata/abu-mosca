@@ -13,6 +13,7 @@ Sem dependências externas além de `tools/validate_plan.py`.
 
 from __future__ import annotations
 
+import hashlib
 import re
 import sys
 from pathlib import Path
@@ -341,6 +342,21 @@ NOVELTY_GAP_FIELDS = (
 )
 NOVELTY_CON_FIELDS = ("Contribuição", "Teste", "Versão mínima", "Risco", "Status")
 NOVELTY_RULES = ("não há novidade suficiente", "ausência em uma busca não prova novidade")
+GATE_G1 = ROOT / "docs" / "gates" / "G1-LITERATURA.md"
+GATE_G1_SNAPSHOT = ROOT / "docs" / "gates" / "G1-LEDGER-SNAPSHOT.tsv"
+GATE_G1_SECTIONS = (
+    "## Pacote de revisão",
+    "## Critérios",
+    "## Riscos e divergências",
+    "## Condições do G1",
+    "## Escopo liberado",
+    "## Assinaturas",
+)
+GATE_G1_SIGNATURE_FIELDS = (
+    "Responsável científico",
+    "Custodiante do alvo, quando aplicável",
+    "Revisor de literatura/novidade",
+)
 LIT_ID_RE = re.compile(r"^LIT-\d{4}$")
 LIT_QUERY_LOG = ROOT / "research" / "literature" / "QUERY-LOG.tsv"
 LIT_QUERY_LOG_COLUMNS = (
@@ -1380,6 +1396,65 @@ def check_novelty() -> tuple[list[str], int]:
     return failures, len(gaps)
 
 
+def check_gate_g1() -> tuple[list[str], int]:
+    label = "G1-LITERATURA.md"
+    if not GATE_G1.exists():
+        return [f"{label}: arquivo ausente"], 0
+    text = GATE_G1.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    failures: list[str] = []
+    for section in GATE_G1_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for field in GATE_HEADER_FIELDS:
+        if field_value(lines, field) is None:
+            failures.append(f"{label}: cabeçalho sem campo '{field}'")
+    decision = field_value(lines, "Decisão")
+    if decision is None or not decision.startswith("AGUARDAR"):
+        failures.append(f"{label}: decisão deve começar com AGUARDAR enquanto pendente de revisão humana")
+
+    if not GATE_G1_SNAPSHOT.exists():
+        failures.append(f"{label}: snapshot G1-LEDGER-SNAPSHOT.tsv ausente")
+    elif LIT_LEDGER.exists():
+        ledger_bytes = LIT_LEDGER.read_bytes()
+        snapshot_bytes = GATE_G1_SNAPSHOT.read_bytes()
+        if ledger_bytes != snapshot_bytes:
+            failures.append(f"{label}: snapshot diverge do ledger atual")
+        digest = hashlib.sha256(ledger_bytes).hexdigest()
+        if digest not in text:
+            failures.append(f"{label}: SHA-256 do ledger ausente no pacote ('{digest}')")
+
+    criteria = [line for line in lines if CRITERION_RE.match(line)]
+    if len(criteria) < 6:
+        failures.append(f"{label}: esperados ao menos 6 critérios no formato do modelo (achados {len(criteria)})")
+    if not any("`NÃO VERIFICADO`" in line for line in criteria):
+        failures.append(f"{label}: nenhum critério marcado 'NÃO VERIFICADO'")
+    if any("`FAIL`" in line for line in criteria):
+        failures.append(f"{label}: critério FAIL exige decisão REFORMULAR/NO-GO")
+
+    start = next((i for i, line in enumerate(lines) if line.startswith("## Assinaturas")), None)
+    signature_lines = lines[start:] if start is not None else []
+    for field in GATE_G1_SIGNATURE_FIELDS:
+        value = field_value(signature_lines, field)
+        if value is None:
+            failures.append(f"{label}: assinatura sem campo '{field}'")
+        elif "a preencher" not in value.lower():
+            failures.append(f"{label}: assinatura '{field}' não pode ser preenchida pela IA")
+
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    g1_line = next((line for line in plan_lines if "**G1 —" in line), None)
+    if g1_line is None:
+        failures.append(f"{label}: item G1 não encontrado no plano")
+    elif not g1_line.startswith("- [ ]"):
+        failures.append(f"{label}: G1 marcado como concluído enquanto a decisão é AGUARDAR")
+
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    refs = phase_refs(text)
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(criteria)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
@@ -1400,6 +1475,7 @@ def check_paths() -> tuple[list[str], int]:
         SSL_REVIEW,
         METHODS,
         NOVELTY,
+        GATE_G1,
     ):
         if not path.exists():
             continue
@@ -1438,6 +1514,7 @@ def main() -> int:
     ssl_failures, ssl_families = check_ssl_review()
     methods_failures, methods_count = check_methods_matrix()
     novelty_failures, novelty_gaps = check_novelty()
+    gate_g1_failures, gate_g1_criteria = check_gate_g1()
     failures += (
         ref_failures
         + path_failures
@@ -1454,6 +1531,7 @@ def main() -> int:
         + ssl_failures
         + methods_failures
         + novelty_failures
+        + gate_g1_failures
     )
 
     if failures:
@@ -1513,6 +1591,10 @@ def main() -> int:
     print(
         f"OK: research/literature/NOVIDADE.md com {novelty_gaps} lacunas e no "
         f"máximo três contribuições"
+    )
+    print(
+        f"OK: G1-LITERATURA.md com decisão AGUARDAR, {gate_g1_criteria} critérios, "
+        f"snapshot do ledger conferido e G1 ainda aberto no plano"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

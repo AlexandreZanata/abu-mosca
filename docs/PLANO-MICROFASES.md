@@ -503,6 +503,15 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: gate não aprova paper; apenas autoriza a auditoria de dados.
   - Dependências: L01–L07.
   - Orçamento: IA baixa para síntese; revisão humana científica.
+  Bloqueio (2026-09-14, executor): pacote preparado em
+  `docs/gates/G1-LITERATURA.md` com decisão `AGUARDAR` e 8 critérios, mais o
+  snapshot `docs/gates/G1-LEDGER-SNAPSHOT.tsv` com SHA-256 conferido contra o
+  ledger; os critérios científicos (nível honesto de novidade e eventual
+  reformulação de H0/H1) estão `NÃO VERIFICADO` aguardando revisão humana; a IA
+  não assinou nem aprovou; validação estrutural com smoke negativo em
+  `tools/validate_research.py` (21,4 MB de RAM, 0,09 s, sem GPU); próxima ação
+  humana: decidir GO/NO-GO/REFORMULAR e assinar; commit
+  f83d3cf57c7823e96ef454197eead85e7b0bd964.
 
 ### Auditoria de datasets
 
