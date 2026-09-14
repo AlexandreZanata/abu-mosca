@@ -1001,7 +1001,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   é implementação própria (sem `jsonschema`) para não alterar o lock; commit
   ab1836f6e1ee55f3d2745260e65de27ae2dc2352.
 
-- [ ] **R04 — Fixar contrato de configuração, run e determinismo.**
+- [x] **R04 — Fixar contrato de configuração, run e determinismo.**
   - Objetivo: eliminar parâmetros escondidos e resultados sem linhagem.
   - Entregas: schema de configuração, implementação do `RUN-MANIFEST`, seeds
     centralizadas, captura de Git/ambiente/recursos e teste de repetição.
@@ -1011,6 +1011,31 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: sem default dependente da máquina ou timestamp usado como seed.
   - Dependências: R02, R03.
   - Orçamento: IA baixa; CPU; sem treino real.
+  Evidência (2026-09-14, executor): arquivos `schemas/run-config.schema.json` e
+  `schemas/run-manifest.schema.json` (JSON Schema 2020-12), `tools/run.py`
+  (config resolvida, `run_id` imutável, cache verificado por SHA-256,
+  RUN-MANIFEST em `runs/<run_id>/manifest.json`), `tools/seeds.py` (seeds
+  centralizadas e independentes de relógio), `configs/fixture.json`,
+  `tests/test_run_contract.py` (18 casos) e `docs/research/RUN-CONTRACT.md`
+  (7 seções); fontes/versões: R02/R03 e PROTOCOLO, Python 3.12.2, sem
+  dependência nova, sem download de dados e sem GPU; comandos e testes:
+  `.venv/bin/python -m pytest tests/ -q` (42 passaram em 4,71 s; 18 novos),
+  `.venv/bin/python tools/run.py --config configs/fixture.json` (completed;
+  segunda execução `cached` sem reescrita; `run_id=f39e7779b00ad433`;
+  `outputs/stream.bin` 8192 bytes `sha256=35c06f34…`; `outputs/summary.json`
+  983 bytes `sha256=9d18bdc4…`), nova checagem R04 no `validate_research.py`
+  com smoke negativo (seção, token, campo fora do schema, seed ausente e ID
+  cru), `validate_plan.py` e `git diff --cached --check`; resultado: toda opção
+  efetiva serializada (defaults `n_bytes=4096`, `repeats=2` sempre gravados),
+  `run_id` derivado de configuração + commit + versão, seeds derivadas por
+  SHA-256 e registradas, timestamp nunca usado como seed, duas execuções com
+  saídas byte a byte idênticas e saída divergente bloqueada sem sobrescrita;
+  recursos medidos: fixture em 0,0005 s, pico de RSS 23,03 MiB, disco livre
+  149,83 GiB, CPU apenas; decisão/limitação: fixture sintética prova o contrato
+  e não desempenho; tolerância numérica zero documentada; `git_dirty=true` é
+  esperado pelo workstream NEXT e o diff exato fica em `dirty_diff_sha256`;
+  run interrompido sem manifesto exige limpeza manual para preservar a
+  imutabilidade; commit 71f81864305110854c44feb947c8e82903971add.
 
 - [ ] **R05 — Implementar o firewall do alvo e teste antileakage.**
   - Objetivo: impedir acesso acidental do executor aos labels e crosswalk

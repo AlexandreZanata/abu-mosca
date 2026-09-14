@@ -1,0 +1,6 @@
+{
+  "experiment": "fixture-r04",
+  "seed": 20260914,
+  "params": {"n_bytes": 4096, "repeats": 2},
+  "notes": "Fixture determinística do contrato de run (R04); não é experimento científico."
+}

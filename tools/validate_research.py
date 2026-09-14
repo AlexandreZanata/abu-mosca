@@ -415,6 +415,49 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+RUN_CONTRACT_DOC = ROOT / "docs" / "research" / "RUN-CONTRACT.md"
+RUN_CONFIG_SCHEMA = ROOT / "schemas" / "run-config.schema.json"
+RUN_MANIFEST_SCHEMA = ROOT / "schemas" / "run-manifest.schema.json"
+RUN_TOOL = ROOT / "tools" / "run.py"
+SEEDS_TOOL = ROOT / "tools" / "seeds.py"
+RUN_FIXTURE = ROOT / "configs" / "fixture.json"
+RUN_CONTRACT_SECTIONS = (
+    "## 1. Configuração",
+    "## 2. run_id, seeds e determinismo",
+    "## 3. RUN-MANIFEST",
+    "## 4. Cache e imutabilidade",
+    "## 5. Comandos",
+    "## 6. Testes",
+    "## 7. Limitações",
+)
+RUN_CONTRACT_TOKENS = (
+    "run_id",
+    "seed",
+    "manifest",
+    "git",
+    "ambiente",
+    "recursos",
+    "tolerância",
+    "cache",
+    "imutável",
+    "sha256",
+    "timestamp",
+    "fixture",
+)
+RUN_MANIFEST_REQUIRED = (
+    "schema_version",
+    "run_id",
+    "created_at",
+    "tool",
+    "config",
+    "config_sha256",
+    "code",
+    "environment",
+    "seeds",
+    "resources",
+    "outputs",
+    "status",
+)
 PROVENANCE_DOC = ROOT / "docs" / "research" / "PROVENANCE.md"
 PROVENANCE_SCHEMA = ROOT / "schemas" / "manifest.schema.json"
 PROVENANCE_TOOL = ROOT / "tools" / "manifest.py"
@@ -1806,6 +1849,54 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_run_contract() -> tuple[list[str], int]:
+    label = "R04"
+    failures: list[str] = []
+    for path in (
+        RUN_CONTRACT_DOC,
+        RUN_CONFIG_SCHEMA,
+        RUN_MANIFEST_SCHEMA,
+        RUN_TOOL,
+        SEEDS_TOOL,
+        RUN_FIXTURE,
+        ROOT / "tests" / "test_run_contract.py",
+    ):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+
+    doc = RUN_CONTRACT_DOC.read_text(encoding="utf-8")
+    for section in RUN_CONTRACT_SECTIONS:
+        if section not in doc:
+            failures.append(f"{label}: RUN-CONTRACT.md sem seção '{section}'")
+    for token in RUN_CONTRACT_TOKENS:
+        if token.lower() not in doc.lower():
+            failures.append(f"{label}: RUN-CONTRACT.md sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(doc)
+    if leak:
+        failures.append(f"{label}: RUN-CONTRACT.md com possível ID cru ('{leak.group(0)}')")
+
+    config_schema = json.loads(RUN_CONFIG_SCHEMA.read_text(encoding="utf-8"))
+    manifest_schema = json.loads(RUN_MANIFEST_SCHEMA.read_text(encoding="utf-8"))
+    fixture = json.loads(RUN_FIXTURE.read_text(encoding="utf-8"))
+    if tuple(manifest_schema.get("required", ())) != RUN_MANIFEST_REQUIRED:
+        failures.append(f"{label}: schema do manifesto divergente da lista obrigatória")
+    config_props = set(config_schema.get("properties", {}))
+    for key in fixture:
+        if key not in config_props:
+            failures.append(f"{label}: fixture usa campo fora do schema '{key}'")
+    for key in fixture.get("params", {}):
+        if key not in config_schema["properties"]["params"]["properties"]:
+            failures.append(f"{label}: fixture usa parâmetro fora do schema '{key}'")
+    if "seed" not in fixture:
+        failures.append(f"{label}: fixture sem seed mestra")
+    gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
+    if "/runs/" not in gitignore:
+        failures.append(f"{label}: /runs/ deve continuar ignorado pelo Git")
+    return failures, len(RUN_CONTRACT_TOKENS)
+
+
 def check_provenance_phase() -> tuple[list[str], int]:
     label = "R03"
     failures: list[str] = []
@@ -2302,6 +2393,7 @@ def main() -> int:
     data_management_failures, data_management_sections = check_data_management()
     environment_failures, environment_tokens = check_environment_phase()
     provenance_failures, provenance_manifests = check_provenance_phase()
+    run_contract_failures, run_contract_tokens = check_run_contract()
     failures += (
         ref_failures
         + path_failures
@@ -2327,6 +2419,7 @@ def main() -> int:
         + data_management_failures
         + environment_failures
         + provenance_failures
+        + run_contract_failures
     )
 
     if failures:
@@ -2422,6 +2515,10 @@ def main() -> int:
     print(
         f"OK: proveniência R03 com schema, validador e {provenance_manifests} "
         f"manifestos sem credenciais"
+    )
+    print(
+        f"OK: contrato de run R04 com {run_contract_tokens} tokens, fixture "
+        f"determinística e RUN-MANIFEST"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
