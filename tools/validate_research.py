@@ -415,6 +415,19 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+B04_TOOL = ROOT / "tools" / "artisanal_features.py"
+B04_REPORT = ROOT / "artifacts" / "reports" / "B04-ARTESANAL.md"
+B04_METRICS = ROOT / "artifacts" / "reports" / "B04-ARTESANAL.json"
+B04_TOKENS = (
+    "famílias",
+    "ablação",
+    "invariância",
+    "grafo conhecido",
+    "probe",
+    "interrompida",
+    "source-fit",
+    "sem nenhum dado do alvo",
+)
 B03_TOOL = ROOT / "tools" / "baselines_source.py"
 B03_REPORT = ROOT / "artifacts" / "reports" / "B03-BASELINES-FONTE.md"
 B03_METRICS = ROOT / "artifacts" / "reports" / "B03-BASELINES-FONTE.json"
@@ -2241,6 +2254,47 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_b04_artisanal() -> tuple[list[str], int]:
+    label = "B04"
+    failures: list[str] = []
+    for path in (B04_TOOL, B04_REPORT, B04_METRICS, ROOT / "tests" / "test_artisanal_features.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    report = B04_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in B04_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+    source = B04_TOOL.read_text(encoding="utf-8")
+    for token in ("male-cns", "data/sealed", "target_labels", "crosswalk"):  # firewall-allow
+        if token in source:
+            failures.append(f"{label}: features artesanais não podem referenciar o alvo ('{token}')")
+    metrics = json.loads(B04_METRICS.read_text(encoding="utf-8"))
+    results = metrics.get("results", {})
+    if set(results) != {"degree", "reciprocity", "clustering", "motifs", "neighborhood", "all"}:
+        failures.append(f"{label}: famílias da ablação divergentes")
+    for family, data in results.items():
+        value = float(data.get("macro_recall@1", -1))
+        if not 0.0 <= value <= 1.0:
+            failures.append(f"{label}: macro fora de [0,1] em '{family}'")
+    if abs(results["degree"]["macro_recall@1"] - metrics.get("baseline_degree_only_macro@1", -1)) > 1e-6:
+        failures.append(f"{label}: família degree deve reproduzir o baseline B03")
+    if not metrics.get("interrupted_features"):
+        failures.append(f"{label}: feature interrompida não registrada")
+    if not re.fullmatch(r"[0-9a-f]{64}", str(metrics.get("predictions", {}).get("sha256", ""))):
+        failures.append(f"{label}: predição sem hash válido")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(B04_TOKENS)
+
+
 def check_b03_source_baselines() -> tuple[list[str], int]:
     label = "B03"
     failures: list[str] = []
@@ -3943,6 +3997,7 @@ def main() -> int:
     b01_failures, b01_tokens = check_b01_metrics()
     b02_failures, b02_tokens = check_b02_calibration()
     b03_failures, b03_tokens = check_b03_source_baselines()
+    b04_failures, b04_tokens = check_b04_artisanal()
     failures += (
         ref_failures
         + path_failures
@@ -3987,6 +4042,7 @@ def main() -> int:
         + b01_failures
         + b02_failures
         + b03_failures
+        + b04_failures
     )
 
     if failures:
@@ -4156,6 +4212,10 @@ def main() -> int:
     print(
         f"OK: baselines da fonte B03 com {b03_tokens} tokens, chance analítica "
         f"concordando com a simulada"
+    )
+    print(
+        f"OK: estatísticas artesanais B04 com {b04_tokens} tokens, ablação por "
+        f"família e invariância a IDs"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

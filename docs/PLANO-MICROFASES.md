@@ -1699,7 +1699,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   traçada foram descartados com registro e o alvo permanece intocado; commit
   49342c9f26b9eb81eb5d21a792f6ff8d4ce9a330.
 
-- [ ] **B04 — Implementar estatísticas artesanais.**
+- [x] **B04 — Implementar estatísticas artesanais.**
   - Objetivo: comparar a GNN com assinaturas estruturais interpretáveis.
   - Entregas: feature extractor versionado para graus ponderados, reciprocidade,
     clustering/motifs e resumos de vizinhança permitidos; classifier/probe comum.
@@ -1708,6 +1708,34 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: feature escolhida após olhar alvo vira exploratória.
   - Dependências: B03, H05, H06.
   - Orçamento: IA baixa; CPU; interromper feature inviável e registrar.
+  Evidência (2026-09-14, executor; modo exploratório e somente na fonte):
+  arquivos `tools/artisanal_features.py` (extractor versionado com famílias
+  degree/reciprocity/clustering/motifs/neighborhood, probe comum idêntico ao de
+  B03 e ablação por família; feature dirigida interrompida com motivo
+  registrado), `tests/test_artisanal_features.py` (5 casos: grafo conhecido
+  conferido à mão, invariância a IDs/ordem, probe determinístico, ausência de
+  features proibidas e ablação completa) e `artifacts/reports/B04-ARTESANAL.md`
+  + `.json`; resultados na mesma partição de B03 (14.847 nodes, 519 classes):
+  degree 0,149547 (= baseline B03, conferência), reciprocity 0,026732,
+  clustering 0,014742, motifs 0,030519, neighborhood 0,036956 e **todas
+  0,383676** macro Recall@1 (0,353570 micro), com predições congeláveis em
+  `runs/b04/predictions-artesanal-all.json`; fontes/versões: snapshot H08,
+  propriedades públicas do MANC, B03/B01 e R07, Python 3.12.2 com numpy/scipy do
+  lock R02, sem GPU e sem qualquer dado do alvo; comandos e testes:
+  `python3 tools/artisanal_features.py --snapshot runs/h08/source --properties
+  data/raw/spikes/manc_neuron_properties.feather --out-dir runs/b04 --report
+  artifacts/reports/B04-ARTESANAL.json` (~56 s; pico 5.327 MiB),
+  `.venv/bin/python -m pytest tests/ -q` (174 testes), nova checagem B04 no
+  `validate_research.py` (ablação, igualdade com B03, feature interrompida,
+  hash e proibição de referências ao alvo) e `python3 tools/validate_plan.py`;
+  resultado: comparador artesanal interpretável pronto para confrontar a GNN e
+  o MLP, com ablação identificando cada família; falha real corrigida: a
+  contagem de triângulos estava dobrada (não afetava o probe por ser escala,
+  mas foi corrigida); recursos medidos: CPU apenas, sem downloads; decisão/
+  limitação: resultados internos à fonte e sem claim de transferência; motivos
+  dirigidos ficam restritos nesta versão e o custo de memória do dicionário de
+  pares é o teto do extrator; commit
+  e6e1d5b8537771bd951f65f86615b408e5a4fb6f.
 
 - [ ] **B05 — Implementar o MLP de controle.**
   - Objetivo: separar ganho do encoder de ganho causado apenas por não linearidade.

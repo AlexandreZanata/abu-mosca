@@ -1,0 +1,111 @@
+{
+  "baseline_degree_only_macro@1": 0.149547,
+  "families": {
+    "clustering": [
+      "clustering_undirected"
+    ],
+    "degree": [
+      "in_degree",
+      "out_degree",
+      "weighted_in",
+      "weighted_out"
+    ],
+    "motifs": [
+      "feedforward_paths",
+      "bottleneck_ratio"
+    ],
+    "neighborhood": [
+      "successor_out_degree_mean",
+      "predecessor_in_degree_mean"
+    ],
+    "reciprocity": [
+      "reciprocal_weight_ratio",
+      "reciprocal_count_ratio"
+    ]
+  },
+  "feature_version": "1.0",
+  "interrupted_features": [
+    {
+      "feature": "directed_triangle_ratio",
+      "reason": "contagem de triângulos dirigidos exigia produto esparso potencialmente denso; interrompida nesta fase"
+    }
+  ],
+  "label_meta": {
+    "classes_k_min": 525,
+    "nodes_labeled": 15304,
+    "types_total": 2448
+  },
+  "nodes_used": 14847,
+  "peak_rss_mib": 5326.9,
+  "predictions": {
+    "path": "runs/b04/predictions-artesanal-all.json",
+    "sha256": "aac5bd726a9f9f6699d248f944d9e4aba827877bd1756e7dd6bc24b859b6c145"
+  },
+  "results": {
+    "all": {
+      "features": [
+        "in_degree",
+        "out_degree",
+        "weighted_in",
+        "weighted_out",
+        "reciprocal_weight_ratio",
+        "reciprocal_count_ratio",
+        "clustering_undirected",
+        "feedforward_paths",
+        "bottleneck_ratio",
+        "successor_out_degree_mean",
+        "predecessor_in_degree_mean"
+      ],
+      "macro_recall@1": 0.383676,
+      "micro_recall@1": 0.35357
+    },
+    "clustering": {
+      "features": [
+        "clustering_undirected"
+      ],
+      "macro_recall@1": 0.014742,
+      "micro_recall@1": 0.018559
+    },
+    "degree": {
+      "features": [
+        "in_degree",
+        "out_degree",
+        "weighted_in",
+        "weighted_out"
+      ],
+      "macro_recall@1": 0.149547,
+      "micro_recall@1": 0.135892
+    },
+    "motifs": {
+      "features": [
+        "feedforward_paths",
+        "bottleneck_ratio"
+      ],
+      "macro_recall@1": 0.030519,
+      "micro_recall@1": 0.033029
+    },
+    "neighborhood": {
+      "features": [
+        "successor_out_degree_mean",
+        "predecessor_in_degree_mean"
+      ],
+      "macro_recall@1": 0.036956,
+      "micro_recall@1": 0.040893
+    },
+    "reciprocity": {
+      "features": [
+        "reciprocal_weight_ratio",
+        "reciprocal_count_ratio"
+      ],
+      "macro_recall@1": 0.026732,
+      "micro_recall@1": 0.028311
+    }
+  },
+  "schema": "b04-artisanal-features",
+  "seconds": 55.69,
+  "split": {
+    "classes": 519,
+    "train": 11668,
+    "val": 3179
+  }
+}
