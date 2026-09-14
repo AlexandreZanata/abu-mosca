@@ -1460,20 +1460,22 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: lista por node ID não sai da zona selada.
   - Dependências: D08, H04, R07; execução pelo custodiante.
   - Orçamento: IA baixa + dupla revisão humana; sem GPU.
-  - Bloqueio (2026-09-14, executor): o rascunho `draft-1.0` **não foi assinado**
-    (circularidade total dos 4.182 tipos esvaziaria a sensibilidade obrigatória);
-    reformulação executada nos passos 1–4 — auditoria de proveniência
-    (`tools/label_provenance_audit.py`: 11.751 tipos; correspondência 11.751,
-    linhagem 10.461, genético 909, manual 2) — e o resultado formal é
-    **benchmark primário inconclusivo por circularidade**: nenhum subconjunto
-    do desfecho T0 é independente de conectividade/morfologia e `mancType` não
-    vira gold confirmatório. Cobertura K=10 sem scores para alternativas:
-    `fruDsx` 6 classes (menor 16; 4.976 neurônios) e `trumanHl` 64 classes
-    (17.704). Relatório e hashes em `artifacts/reports/H07-PROVENANCE-AUDIT.md/.json`;
-    rascunho mantido como artefato provisório de engenharia. **Aguardando
-    decisão humana sobre a reformulação** (trocar para `fruDsx`, trocar para
-    linhagem, manter T0 exploratório com inconclusivo, ou novo par de datasets)
-    e o segundo revisor antes de M08, se disponível.
+  - Bloqueio (2026-09-14, executor): T0 registrado como **exploratório e
+    inconclusivo por circularidade** (auditoria D07/LIT-0023 + H07). Reformulação
+    opção 2 (hemilinhagem de desenvolvimento) empacotada como minuta:
+    `preregistration/crosswalk-hemilineage.draft.json` (41 rótulos
+    compartilhados; **40 com K≥10 nos dois lados**, sem scores; 5 incertos:
+    `20A.22A`, `20B.21B.22B`, `24B.25B`, `26X`, `27X`),
+    `preregistration/PROTOCOL-v2-hemilineage.md` (pergunta, estimando, H0/H1,
+    métrica, SESOI 5 p.p., cobertura, exclusões, baselines, escada de claims),
+    auditoria de proveniência (`artifacts/reports/H07-HEMILINEAGE-AUDIT.md/.json`)
+    e changelog `2.0-draft`. Independência do MANC documentada (Marin et al.
+    2024: hemilinhagem por desenvolvimento/morfologia, não por conectividade
+    sináptica); **independência do `trumanHl` do MCNS não confirmada** → o
+    desfecho não é materializado como confirmatório (condição 5) e a
+    materialização segue bloqueada até confirmação do alvo e **assinatura
+    humana** da v2; decisão pendente também sobre os 5 rótulos incertos e
+    segundo revisor antes de M08, se disponível. H07 permanece `[ ]`.
 
 - [x] **H08 — Processar releases completas e medir recursos.**
   - Objetivo: gerar snapshots canônicos reproduzíveis no hardware-alvo.

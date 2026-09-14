@@ -1,0 +1,1013 @@
+{
+  "crosswalk_version": "hemilineage-draft-1.0",
+  "dataset_pair": [
+    "MANC",
+    "MCNS"
+  ],
+  "mappings": [
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 256,
+        "mcns_neurons": 297,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "00A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "00A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 58,
+        "mcns_neurons": 88,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "00B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "00B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 399,
+        "mcns_neurons": 399,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "01A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "01A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 477,
+        "mcns_neurons": 503,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "01B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "01B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 310,
+        "mcns_neurons": 487,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "02A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "02A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 572,
+        "mcns_neurons": 802,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "03A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "03A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 492,
+        "mcns_neurons": 957,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "03B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "03B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 12,
+        "mcns_neurons": 12,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "04A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "04A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 562,
+        "mcns_neurons": 568,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "04B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "04B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 274,
+        "mcns_neurons": 379,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "05B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "05B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 604,
+        "mcns_neurons": 788,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "06A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "06A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 444,
+        "mcns_neurons": 447,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "06B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "06B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 619,
+        "mcns_neurons": 1224,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "07B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "07B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 345,
+        "mcns_neurons": 352,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "08A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "08A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 490,
+        "mcns_neurons": 877,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "08B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "08B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 499,
+        "mcns_neurons": 791,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "09A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "09A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 206,
+        "mcns_neurons": 543,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "09B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "09B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 443,
+        "mcns_neurons": 455,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "10B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "10B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 191,
+        "mcns_neurons": 223,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "11A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "11A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 175,
+        "mcns_neurons": 180,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "11B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "11B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 320,
+        "mcns_neurons": 543,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "12A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "12A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 575,
+        "mcns_neurons": 562,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "12B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "12B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 433,
+        "mcns_neurons": 610,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "13A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "13A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 430,
+        "mcns_neurons": 461,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "13B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "13B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 498,
+        "mcns_neurons": 518,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "14A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "14A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 39,
+        "mcns_neurons": 47,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "14B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "14B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 152,
+        "mcns_neurons": 161,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "15B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "15B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 315,
+        "mcns_neurons": 518,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "16B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "16B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 377,
+        "mcns_neurons": 680,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "17A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "17A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 36,
+        "mcns_neurons": 46,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "17B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "17B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 184,
+        "mcns_neurons": 184,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "18B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "18B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 649,
+        "mcns_neurons": 642,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "19A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "19A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 421,
+        "mcns_neurons": 570,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "19B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "19B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 817,
+        "mcns_neurons": 817,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": true
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "20A.22A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "20A.22A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 32,
+        "mcns_neurons": 30,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": true
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "20B.21B.22B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "20B.21B.22B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 419,
+        "mcns_neurons": 419,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "21A",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "21A"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 441,
+        "mcns_neurons": 645,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": false
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "23B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "23B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 50,
+        "mcns_neurons": 43,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": true
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "24B.25B",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "24B.25B"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 18,
+        "mcns_neurons": 18,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": true
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "26X",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "26X"
+    },
+    {
+      "kind": "one-to-one",
+      "provenance": {
+        "columns": [
+          "hemilineage",
+          "trumanHl"
+        ],
+        "manc_neurons": 58,
+        "mcns_neurons": 243,
+        "rule": "normalized-hemilineage==trumanHl",
+        "source_file": "manc_neuron_properties.feather",
+        "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+        "target_file": "mcns_body_annotations.feather",
+        "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+        "uncertain_label": true
+      },
+      "reviewer1": "Alexandre Zanata",
+      "reviewer2": "Alexandre Zanata",
+      "source_type": "27X",
+      "sources": [
+        "LIT-0015",
+        "LIT-0023"
+      ],
+      "target_type": "27X"
+    }
+  ],
+  "single_reviewer_deviation": {
+    "changelog_version": "2.0-draft",
+    "note": "revisão única autorizada; revisão final e assinatura humanas pendentes"
+  }
+}

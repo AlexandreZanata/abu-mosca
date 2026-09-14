@@ -430,6 +430,8 @@ H08_TOKENS = (
 )
 H07_TOOL = ROOT / "tools" / "sealed_labels.py"
 H07_PACKAGE = ROOT / "docs" / "research" / "H07-PACKAGE.md"
+H07_HEMI_METRICS = ROOT / "artifacts" / "reports" / "H07-HEMILINEAGE-AUDIT.json"
+H07_HEMI_DRAFT = ROOT / "preregistration" / "crosswalk-hemilineage.draft.json"
 H07_AUDIT_MD = ROOT / "artifacts" / "reports" / "H07-PROVENANCE-AUDIT.md"
 H07_AUDIT_JSON = ROOT / "artifacts" / "reports" / "H07-PROVENANCE-AUDIT.json"
 H07_DRAFT = ROOT / "preregistration" / "crosswalk-manc-mcns.draft.json"
@@ -2224,6 +2226,12 @@ def check_h07_blocked() -> tuple[list[str], int]:
         ROOT / "tests" / "test_label_provenance_audit.py",
         H07_AUDIT_MD,
         H07_AUDIT_JSON,
+        ROOT / "tools" / "hemilineage_crosswalk.py",
+        ROOT / "tests" / "test_hemilineage_crosswalk.py",
+        ROOT / "artifacts" / "reports" / "H07-HEMILINEAGE-AUDIT.md",
+        H07_HEMI_METRICS,
+        H07_HEMI_DRAFT,
+        ROOT / "preregistration" / "PROTOCOL-v2-hemilineage.md",
     ):
         if not path.exists():
             failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
@@ -2261,6 +2269,23 @@ def check_h07_blocked() -> tuple[list[str], int]:
     leak = PUBLIC_ID_RE.search(audit_report)
     if leak:
         failures.append(f"{label}: auditoria com possível ID cru ('{leak.group(0)}')")
+    hemi_metrics = json.loads(H07_HEMI_METRICS.read_text(encoding="utf-8"))
+    hemi_draft = json.loads(H07_HEMI_DRAFT.read_text(encoding="utf-8"))
+    if hemi_metrics.get("k_min") != 10 or hemi_metrics.get("classes_k_min_both", 0) < 1:
+        failures.append(f"{label}: cobertura K=10 da hemilinhagem ausente ou inválida")
+    if hemi_metrics.get("classes_k_min_both") != len(hemi_draft.get("mappings", [])):
+        failures.append(f"{label}: rascunho de hemilinhagem divergente das métricas")
+    if hemi_metrics.get("shared_labels", 0) < hemi_metrics.get("classes_k_min_both", 0):
+        failures.append(f"{label}: interseção de hemilinhagem inconsistente")
+    if not hemi_metrics.get("uncertain_labels"):
+        failures.append(f"{label}: rótulos incertos de hemilinhagem devem ser listados")
+    hemi_report = (ROOT / "artifacts" / "reports" / "H07-HEMILINEAGE-AUDIT.md").read_text(encoding="utf-8")
+    for token in ("não confirmado", "k≥10", "exploratório", "inconclusivo", "trumanhl"):
+        if token.lower() not in " ".join(hemi_report.split()).lower():
+            failures.append(f"{label}: auditoria de hemilinhagem sem token '{token}'")
+    changelog_text = (ROOT / "preregistration" / "CHANGELOG.md").read_text(encoding="utf-8")
+    if "| 2.0-draft |" not in changelog_text:
+        failures.append(f"{label}: changelog 2.0-draft ausente")
     draft = json.loads(H07_DRAFT.read_text(encoding="utf-8"))
     draft_failures = module.validate_crosswalk(draft, H07_DRAFT.name)
     for failure in draft_failures:
@@ -2314,7 +2339,7 @@ def check_h07_blocked() -> tuple[list[str], int]:
         failures.append(f"{label}: H07 deve permanecer [ ] enquanto bloqueada")
     else:
         index = plan_lines.index(h07_line)
-        note = " ".join(plan_lines[index:index + 25]).lower()
+        note = " ".join(plan_lines[index:index + 40]).lower()
         pending_tokens = ("segundo revisor", "revisão final", "revisor único")
         if "bloqueio" not in note or not any(token in note for token in pending_tokens):
             failures.append(f"{label}: item do plano sem nota de bloqueio/pendência humana")

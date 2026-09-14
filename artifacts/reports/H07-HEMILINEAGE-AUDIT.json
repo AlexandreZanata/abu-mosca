@@ -1,0 +1,263 @@
+{
+  "classes": [
+    {
+      "label": "00A",
+      "manc_neurons": 256,
+      "mcns_neurons": 297,
+      "uncertain": false
+    },
+    {
+      "label": "00B",
+      "manc_neurons": 58,
+      "mcns_neurons": 88,
+      "uncertain": false
+    },
+    {
+      "label": "01A",
+      "manc_neurons": 399,
+      "mcns_neurons": 399,
+      "uncertain": false
+    },
+    {
+      "label": "01B",
+      "manc_neurons": 477,
+      "mcns_neurons": 503,
+      "uncertain": false
+    },
+    {
+      "label": "02A",
+      "manc_neurons": 310,
+      "mcns_neurons": 487,
+      "uncertain": false
+    },
+    {
+      "label": "03A",
+      "manc_neurons": 572,
+      "mcns_neurons": 802,
+      "uncertain": false
+    },
+    {
+      "label": "03B",
+      "manc_neurons": 492,
+      "mcns_neurons": 957,
+      "uncertain": false
+    },
+    {
+      "label": "04A",
+      "manc_neurons": 12,
+      "mcns_neurons": 12,
+      "uncertain": false
+    },
+    {
+      "label": "04B",
+      "manc_neurons": 562,
+      "mcns_neurons": 568,
+      "uncertain": false
+    },
+    {
+      "label": "05B",
+      "manc_neurons": 274,
+      "mcns_neurons": 379,
+      "uncertain": false
+    },
+    {
+      "label": "06A",
+      "manc_neurons": 604,
+      "mcns_neurons": 788,
+      "uncertain": false
+    },
+    {
+      "label": "06B",
+      "manc_neurons": 444,
+      "mcns_neurons": 447,
+      "uncertain": false
+    },
+    {
+      "label": "07B",
+      "manc_neurons": 619,
+      "mcns_neurons": 1224,
+      "uncertain": false
+    },
+    {
+      "label": "08A",
+      "manc_neurons": 345,
+      "mcns_neurons": 352,
+      "uncertain": false
+    },
+    {
+      "label": "08B",
+      "manc_neurons": 490,
+      "mcns_neurons": 877,
+      "uncertain": false
+    },
+    {
+      "label": "09A",
+      "manc_neurons": 499,
+      "mcns_neurons": 791,
+      "uncertain": false
+    },
+    {
+      "label": "09B",
+      "manc_neurons": 206,
+      "mcns_neurons": 543,
+      "uncertain": false
+    },
+    {
+      "label": "10B",
+      "manc_neurons": 443,
+      "mcns_neurons": 455,
+      "uncertain": false
+    },
+    {
+      "label": "11A",
+      "manc_neurons": 191,
+      "mcns_neurons": 223,
+      "uncertain": false
+    },
+    {
+      "label": "11B",
+      "manc_neurons": 175,
+      "mcns_neurons": 180,
+      "uncertain": false
+    },
+    {
+      "label": "12A",
+      "manc_neurons": 320,
+      "mcns_neurons": 543,
+      "uncertain": false
+    },
+    {
+      "label": "12B",
+      "manc_neurons": 575,
+      "mcns_neurons": 562,
+      "uncertain": false
+    },
+    {
+      "label": "13A",
+      "manc_neurons": 433,
+      "mcns_neurons": 610,
+      "uncertain": false
+    },
+    {
+      "label": "13B",
+      "manc_neurons": 430,
+      "mcns_neurons": 461,
+      "uncertain": false
+    },
+    {
+      "label": "14A",
+      "manc_neurons": 498,
+      "mcns_neurons": 518,
+      "uncertain": false
+    },
+    {
+      "label": "14B",
+      "manc_neurons": 39,
+      "mcns_neurons": 47,
+      "uncertain": false
+    },
+    {
+      "label": "15B",
+      "manc_neurons": 152,
+      "mcns_neurons": 161,
+      "uncertain": false
+    },
+    {
+      "label": "16B",
+      "manc_neurons": 315,
+      "mcns_neurons": 518,
+      "uncertain": false
+    },
+    {
+      "label": "17A",
+      "manc_neurons": 377,
+      "mcns_neurons": 680,
+      "uncertain": false
+    },
+    {
+      "label": "17B",
+      "manc_neurons": 36,
+      "mcns_neurons": 46,
+      "uncertain": false
+    },
+    {
+      "label": "18B",
+      "manc_neurons": 184,
+      "mcns_neurons": 184,
+      "uncertain": false
+    },
+    {
+      "label": "19A",
+      "manc_neurons": 649,
+      "mcns_neurons": 642,
+      "uncertain": false
+    },
+    {
+      "label": "19B",
+      "manc_neurons": 421,
+      "mcns_neurons": 570,
+      "uncertain": false
+    },
+    {
+      "label": "20A.22A",
+      "manc_neurons": 817,
+      "mcns_neurons": 817,
+      "uncertain": true
+    },
+    {
+      "label": "20B.21B.22B",
+      "manc_neurons": 32,
+      "mcns_neurons": 30,
+      "uncertain": true
+    },
+    {
+      "label": "21A",
+      "manc_neurons": 419,
+      "mcns_neurons": 419,
+      "uncertain": false
+    },
+    {
+      "label": "23B",
+      "manc_neurons": 441,
+      "mcns_neurons": 645,
+      "uncertain": false
+    },
+    {
+      "label": "24B.25B",
+      "manc_neurons": 50,
+      "mcns_neurons": 43,
+      "uncertain": true
+    },
+    {
+      "label": "26X",
+      "manc_neurons": 18,
+      "mcns_neurons": 18,
+      "uncertain": true
+    },
+    {
+      "label": "27X",
+      "manc_neurons": 58,
+      "mcns_neurons": 243,
+      "uncertain": true
+    }
+  ],
+  "classes_k_min_both": 40,
+  "crosswalk_sha256": "fdb8dbc8e0844dfc52b984fd629ec23d22540d3ecc8782c96ae9d547e28e1bbe",
+  "excluded_labels": [
+    "21X",
+    "TBD",
+    "ausentes"
+  ],
+  "file": "crosswalk-hemilineage.draft.json",
+  "k_min": 10,
+  "shared_labels": 41,
+  "source_sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+  "target_sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2",
+  "uncertain_labels": [
+    "20A.22A",
+    "20B.21B.22B",
+    "24B.25B",
+    "26X",
+    "27X"
+  ]
+}
