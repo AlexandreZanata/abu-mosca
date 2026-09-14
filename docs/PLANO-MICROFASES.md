@@ -82,7 +82,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   arquivos não relacionados surgidos na árvore durante a sessão foram preservados
   fora deste commit; commit 1d103a3c649cb58dad70324a266dbd5437b23875.
 
-- [ ] **C02 — Fixar pergunta, estimando (*estimand*) e unidade de análise provisórios.**
+- [x] **C02 — Fixar pergunta, estimando (*estimand*) e unidade de análise provisórios.**
   - Objetivo: dizer exatamente o que será estimado e em qual população observada.
   - Entregas: `docs/research/PERGUNTA-E-ESTIMANDO.md` com H0/H1, diagrama do fluxo,
     unidade de consulta, galeria e limites de generalização.
@@ -92,6 +92,22 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     verificável.
   - Dependências: C01.
   - Orçamento: IA baixa + revisão; sem GPU.
+  Evidência (2026-09-14, executor): arquivos
+  `docs/research/PERGUNTA-E-ESTIMANDO.md`, `tools/validate_research.py` (funções
+  de C02) e esta linha; fontes/versões: apenas documentos internos do projeto
+  (ESCOPO, PROTOCOLO e registros de C01), nenhuma fonte externa consultada,
+  Python 3.12.2 (stdlib); comandos e testes: `python3 tools/validate_research.py`
+  com smoke negativo inline (seção ausente, termo restrito fora da seção,
+  declaração de independência ausente e fase inexistente),
+  `python3 tools/validate_plan.py`, `git diff --cached --check` e
+  `git status --porcelain`; resultado: Δ condicional ao par observado, H0/H1,
+  diagrama do fluxo, unidade de consulta e galeria, limites de generalização, 7
+  seções obrigatórias, 22 referências de fase e 30 caminhos citados válidos;
+  recursos: 13,9 MB de RAM e 0,06 s no validador, sem GPU; decisão/limitação:
+  documento provisório com revisão humana pendente para G0; números finais
+  (SESOI e cobertura mínima) dependem de C04/R07; nenhum dado externo consultado;
+  arquivos não relacionados preservados fora do commit; commit
+  cb5094be70b42beeb89e8ea740bb879d08e0bcc8.
 
 - [ ] **C03 — Definir “neurônio equivalente” e a hierarquia avaliativa.**
   - Objetivo: escolher targets cientificamente defensáveis antes de ver scores.

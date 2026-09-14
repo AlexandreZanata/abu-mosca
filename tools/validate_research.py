@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-"""Valida os registros abertos em C01: GLOSSARIO.md, CLAIMS.md e RISCOS.md.
+"""Valida os registros de C01 e o documento de estimando de C02.
 
-Verifica IDs estáveis e únicos, campos obrigatórios, vocabulário de status,
-exigência de artefato para itens marcados como mitigados/confirmados, referências
-de fase contra o plano e caminhos de arquivo citados em backticks. Sem
-dependências externas além de `tools/validate_plan.py`.
+C01: GLOSSARIO.md, CLAIMS.md e RISCOS.md — IDs estáveis e únicos, campos
+obrigatórios, vocabulário de status, exigência de artefato para itens marcados
+como mitigados/confirmados e caminhos citados em backticks.
+C02: PERGUNTA-E-ESTIMANDO.md — seções obrigatórias, declaração de independência
+de seeds/neurônios, separação entre datasets observados e população de moscas,
+diagrama do fluxo, termos restritos confinados à seção de vocabulário e
+referências de fase contra o plano.
+Sem dependências externas além de `tools/validate_plan.py`.
 """
 
 from __future__ import annotations
@@ -21,6 +25,19 @@ RESEARCH = ROOT / "docs" / "research"
 GLOSSARY = RESEARCH / "GLOSSARIO.md"
 CLAIMS = RESEARCH / "CLAIMS.md"
 RISKS = RESEARCH / "RISCOS.md"
+ESTIMAND = RESEARCH / "PERGUNTA-E-ESTIMANDO.md"
+
+ESTIMAND_SECTIONS = (
+    "Estimando",
+    "Hipótese primária",
+    "Hipótese nula",
+    "Diagrama do fluxo",
+    "Unidade de consulta e galeria",
+    "Limites de generalização",
+    "Vocabulário restrito",
+)
+RESTRICTED_TERMS = ("universal", "função", "cross-individual")
+PHASE_TOKEN_RE = re.compile(r"\b([CLDRHBMS])(\d{2})\b|\bG(\d)\b")
 
 REQUIRED_GLOSSARY_TERMS = (
     "fonte",
@@ -176,10 +193,51 @@ def check_phase_refs(entries_by_file: list[tuple[Path, list[tuple[str, str, list
     return failures, resolved
 
 
+def check_estimand() -> tuple[list[str], int]:
+    label = ESTIMAND.name
+    if not ESTIMAND.exists():
+        return [f"{label}: arquivo ausente"], 0
+    text = ESTIMAND.read_text(encoding="utf-8")
+    flat = " ".join(text.split())
+    failures: list[str] = []
+    for section in ESTIMAND_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    if "não são indivíduos biológicos independentes" not in flat:
+        failures.append(f"{label}: falta a declaração de que seeds e neurônios não são indivíduos")
+    for phrase in ("datasets observados", "população de moscas"):
+        if phrase not in flat:
+            failures.append(f"{label}: falta separar generalização; esperado '{phrase}'")
+    fenced = re.findall(r"```[a-z]*\n(.*?)```", text, re.S)
+    if not any(
+        all(word in block.lower() for word in ("fonte", "alvo", "avaliador")) for block in fenced
+    ):
+        failures.append(f"{label}: diagrama do fluxo ausente ou sem FONTE/ALVO/AVALIADOR")
+
+    lines = text.splitlines()
+    start = next((i for i, line in enumerate(lines) if "Vocabulário restrito" in line), None)
+    if start is None:
+        outside = text
+    else:
+        end = next((i for i in range(start + 1, len(lines)) if lines[i].startswith("## ")), len(lines))
+        outside = "\n".join(lines[:start] + lines[end:])
+    for term in RESTRICTED_TERMS:
+        if term in outside.lower():
+            failures.append(f"{label}: termo restrito '{term}' fora da seção de vocabulário restrito")
+
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    refs = set(expand_ranges(text))
+    for phase, number, gate in PHASE_TOKEN_RE.findall(text):
+        refs.add(f"{phase}{number}" if phase else f"G{gate}")
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(refs)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
-    for path in (GLOSSARY, CLAIMS, RISKS):
+    for path in (GLOSSARY, CLAIMS, RISKS, ESTIMAND):
         if not path.exists():
             continue
         for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -204,7 +262,8 @@ def main() -> int:
     ]
     ref_failures, refs = check_phase_refs(entries_by_file)
     path_failures, paths = check_paths()
-    failures += ref_failures + path_failures
+    estimand_failures, estimand_refs = check_estimand()
+    failures += ref_failures + path_failures + estimand_failures
 
     if failures:
         for failure in failures:
@@ -214,6 +273,7 @@ def main() -> int:
     print(f"OK: GLOSSARIO.md com {glossary_count} termos e os {len(REQUIRED_GLOSSARY_TERMS)} obrigatórios")
     print(f"OK: CLAIMS.md com {claim_count} claims, todos com status e evidência")
     print(f"OK: RISCOS.md com {risk_count} riscos, todos com campos completos")
+    print(f"OK: PERGUNTA-E-ESTIMANDO.md com seções obrigatórias e {estimand_refs} referências de fase")
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
     return 0
