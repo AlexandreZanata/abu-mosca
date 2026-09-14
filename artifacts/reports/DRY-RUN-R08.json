@@ -1,0 +1,33 @@
+{
+  "classes_known": [
+    "alpha",
+    "beta",
+    "gamma"
+  ],
+  "dryrun_tag": "dryrun-1.0-f90a4927",
+  "firewall_scanner_clean": true,
+  "metrics_sha256": "bbbf9e823f5c57047c275f33be1c64ddda1e3b4640a1a686f116ad72da0767f8",
+  "predictions_sha256": "9f1ad2cf57fc306c5b0f86bc1e22f28370b9436ff430df5cbfc30df1b5a3fefd",
+  "schema_version": "1.0",
+  "seed": 20260914,
+  "stages": {
+    "download": {
+      "bytes": 1076,
+      "download": "downloaded",
+      "sha256": "f09fee7b51e481149ee8c3feccf678b356cce04b368bd49ef07f7cb684b93d92"
+    },
+    "inference": {
+      "queries": 70,
+      "rejected": 13
+    },
+    "preprocess": {
+      "classes": 3,
+      "rows": 60
+    },
+    "train": {
+      "classes": 3,
+      "weights_sha256": "6c20ffb6841d5ce6"
+    }
+  },
+  "unknown_queries": 10
+}

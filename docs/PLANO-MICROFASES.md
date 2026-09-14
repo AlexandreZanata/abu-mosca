@@ -1154,7 +1154,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   mantém os mesmos bytes da minuta e qualquer mudança futura exige changelog e
   nova assinatura; commit f162f693cf41059f3850a6f2f199f5b79ca2446d.
 
-- [ ] **R08 — Ensaiar o protocolo completo em dados sintéticos e congelar versão.**
+- [x] **R08 — Ensaiar o protocolo completo em dados sintéticos e congelar versão.**
   - Objetivo: descobrir falhas operacionais antes de gastar o alvo ou a GPU.
   - Entregas: fixture com classes conhecidas/unknown, execução ponta a ponta,
     relatório de dry run, tag/hash interno do protocolo e pacote de handoff ao
@@ -1165,6 +1165,31 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: dados reais do alvo não entram no dry run.
   - Dependências: R03–R07.
   - Orçamento: IA baixa; CPU/GPU smoke até 5 minutos.
+  Evidência (2026-09-14, executor): arquivos `tools/dry_run.py` (fixture
+  sintética com 3 tipos conhecidos e 1 unknown, estágios de geração, download
+  local via HTTP + `tools/download.py`, pré-processamento, treino trivial MLP
+  em CPU, congelamento com hashes, inferência opaca e avaliação selada no
+  ambiente sintético sob firewall), `tests/test_dry_run.py` (5 casos, incluindo
+  sabotagem proposital de leakage que falha como esperado e recusa de predição
+  com label), `artifacts/reports/DRY-RUN-R08.md` e `DRY-RUN-R08.json` e
+  `docs/research/HANDOFF-CUSTODIAN.md` (pacote de handoff); tag interna do
+  protocolo `dryrun-1.0-f90a4927`; hashes de predições `9f1ad2cf…` e métricas
+  `bbbf9e82…`; fontes/versões: R03–R07, schemas R06, PROTOCOLO e firewall R05,
+  Python 3.12.2 com torch do lock R02 (sem dependência nova), nenhum dado real
+  de fonte ou alvo; comandos e testes: `.venv/bin/python tools/dry_run.py
+  --workdir runs/dryrun-r08` (ponta a ponta, 70 consultas, 13 rejeições, scanner
+  de firewall limpo, download idempotente `skipped` na segunda chamada),
+  `.venv/bin/python -m pytest tests/ -q` (75 passaram; 5 novos), nova checagem
+  R08 no `validate_research.py` com smoke negativo (tag inválida, scanner sujo,
+  zero rejeições, tag ausente no relatório e token ausente no handoff),
+  `python3 tools/validate_plan.py` e `git diff --cached --check`; resultado:
+  fluxo completo passa sem acesso indevido, leakage proposital é detectado,
+  todos os schemas de predições/métricas validam e o pacote de handoff ao
+  custodiante está definido; recursos medidos: dry run em 4,81 s com pico de
+  874 MB de RSS, CPU apenas, sem GPU; decisão/limitação: a fixture é separável
+  e trivial e não gera evidência científica; a avaliação selada real segue com
+  o custodiante em H04/H07/M08 e a versão do protocolo fica congelada pela tag
+  interna; commit de71950ee6715362de87a4c792cfd8acdd4cdf2a.
 
 - [ ] **G3 — Aprovar pré-registro e firewall.**
   - Objetivo: autorizar ingestão integral sem mudar a pergunta durante o caminho.

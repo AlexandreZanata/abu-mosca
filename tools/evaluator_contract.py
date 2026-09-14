@@ -37,7 +37,7 @@ QUERY_RE = re.compile(r"^q[0-9a-f]{16}$")
 GALLERY_RE = re.compile(r"^g[0-9a-f]{16}$")
 RAW_ID_RE = re.compile(r"\b\d{9,}\b")
 FORBIDDEN_KEYS = {
-    "label", "labels", "true_type", "target_type", "cell_type", "celltype",
+    "label", "labels", "type", "true_type", "target_type", "cell_type", "celltype",
     "bodyid", "body_id", "root_id", "neuron_id", "id_map", "qid_map",
 }
 FORBIDDEN_SUBSTRINGS = ("per_query", "per_node", "example", "true_type", "target_type")

@@ -415,6 +415,33 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+DRY_RUN_TOOL = ROOT / "tools" / "dry_run.py"
+DRY_RUN_REPORT = ROOT / "artifacts" / "reports" / "DRY-RUN-R08.md"
+DRY_RUN_JSON = ROOT / "artifacts" / "reports" / "DRY-RUN-R08.json"
+HANDOFF_DOC = ROOT / "docs" / "research" / "HANDOFF-CUSTODIAN.md"
+DRY_RUN_TOKENS = (
+    "download",
+    "preprocessamento",
+    "treino trivial",
+    "congelamento",
+    "inferência",
+    "avaliação selada",
+    "leakage",
+    "schemas",
+    "idempotente",
+    "limitações",
+    "dryrun-1.0-",
+)
+HANDOFF_TOKENS = (
+    "custodiante",
+    "predições",
+    "metrics.json",
+    "unseal",
+    "firewall",
+    "hashes",
+    "ids opacos",
+    "crosswalk",
+)
 PREREG_DIR = ROOT / "preregistration"
 PREREG_PROTOCOL = PREREG_DIR / "PROTOCOL.md"
 PREREG_REGISTRY = PREREG_DIR / "REGISTRY.md"
@@ -1993,6 +2020,60 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_dry_run() -> tuple[list[str], int]:
+    label = "R08"
+    failures: list[str] = []
+    for path in (
+        DRY_RUN_TOOL,
+        ROOT / "tests" / "test_dry_run.py",
+        DRY_RUN_REPORT,
+        DRY_RUN_JSON,
+        HANDOFF_DOC,
+    ):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+
+    report = DRY_RUN_REPORT.read_text(encoding="utf-8")
+    handoff = HANDOFF_DOC.read_text(encoding="utf-8")
+    flat_report = " ".join(report.split()).lower()
+    for token in DRY_RUN_TOKENS:
+        if token.lower() not in flat_report:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    for token in HANDOFF_TOKENS:
+        if token.lower() not in " ".join(handoff.split()).lower():
+            failures.append(f"{label}: handoff sem token '{token}'")
+    for path in (DRY_RUN_REPORT, HANDOFF_DOC):
+        leak = PUBLIC_ID_RE.search(path.read_text(encoding="utf-8"))
+        if leak:
+            failures.append(f"{label}: {path.name} com possível ID cru ('{leak.group(0)}')")
+
+    manifest = json.loads(DRY_RUN_JSON.read_text(encoding="utf-8"))
+    tag = str(manifest.get("dryrun_tag", ""))
+    if not re.fullmatch(r"dryrun-1\.0-[0-9a-f]{8}", tag):
+        failures.append(f"{label}: dryrun_tag inválido '{tag}'")
+    if tag and tag not in report:
+        failures.append(f"{label}: relatório não cita a tag '{tag}'")
+    stages = manifest.get("stages", {})
+    for stage in ("download", "preprocess", "train", "inference"):
+        if stage not in stages:
+            failures.append(f"{label}: manifesto sem estágio '{stage}'")
+    if manifest.get("firewall_scanner_clean") is not True:
+        failures.append(f"{label}: scanner do firewall não consta limpo no manifesto")
+    for field in ("predictions_sha256", "metrics_sha256"):
+        if not re.fullmatch(r"[0-9a-f]{64}", str(manifest.get(field, ""))):
+            failures.append(f"{label}: manifesto sem hash válido em '{field}'")
+    if stages.get("inference", {}).get("rejected", 0) < 1:
+        failures.append(f"{label}: dry run sem nenhuma rejeição de unknown")
+
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report + handoff) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(DRY_RUN_TOKENS)
+
+
 def check_preregistration() -> tuple[list[str], int, str]:
     label = "R07"
     failures: list[str] = []
@@ -2724,6 +2805,7 @@ def main() -> int:
     firewall_failures, firewall_tokens = check_firewall_phase()
     statistical_plan_failures, statistical_plan_tokens = check_statistical_plan()
     prereg_failures, prereg_entries, prereg_state = check_preregistration()
+    dry_run_failures, dry_run_tokens = check_dry_run()
     failures += (
         ref_failures
         + path_failures
@@ -2753,6 +2835,7 @@ def main() -> int:
         + firewall_failures
         + statistical_plan_failures
         + prereg_failures
+        + dry_run_failures
     )
 
     if failures:
@@ -2864,6 +2947,10 @@ def main() -> int:
     print(
         f"OK: pré-registro R07 com {prereg_entries} artefatos congelados e "
         f"assinatura {prereg_state}"
+    )
+    print(
+        f"OK: dry run R08 com {dry_run_tokens} tokens, manifesto ponta a ponta e "
+        f"handoff ao custodiante"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
