@@ -146,7 +146,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   arquivos não relacionados preservados fora do commit; commit
   40552405b9e5447c8790cb5052c54dc76beae5e4.
 
-- [ ] **C04 — Fixar desfechos, sucesso, nulidade e falsificação provisórios.**
+- [x] **C04 — Fixar desfechos, sucesso, nulidade e falsificação provisórios.**
   - Objetivo: impedir que a conclusão seja escolhida depois do resultado.
   - Entregas: `docs/research/DESFECHOS-E-FALSIFICACAO.md` com métrica primária,
     métricas secundárias, SESOI provisório, controles nulos e árvore de decisão.
@@ -157,6 +157,22 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     estimativa.
   - Dependências: C02, C03.
   - Orçamento: IA baixa + revisão; sem GPU.
+  Evidência (2026-09-14, executor): arquivos
+  `docs/research/DESFECHOS-E-FALSIFICACAO.md`, `tools/validate_research.py`
+  (funções de C04) e esta linha; fontes/versões: apenas documentos internos
+  (ESCOPO, PROTOCOLO, estimando de C02 e equivalência de C03 aprovada), nenhuma
+  fonte externa consultada, Python 3.12.2 (stdlib); comandos e testes:
+  `python3 tools/validate_research.py` com smoke negativo inline (estado ausente,
+  métrica ausente, proibição removida, seção ausente e fase inexistente),
+  `python3 tools/validate_plan.py`, `git diff --cached --check` e
+  `git status --porcelain`; resultado: métrica primária Macro Recall@1, 17
+  marcadores obrigatórios (recuperação, classificação, calibração, open-set,
+  intervalos, degree-matched, gap within-vs-cross e SESOI), 4 estados de decisão
+  e proibições de UMAP/t-SNE e melhor seed; recursos: 14,6 MB de RAM e 0,06 s no
+  validador, sem GPU; decisão/limitação: desfechos provisórios, números finais
+  (SESOI, K e seeds) dependem de R07, estados decididos em G6 e a validação é
+  apenas estrutural; arquivos não relacionados preservados fora do commit; commit
+  7341d27cc4ff0b53e350787870e7b9c6b094d5d1.
 
 - [ ] **C05 — Modelar ameaças à validade e leakage.**
   - Objetivo: listar como o estudo poderia acertar pelo motivo errado.

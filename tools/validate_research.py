@@ -27,6 +27,44 @@ CLAIMS = RESEARCH / "CLAIMS.md"
 RISKS = RESEARCH / "RISCOS.md"
 ESTIMAND = RESEARCH / "PERGUNTA-E-ESTIMANDO.md"
 EQUIVALENCE = RESEARCH / "EQUIVALENCIA.md"
+OUTCOMES = RESEARCH / "DESFECHOS-E-FALSIFICACAO.md"
+
+OUTCOMES_SECTIONS = (
+    "## 1. Estado e escopo",
+    "## 2. Métrica primária",
+    "## 3. Métricas secundárias",
+    "## 4. SESOI provisório",
+    "## 5. Controles nulos e robustez",
+    "## 6. Gap within-vs-cross",
+    "## 7. Árvore de decisão",
+    "## 8. Regras de reporte e proibições",
+    "## 9. Rastreabilidade e limitações",
+)
+OUTCOMES_TOKENS = (
+    "Macro Recall@1",
+    "Recall@5",
+    "Recall@10",
+    "MRR",
+    "MAP",
+    "macro-F1",
+    "balanced accuracy",
+    "Brier",
+    "ECE",
+    "AUROC",
+    "AUPR",
+    "FPR",
+    "degree-matched",
+    "gap within-vs-cross",
+    "bootstrap agrupado por tipo",
+    "IC 95%",
+    "SESOI",
+)
+OUTCOMES_STATES = ("sucesso", "parcial", "refutado", "inconclusivo")
+OUTCOMES_RULES = (
+    "não contam como evidência",
+    "não conta como estimativa",
+    "após o unseal",
+)
 
 ESTIMAND_SECTIONS = (
     "Estimando",
@@ -374,10 +412,37 @@ def check_equivalence() -> tuple[list[str], int, int]:
     return failures, len(decisions), approved
 
 
+def check_outcomes() -> tuple[list[str], int]:
+    label = OUTCOMES.name
+    if not OUTCOMES.exists():
+        return [f"{label}: arquivo ausente"], 0
+    text = OUTCOMES.read_text(encoding="utf-8")
+    flat = " ".join(text.split()).lower()
+    failures: list[str] = []
+    for section in OUTCOMES_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for token in OUTCOMES_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: métrica/controle obrigatório ausente ('{token}')")
+    for state in OUTCOMES_STATES:
+        if not re.search(rf"^- \*\*{state}:\*\*", text, re.M):
+            failures.append(f"{label}: estado obrigatório ausente ou fora do formato: {state}")
+    for rule in OUTCOMES_RULES:
+        if rule not in flat:
+            failures.append(f"{label}: proibição obrigatória ausente ('{rule}')")
+
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    refs = phase_refs(text)
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(OUTCOMES_TOKENS)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
-    for path in (GLOSSARY, CLAIMS, RISKS, ESTIMAND, EQUIVALENCE):
+    for path in (GLOSSARY, CLAIMS, RISKS, ESTIMAND, EQUIVALENCE, OUTCOMES):
         if not path.exists():
             continue
         for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -404,7 +469,10 @@ def main() -> int:
     path_failures, paths = check_paths()
     estimand_failures, estimand_refs = check_estimand()
     equivalence_failures, equivalence_decisions, equivalence_approved = check_equivalence()
-    failures += ref_failures + path_failures + estimand_failures + equivalence_failures
+    outcomes_failures, outcomes_tokens = check_outcomes()
+    failures += (
+        ref_failures + path_failures + estimand_failures + equivalence_failures + outcomes_failures
+    )
 
     if failures:
         for failure in failures:
@@ -418,6 +486,10 @@ def main() -> int:
     print(
         f"OK: EQUIVALENCIA.md com 5 relações e {equivalence_decisions} decisões "
         f"({equivalence_approved} aprovadas por humano)"
+    )
+    print(
+        f"OK: DESFECHOS-E-FALSIFICACAO.md com {len(OUTCOMES_STATES)} estados e "
+        f"{outcomes_tokens} marcadores obrigatórios"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
