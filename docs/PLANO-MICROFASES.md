@@ -1337,7 +1337,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   continua candidato a escrita incremental/colunar sem mudar o schema; commit
   ce7a6152b49d8b443216f9f5671aeeada2dcf041.
 
-- [ ] **H04 — Implementar o adapter selado de avaliação.**
+- [x] **H04 — Implementar o adapter selado de avaliação.**
   - Objetivo: permitir pontuação sem expor rótulos por neurônio ao executor.
   - Entregas: módulo/ambiente do custodiante, validação de label schema,
     agregação segura e teste em fixture.
@@ -1348,6 +1348,31 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     reais.
   - Dependências: H01, R05, R06; execução pelo custodiante.
   - Orçamento: IA baixa em sessão separada; revisão humana.
+  Evidência (2026-09-14, executor): módulo do custodiante
+  `tools/sealed_evaluator.py` (validação de label schema e cobertura/crosswalk,
+  agregação segura multi-seed com bootstrap agrupado por tipo, open-set,
+  calibração, permutação por rotação de tipos na galeria, família Holm de 3,
+  registro do hash do label set e escrita de `metrics.json` no schema R06),
+  `tests/test_sealed_evaluator.py` (5 casos: métricas válidas com SESOI
+  detectado, hash do label set, cobertura incompleta, status inválido e CLI sem
+  vazamento de IDs) e `artifacts/reports/H04-AVALIADOR-SELADO.md`; fontes/
+  versões: H01 (contrato de grafo), R05 (firewall), R06 (schemas/schemas de
+  métricas e predições) e HANDOFF-CUSTODIAN, Python 3.12.2 (stdlib), nenhum
+  rótulo real e nenhum acesso a `data/sealed`; comandos e testes:
+  `.venv/bin/python -m pytest tests/ -q` (106 passaram; 5 novos),
+  `.venv/bin/python tools/sealed_evaluator.py …` (CLI validada em subprocesso,
+  sem `q<hex>` em stdout/stderr), nova checagem H04 no `validate_research.py`
+  com smoke negativo (token, ID cru e referência à zona selada),
+  `python3 tools/validate_plan.py` e `git diff --cached --check`; resultado:
+  predições opacas e labels selados geram apenas métricas/contagens agregadas
+  no schema R06, com hash do label set registrado e sem exposição de exemplos
+  individuais; falha real corrigida nos testes: o teste de permutação usava
+  rótulos permutados entre consultas (macro trivialmente 1), substituído por
+  rotação dos tipos na galeria; recursos medidos: CPU apenas, suíte em ~40 s,
+  sem GPU e sem dados reais; decisão/limitação: papel de custodiante exercido na
+  mesma sessão por acumulação procedural (revisor/custodiante independente
+  recomendado antes de M08), calibração usa aproximação top-1 e a avaliação
+  real única depende de H07/M08; commit 6f632932bfaa08f29f95128893ba96c1b918a745.
 
 - [ ] **H05 — Remapear IDs e produzir features topology-only.**
   - Objetivo: gerar features comparáveis sem deixar identidade ou ordem virar

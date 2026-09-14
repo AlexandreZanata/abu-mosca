@@ -415,6 +415,20 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+SEALED_EVALUATOR_TOOL = ROOT / "tools" / "sealed_evaluator.py"
+SEALED_EVALUATOR_REPORT = ROOT / "artifacts" / "reports" / "H04-AVALIADOR-SELADO.md"
+SEALED_EVALUATOR_TOKENS = (
+    "custodiante",
+    "label schema",
+    "cobertura",
+    "crosswalk",
+    "hash do label set",
+    "logs",
+    "sessão separada",
+    "firewall",
+    "métricas agregadas",
+    "limitaç",
+)
 TARGET_ADAPTER_TOOL = ROOT / "tools" / "adapter_mcns.py"
 TARGET_ADAPTER_REPORT = ROOT / "artifacts" / "reports" / "H03-ADAPTER-ALVO.md"
 TARGET_ADAPTER_METRICS = ROOT / "artifacts" / "reports" / "H03-ADAPTER-ALVO.json"
@@ -2095,6 +2109,47 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_sealed_evaluator() -> tuple[list[str], int]:
+    label = "H04"
+    failures: list[str] = []
+    for path in (
+        SEALED_EVALUATOR_TOOL,
+        SEALED_EVALUATOR_REPORT,
+        ROOT / "tests" / "test_sealed_evaluator.py",
+    ):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+
+    report = SEALED_EVALUATOR_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in SEALED_EVALUATOR_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+
+    source = SEALED_EVALUATOR_TOOL.read_text(encoding="utf-8")
+    if "data/sealed" in source:  # firewall-allow
+        failures.append(f"{label}: avaliador referencia caminho da zona selada real")
+    spec = importlib.util.spec_from_file_location("sealed_evaluator_module", SEALED_EVALUATOR_TOOL)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    for attribute in ("validate_label_set", "evaluate", "LABEL_STATUSES"):
+        if not hasattr(module, attribute):
+            failures.append(f"{label}: módulo sem '{attribute}'")
+    if "known" not in module.LABEL_STATUSES or "unknown" not in module.LABEL_STATUSES:
+        failures.append(f"{label}: status de label incompletos")
+
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(SEALED_EVALUATOR_TOKENS)
+
+
 def check_adapter_target() -> tuple[list[str], int]:
     label = "H03"
     failures: list[str] = []
@@ -3171,6 +3226,7 @@ def main() -> int:
     graph_contract_failures, graph_contract_tokens = check_graph_contract()
     adapter_source_failures, adapter_source_tokens = check_adapter_source()
     adapter_target_failures, adapter_target_tokens = check_adapter_target()
+    sealed_evaluator_failures, sealed_evaluator_tokens = check_sealed_evaluator()
     failures += (
         ref_failures
         + path_failures
@@ -3205,6 +3261,7 @@ def main() -> int:
         + graph_contract_failures
         + adapter_source_failures
         + adapter_target_failures
+        + sealed_evaluator_failures
     )
 
     if failures:
@@ -3335,6 +3392,10 @@ def main() -> int:
     print(
         f"OK: adapter público do alvo H03 com {adapter_target_tokens} tokens, "
         f"amostra sem labels e arquivo completo contado"
+    )
+    print(
+        f"OK: avaliador selado H04 com {sealed_evaluator_tokens} tokens, label "
+        f"schema validado e métricas sem IDs"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
