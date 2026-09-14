@@ -14,6 +14,7 @@ Sem dependências externas além de `tools/validate_plan.py`.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import sys
 from pathlib import Path
@@ -413,6 +414,34 @@ RESOURCES_SECTIONS = (
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
 )
+ENVIRONMENT_README = ROOT / "environment" / "README.md"
+ENVIRONMENT_LOCK = ROOT / "environment" / "requirements.lock"
+ENVIRONMENT_TOOL = ROOT / "tools" / "check_environment.py"
+ENVIRONMENT_REPORT = ROOT / "artifacts" / "reports" / "AMBIENTE-R02.md"
+ENVIRONMENT_JSON = ROOT / "artifacts" / "reports" / "AMBIENTE-R02.json"
+ENVIRONMENT_TOKENS = (
+    "Linux",
+    "CUDA",
+    "requirements.lock",
+    "RTX 4060",
+    "licença",
+    "justificativa",
+    "PyG",
+    "pytest",
+    "venv",
+    "check_environment.py",
+    "atualização",
+)
+ENVIRONMENT_REPORT_TOKENS = (
+    "RTX 4060",
+    "CUDA",
+    "compute capability",
+    "8.9",
+    "multiplicação",
+    "limitação",
+    "requirements.lock",
+)
+ENVIRONMENT_LOCK_PACKAGES = ("numpy", "scipy", "pandas", "pyarrow", "torch", "pytest")
 DATA_README = ROOT / "data" / "README.md"
 DATA_MANAGEMENT = ROOT / "docs" / "research" / "DATA-MANAGEMENT.md"
 DATA_HYGIENE_TOOL = ROOT / "tools" / "check_data_hygiene.py"
@@ -1750,6 +1779,64 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_environment_phase() -> tuple[list[str], int]:
+    label = "R02"
+    failures: list[str] = []
+    for path in (ENVIRONMENT_README, ENVIRONMENT_LOCK, ENVIRONMENT_TOOL, ENVIRONMENT_REPORT):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if not ENVIRONMENT_JSON.exists():
+        failures.append(f"{label}: métricas ausentes 'artifacts/reports/AMBIENTE-R02.json'")
+    if failures:
+        return failures, 0
+
+    readme = ENVIRONMENT_README.read_text(encoding="utf-8")
+    report = ENVIRONMENT_REPORT.read_text(encoding="utf-8")
+    lock = ENVIRONMENT_LOCK.read_text(encoding="utf-8")
+    for token in ENVIRONMENT_TOKENS:
+        if token.lower() not in readme.lower():
+            failures.append(f"{label}: environment/README.md sem token '{token}'")
+    for token in ENVIRONMENT_REPORT_TOKENS:
+        if token.lower() not in report.lower():
+            failures.append(f"{label}: relatório sem token '{token}'")
+    for package in ENVIRONMENT_LOCK_PACKAGES:
+        if not re.search(rf"^{package}==\d", lock, re.M):
+            failures.append(f"{label}: lock sem pino '== {package}'")
+
+    data = json.loads(ENVIRONMENT_JSON.read_text(encoding="utf-8"))
+    for key in ("sistema", "python", "pacotes", "cpu", "memoria_gib", "disco_gib", "gpu", "cuda_op"):
+        if key not in data:
+            failures.append(f"{label}: JSON sem chave '{key}'")
+    gpu = data.get("gpu", {})
+    if "RTX 4060" not in str(gpu.get("nome", "")):
+        failures.append(f"{label}: GPU medida não é a RTX 4060 esperada")
+    if int(gpu.get("vram_mib", 0)) < 8000:
+        failures.append(f"{label}: VRAM medida abaixo de 8 GB")
+    if str(gpu.get("compute_cap")) != "8.9":
+        failures.append(f"{label}: compute capability inesperada '{gpu.get('compute_cap')}'")
+    cuda = data.get("cuda_op", {})
+    if not cuda.get("cuda_available") or not cuda.get("matmul_finito"):
+        failures.append(f"{label}: operação CUDA mínima não registrada como aprovada")
+    if str(data.get("python", {}).get("versao")) != "3.12.2":
+        failures.append(f"{label}: versão de Python medida diverge do lock documentado")
+    driver = str(gpu.get("driver", ""))
+    if driver and driver not in report:
+        failures.append(f"{label}: relatório não cita o driver medido '{driver}'")
+    for path in (ENVIRONMENT_JSON, ENVIRONMENT_REPORT, ENVIRONMENT_README):
+        text = path.read_text(encoding="utf-8")
+        if "/home/" in text or "iiii" in text:
+            failures.append(f"{path.name}: caminho local ou usuário no artefato versionado")
+        leak = PUBLIC_ID_RE.search(text)
+        if leak:
+            failures.append(f"{path.name}: possível ID cru de neurônio ('{leak.group(0)}')")
+
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report + readme) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(ENVIRONMENT_TOKENS)
+
+
 def check_data_management() -> tuple[list[str], int]:
     label = "DATA-MANAGEMENT.md"
     failures: list[str] = []
@@ -2139,6 +2226,7 @@ def main() -> int:
     selection_failures, selection_pairs = check_dataset_selection()
     gate_g2_failures, gate_g2_criteria, gate_g2_state = check_gate_g2()
     data_management_failures, data_management_sections = check_data_management()
+    environment_failures, environment_tokens = check_environment_phase()
     failures += (
         ref_failures
         + path_failures
@@ -2162,6 +2250,7 @@ def main() -> int:
         + selection_failures
         + gate_g2_failures
         + data_management_failures
+        + environment_failures
     )
 
     if failures:
@@ -2249,6 +2338,10 @@ def main() -> int:
     print(
         f"OK: gestão de dados com {data_management_sections} seções, .gitignore "
         f"revisado e teste de higiene de sentinelas"
+    )
+    print(
+        f"OK: ambiente R02 com {environment_tokens} tokens, lock pinado e "
+        f"operação CUDA medida na RTX 4060"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

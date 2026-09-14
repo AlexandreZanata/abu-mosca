@@ -925,7 +925,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   dado selado foi lido ou gerado; commit
   f92f721f0d1d73c8b7bcc1170242480011781fde.
 
-- [ ] **R02 — Fixar ambiente e capturar hardware.**
+- [x] **R02 — Fixar ambiente e capturar hardware.**
   - Objetivo: obter instalação repetível e compatível com a máquina-alvo.
   - Entregas: versão Python, lockfile, instruções Linux/CUDA, script de diagnóstico
     e relatório de compatibilidade da RTX 4060.
@@ -936,6 +936,32 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     dependência fora do lock silenciosamente.
   - Dependências: R01, L06.
   - Orçamento: IA baixa; GPU smoke de segundos; rede apenas para pacotes aprovados.
+  Evidência (2026-09-14, executor): arquivos `environment/README.md`
+  (requisitos, instalação Linux/CUDA, justificativa e licença por dependência),
+  `environment/requirements.lock` (40 pinos do venv limpo),
+  `tools/check_environment.py` (diagnóstico + operação CUDA mínima),
+  `artifacts/reports/AMBIENTE-R02.md` e `artifacts/reports/AMBIENTE-R02.json`
+  (métricas geradas pelo script) e `.venv/` local ignorado (5,8 GB); fontes/
+  versões medidas: Pop!_OS 24.04 LTS, kernel 7.1.5-76070105-generic, Python
+  3.12.2 (CPython), RTX 4060 Laptop 8.188 MiB driver 580.173.02 compute 8.9,
+  torch 2.14.0+cu130 com runtime CUDA 13.0, numpy 2.5.3, scipy 1.18.1, pandas
+  3.0.5, pyarrow 25.0.1, pytest 9.1.1, pip 26.2.1; licenças lidas dos metadados
+  (BSD-3-Clause/BSD, Apache-2.0, MIT e expressão agregada do torch) e
+  justificativa em `research/literature/METHODS.md` (L06); comandos e testes:
+  criação de venv + instalação (3m45s), `.venv/bin/python
+  tools/check_environment.py --json-out artifacts/reports/AMBIENTE-R02.json`
+  PASS (CUDA disponível, multiplicação 1024² em 0,14 s com resultado finito,
+  42 MiB de VRAM reservada, RSS 826,8 MiB, 2,93 s), resolução do lock em venv
+  vazio com `pip install --dry-run` em 11,4 s, nova checagem R02 no
+  `validate_research.py` com smoke negativo (token, pino, GPU, CUDA, driver,
+  caminho local e ID cru), `validate_plan.py` e `git diff --cached --check`;
+  resultado: ambiente limpo reproduzível com lock pinado e smoke CUDA aprovado,
+  hardware conferindo com o ESCOPO; recursos medidos: disco livre caiu de 31,5
+  para 23,2 GiB (venv de 5,8 GB), sem download de dados e sem GPU além do
+  smoke; decisão/limitação: lock sem hashes de wheel (evoluível em R03), PyG/DGL
+  adiados para M02/M03 por não terem uso imediato, driver NVIDIA proprietário
+  fora do Git, instalação byte a byte em outra máquina fica para P02; commit
+  fff7f62bc640635c98c8bd79d82409d0214f8389.
 
 - [ ] **R03 — Implementar proveniência, manifests e download idempotente.**
   - Objetivo: tornar toda entrada identificável e reobtível.

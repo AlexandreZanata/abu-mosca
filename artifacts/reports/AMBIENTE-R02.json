@@ -1,0 +1,70 @@
+{
+  "cpu": {
+    "logicos": "16",
+    "modelo": "13th Gen Intel(R) Core(TM) i7-13620H"
+  },
+  "cuda_op": {
+    "cuda_available": true,
+    "dispositivo": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "matmul_1024_s": 0.1403,
+    "matmul_finito": true,
+    "torch": "2.14.0+cu130",
+    "torch_cuda_runtime": "13.0",
+    "vram_alocada_mib": 16.1,
+    "vram_reservada_mib": 42.0
+  },
+  "disco_gib": {
+    "livre": 23.2,
+    "total": 459.5
+  },
+  "gpu": {
+    "compute_cap": "8.9",
+    "disponivel": true,
+    "driver": "580.173.02",
+    "nome": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "vram_mib": 8188
+  },
+  "memoria_gib": {
+    "disponivel": 13.4,
+    "total": 31.0
+  },
+  "pacotes": {
+    "numpy": {
+      "licenca": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+      "versao": "2.5.3"
+    },
+    "pandas": {
+      "licenca": "OSI Approved :: BSD License",
+      "versao": "3.0.5"
+    },
+    "pyarrow": {
+      "licenca": "Apache-2.0",
+      "versao": "25.0.1"
+    },
+    "pytest": {
+      "licenca": "MIT",
+      "versao": "9.1.1"
+    },
+    "scipy": {
+      "licenca": "OSI Approved :: BSD License",
+      "versao": "1.18.1"
+    },
+    "torch": {
+      "licenca": "Apache-2.0 AND Apache-2.0 WITH LLVM-exception AND BSD-2-Clause AND BSD-3-Clause AND BSL-1.0 AND MIT",
+      "versao": "2.14.0"
+    }
+  },
+  "pico_rss_kib": 846632,
+  "python": {
+    "executavel": ".venv/bin/python",
+    "implementacao": "CPython",
+    "venv": true,
+    "versao": "3.12.2"
+  },
+  "sistema": {
+    "arquitetura": "x86_64",
+    "distro": "Pop!_OS 24.04 LTS",
+    "kernel": "7.1.5-76070105-generic"
+  },
+  "tempo_s": 2.93
+}
