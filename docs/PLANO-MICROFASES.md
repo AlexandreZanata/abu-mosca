@@ -755,6 +755,15 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     neurônio do alvo.
   - Dependências: C03, D02–D07.
   - Orçamento: IA baixa + dupla revisão humana; sem GPU.
+  Bloqueio (2026-09-14, executor): pacote preparado em
+  `research/datasets/CROSSWALK-AUDIT.md` com 7 pares (PAIR-01 a PAIR-07) e 4
+  decisões (DEC-CW-01 a DEC-CW-04), todas `aguardando dupla revisão humana`;
+  nenhum mapping exato foi gerado e o documento público contém apenas método,
+  proveniência e agregados; a fase fica `[ ]` porque o orçamento exige dupla
+  revisão humana e o protocolo reserva a aprovação de crosswalk ao revisor;
+  validação estrutural com smoke negativo em `tools/validate_research.py`
+  (21,8 MB de RAM, 0,09 s, sem GPU); próxima ação humana: revisar e assinar as
+  decisões; commit c20399bc6da8303dce2cbd6311f50171fea1d071.
 
 - [ ] **D09 — Estimar escala e fazer spikes mínimos de acesso.**
   - Objetivo: substituir estimativas vagas por medições sem baixar tudo.

@@ -385,6 +385,34 @@ INVENTORY_FIELDS = (
     "Checksum",
 )
 INVENTORY_CANDIDATES = tuple(f"CAND-{number:02d}" for number in range(1, 7))
+CROSSWALK = ROOT / "research" / "datasets" / "CROSSWALK-AUDIT.md"
+CROSSWALK_SECTIONS = (
+    "## 1. Estado e escopo",
+    "## 2. Método de auditoria",
+    "## 3. Proposta por par (somente agregados)",
+    "## 4. Sinalização de rótulos derivados",
+    "## 5. Regras de selagem e acesso",
+    "## 6. Decisões pendentes",
+    "## 7. Limitações",
+)
+CROSSWALK_PAIR_FIELDS = (
+    "Par",
+    "Interseção proposta",
+    "Known/open-set",
+    "Independência do rótulo",
+    "Fontes",
+    "Risco de circularidade",
+    "Status",
+)
+CROSSWALK_DEC_FIELDS = ("Decisão", "Opções", "Recomendação", "Status")
+CROSSWALK_PENDING = "aguardando dupla revisão humana"
+CROSSWALK_RULES = (
+    "zona selada",
+    "dois revisores",
+    "sensibilidade ou exclusão",
+    "não recebe mapping exato",
+)
+PUBLIC_ID_RE = re.compile(r"\b\d{9,}\b")
 CARD_SECTIONS = (
     "## Identidade e proveniência",
     "## Acesso e licença",
@@ -1581,6 +1609,68 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_crosswalk_audit() -> tuple[list[str], int]:
+    label = "CROSSWALK-AUDIT.md"
+    if not CROSSWALK.exists():
+        return [f"{label}: arquivo ausente em research/datasets/"], 0
+    text = CROSSWALK.read_text(encoding="utf-8")
+    flat = " ".join(text.split()).lower()
+    failures: list[str] = []
+    for section in CROSSWALK_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for rule in CROSSWALK_RULES:
+        if rule not in flat:
+            failures.append(f"{label}: regra obrigatória ausente ('{rule}')")
+    leak = PUBLIC_ID_RE.search(text)
+    if leak:
+        failures.append(f"{label}: possível ID/mapeamento exato no documento público ('{leak.group(0)}')")
+
+    rows = _ledger_rows()
+    known_lit = _known_lit_ids(rows)
+
+    pairs = parse_heading_blocks(text, r"^### (PAIR-\d{2}) — (.+)$")
+    if len(pairs) < 6:
+        failures.append(f"{label}: esperados ao menos 6 pares (achados {len(pairs)})")
+    for pair_id, block in pairs:
+        for field in CROSSWALK_PAIR_FIELDS:
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {pair_id} sem campo '{field}'")
+        status = field_value(block, "Status")
+        if status is not None and status != CROSSWALK_PENDING:
+            failures.append(f"{label}: {pair_id} status deve ser '{CROSSWALK_PENDING}'")
+        sources = field_value(block, "Fontes") or ""
+        if not re.search(r"LIT-\d{4}", sources):
+            failures.append(f"{label}: {pair_id} sem fontes LIT-*")
+        for lit_id in sorted(set(re.findall(r"LIT-\d{4}", sources))):
+            if known_lit and lit_id not in known_lit:
+                failures.append(f"{label}: {pair_id} referencia ledger inexistente '{lit_id}'")
+
+    decisions = parse_heading_blocks(text, r"^### (DEC-CW-\d{2}) — (.+)$")
+    if len(decisions) < 4:
+        failures.append(f"{label}: esperadas ao menos 4 decisões (achadas {len(decisions)})")
+    for dec_id, block in decisions:
+        for field in CROSSWALK_DEC_FIELDS:
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {dec_id} sem campo '{field}'")
+        status = field_value(block, "Status")
+        if status is not None and status != CROSSWALK_PENDING:
+            failures.append(f"{label}: {dec_id} status deve ser '{CROSSWALK_PENDING}'")
+
+    for line in text.splitlines():
+        match = re.match(r"^\s*- Status: (.+?)\s*$", line)
+        if match:
+            status = match.group(1).strip().rstrip(".")
+            if status != CROSSWALK_PENDING:
+                failures.append(f"{label}: status '{status}' não é pendência humana")
+
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    refs = phase_refs(text)
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(pairs)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
@@ -1603,6 +1693,7 @@ def check_paths() -> tuple[list[str], int]:
         NOVELTY,
         GATE_G1,
         DATASETS_INVENTORY,
+        CROSSWALK,
     ):
         if not path.exists():
             continue
@@ -1643,6 +1734,7 @@ def main() -> int:
     novelty_failures, novelty_gaps = check_novelty()
     gate_g1_failures, gate_g1_criteria, gate_g1_state = check_gate_g1()
     inventory_failures, inventory_candidates = check_dataset_inventory()
+    crosswalk_failures, crosswalk_pairs = check_crosswalk_audit()
     failures += (
         ref_failures
         + path_failures
@@ -1661,6 +1753,7 @@ def main() -> int:
         + novelty_failures
         + gate_g1_failures
         + inventory_failures
+        + crosswalk_failures
     )
 
     if failures:
@@ -1728,6 +1821,10 @@ def main() -> int:
     print(
         f"OK: research/datasets/INVENTARIO.md com {inventory_candidates} candidatos "
         f"e cards não confirmados"
+    )
+    print(
+        f"OK: research/datasets/CROSSWALK-AUDIT.md com {crosswalk_pairs} pares e "
+        f"decisões pendentes de dupla revisão"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
