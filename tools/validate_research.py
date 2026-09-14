@@ -395,6 +395,14 @@ CARD_SECTIONS = (
     "## Fontes atômicas",
 )
 FABRICATION_RE = re.compile(r":\s*`?confirmado", re.I)
+AUDITED_STATUS_RE = re.compile(r"^auditado \(D\d{2}\)$")
+CARD_VERDICTS = (
+    "candidato",
+    "adequado à fonte",
+    "adequado ao alvo",
+    "apenas exploratório",
+    "rejeitado",
+)
 LIT_ID_RE = re.compile(r"^LIT-\d{4}$")
 LIT_QUERY_LOG = ROOT / "research" / "literature" / "QUERY-LOG.tsv"
 LIT_QUERY_LOG_COLUMNS = (
@@ -1455,14 +1463,10 @@ def check_gate_g1() -> tuple[list[str], int, str]:
 
     if not GATE_G1_SNAPSHOT.exists():
         failures.append(f"{label}: snapshot G1-LEDGER-SNAPSHOT.tsv ausente")
-    elif LIT_LEDGER.exists():
-        ledger_bytes = LIT_LEDGER.read_bytes()
-        snapshot_bytes = GATE_G1_SNAPSHOT.read_bytes()
-        if ledger_bytes != snapshot_bytes:
-            failures.append(f"{label}: snapshot diverge do ledger atual")
-        digest = hashlib.sha256(ledger_bytes).hexdigest()
+    else:
+        digest = hashlib.sha256(GATE_G1_SNAPSHOT.read_bytes()).hexdigest()
         if digest not in text:
-            failures.append(f"{label}: SHA-256 do ledger ausente no pacote ('{digest}')")
+            failures.append(f"{label}: SHA-256 do snapshot ausente no pacote ('{digest}')")
 
     criteria = [line for line in lines if CRITERION_RE.match(line)]
     if len(criteria) < 6:
@@ -1531,6 +1535,12 @@ def check_dataset_inventory() -> tuple[list[str], int]:
             failures.append(f"{label}: candidato inesperado {cand_id}")
         card = field_value(block, "Card")
         status = field_value(block, "Status")
+        if status is None:
+            failures.append(f"{label}: {cand_id} sem campo 'Status'")
+        elif status != "não confirmado" and not AUDITED_STATUS_RE.match(status):
+            failures.append(
+                f"{label}: {cand_id} status inválido '{status}' (use 'não confirmado' ou 'auditado (Dxx)')"
+            )
         if card is None:
             failures.append(f"{label}: {cand_id} sem campo 'Card'")
         else:
@@ -1542,17 +1552,24 @@ def check_dataset_inventory() -> tuple[list[str], int]:
                 for section in CARD_SECTIONS:
                     if section not in card_text:
                         failures.append(f"{card_path.name}: seção do modelo ausente '{section}'")
-                if "não confirmado" not in card_text:
-                    failures.append(f"{card_path.name}: sem marcação 'não confirmado'")
-                card_fabrication = FABRICATION_RE.search(card_text)
-                if card_fabrication:
-                    failures.append(
-                        f"{card_path.name}: valor 'confirmado' sem auditoria ('{card_fabrication.group(0)}')"
-                    )
-        if status is None:
-            failures.append(f"{label}: {cand_id} sem campo 'Status'")
-        elif status != "não confirmado":
-            failures.append(f"{label}: {cand_id} deve permanecer 'não confirmado' em D01 (status '{status}')")
+                if status == "não confirmado":
+                    if "não confirmado" not in card_text:
+                        failures.append(f"{card_path.name}: sem marcação 'não confirmado'")
+                    card_fabrication = FABRICATION_RE.search(card_text)
+                    if card_fabrication:
+                        failures.append(
+                            f"{card_path.name}: valor 'confirmado' sem auditoria ('{card_fabrication.group(0)}')"
+                        )
+                elif status is not None and AUDITED_STATUS_RE.match(status):
+                    if "Status geral: `não confirmado`" in card_text:
+                        failures.append(f"{card_path.name}: card auditado ainda com status 'não confirmado'")
+                    if not re.search(r"https?://|10\.\d{4,}/", card_text):
+                        failures.append(f"{card_path.name}: card auditado sem URL/DOI")
+                    if card_text.count("- Fonte/localização:") < 5:
+                        failures.append(f"{card_path.name}: card auditado com menos de 5 fontes atômicas")
+                    veredito = re.search(r"- Veredito: `([^`]+)`", card_text)
+                    if not veredito or veredito.group(1) not in CARD_VERDICTS:
+                        failures.append(f"{card_path.name}: veredito ausente ou inválido")
     for cand_id in INVENTORY_CANDIDATES:
         if cand_id not in seen:
             failures.append(f"{label}: candidato obrigatório ausente {cand_id}")

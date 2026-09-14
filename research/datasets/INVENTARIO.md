@@ -37,8 +37,10 @@ Campos obrigatórios do inventário e dos cards (identificadores estáveis):
 
 ### CAND-01 — FlyWire/FAFB
 - Card: `research/datasets/cards/FLYWIRE-FAFB.md`
-- Status: não confirmado
-- Pendências: todos os campos CAMPO-01 a CAMPO-16; auditoria em D02.
+- Status: auditado (D02)
+- Pendências: licença das anotações (`não encontrado`), formato/endpoint de
+  esqueleto (`não confirmado`) e exigência de conta no Codex (`ambíguo`);
+  auditoria de release viva em D02 é a de 2026-09-14.
 
 ### CAND-02 — hemibrain
 - Card: `research/datasets/cards/HEMIBRAIN.md`

@@ -562,7 +562,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   card por vez com fonte primária; arquivos não relacionados preservados fora do
   commit; commit 77a5196d85b9a44dff6f051e215c2169cf3c7881.
 
-- [ ] **D02 — Auditar FlyWire/FAFB release por release.**
+- [x] **D02 — Auditar FlyWire/FAFB release por release.**
   - Objetivo: registrar apenas capacidades verificadas desse candidato.
   - Entregas: dataset card, claims atômicos e lista de endpoints/dumps oficiais.
   - Aceite: duas fontes quando uma propriedade altera o desenho; versões não são
@@ -570,6 +570,30 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: sem download integral e sem token/conta sem autorização.
   - Dependências: D01, L02.
   - Orçamento: IA baixa; web; disco máximo 100 MB para amostra autorizada.
+  Evidência (2026-09-14, executor): arquivos
+  `research/datasets/cards/FLYWIRE-FAFB.md` (auditado em D02),
+  `research/datasets/INVENTARIO.md` (CAND-01 auditado),
+  `research/literature/LEDGER.tsv` (LIT-0068 e LIT-0069),
+  `research/literature/QUERY-LOG.tsv` (leituras oficiais registradas) e
+  `tools/validate_research.py` (funções de D02) e esta linha; fontes/versões:
+  Zenodo API record 10676866 (v783.0, 2024-06-02, CC BY 4.0, MD5 por arquivo),
+  Dorkenwald 2024 (10.1038/s41586-024-07558-y), Schlegel 2024
+  (10.1038/s41586-024-07686-5), GitHub API de `flywire_annotations` (v2.1.0,
+  v3.0.0 e v3.1.0; `license: null`) e Codex `about_flywire`, acesso 2026-09-14;
+  Python 3.12.2 (stdlib); comandos e testes: `python3 tools/validate_research.py`
+  com smoke negativo inline (status inválido, card sem seções, poucas fontes,
+  status não confirmado em card auditado, veredito inválido e card vazio
+  rotulado auditado), `python3 tools/validate_plan.py`,
+  `git diff --cached --check` e `git status --porcelain`; resultado: card do
+  FlyWire/FAFB preenchido com 9 fontes atômicas (8 `confirmado` e 1 `não
+  encontrado`), esquema de 16 campos referenciado e pendências explícitas
+  (licença das anotações, esqueleto e conta no Codex); nenhum download integral;
+  o único arquivo dentro do teto (1,1 MB) não foi baixado; recursos: 21,8 MB de
+  RAM e 0,09 s no validador, sem GPU e sem download; decisão/limitação:
+  FlyWire/FAFB permanece `candidato`, licença das anotações `não encontrado`,
+  esqueleto `não confirmado` e conta no Codex `ambíguo`; arquivos não
+  relacionados preservados fora do commit; commit
+  59ec9ef58769512996d5712ec22e4e4a7169501c.
 
 - [ ] **D03 — Auditar hemibrain release por release.**
   - Objetivo: avaliar o comparador cerebral sem presumir cobertura equivalente.
