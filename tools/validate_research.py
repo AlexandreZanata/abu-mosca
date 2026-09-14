@@ -323,6 +323,24 @@ METHODS_FIELDS = (
     "Status",
 )
 METHODS_RULE = "nenhum pacote foi instalado"
+NOVELTY = ROOT / "research" / "literature" / "NOVIDADE.md"
+NOVELTY_SECTIONS = (
+    "## 1. Estado e escopo",
+    "## 2. Mapa de lacunas",
+    "## 3. Contribuições propostas",
+    "## 4. Alternativa sem novidade suficiente",
+    "## 5. Limitações",
+)
+NOVELTY_GAP_FIELDS = (
+    "Claim",
+    "Trabalhos mais próximos",
+    "Diferença proposta",
+    "Evidência conflitante",
+    "Busca adversarial",
+    "Status",
+)
+NOVELTY_CON_FIELDS = ("Contribuição", "Teste", "Versão mínima", "Risco", "Status")
+NOVELTY_RULES = ("não há novidade suficiente", "ausência em uma busca não prova novidade")
 LIT_ID_RE = re.compile(r"^LIT-\d{4}$")
 LIT_QUERY_LOG = ROOT / "research" / "literature" / "QUERY-LOG.tsv"
 LIT_QUERY_LOG_COLUMNS = (
@@ -1302,6 +1320,66 @@ def check_methods_matrix() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_novelty() -> tuple[list[str], int]:
+    label = "NOVIDADE.md"
+    if not NOVELTY.exists():
+        return [f"{label}: arquivo ausente em research/literature/"], 0
+    text = NOVELTY.read_text(encoding="utf-8")
+    flat = " ".join(text.split()).lower()
+    failures: list[str] = []
+    for section in NOVELTY_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for rule in NOVELTY_RULES:
+        if rule not in flat:
+            failures.append(f"{label}: regra obrigatória ausente ('{rule}')")
+
+    rows = _ledger_rows()
+    known_lit = _known_lit_ids(rows)
+
+    gaps = parse_heading_blocks(text, r"^### (GAP-\d{2}) — (.+)$")
+    if len(gaps) < 3:
+        failures.append(f"{label}: esperadas ao menos 3 lacunas (achadas {len(gaps)})")
+    for gap_id, block in gaps:
+        for field in NOVELTY_GAP_FIELDS:
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {gap_id} sem campo '{field}'")
+        references = " ".join(
+            field_value(block, field) or ""
+            for field in ("Trabalhos mais próximos", "Evidência conflitante")
+        )
+        if not re.search(r"LIT-\d{4}", references):
+            failures.append(f"{label}: {gap_id} sem referência LIT-*")
+        for lit_id in sorted(set(re.findall(r"LIT-\d{4}", references))):
+            if known_lit and lit_id not in known_lit:
+                failures.append(f"{label}: {gap_id} referencia ledger inexistente '{lit_id}'")
+
+    contributions = parse_heading_blocks(text, r"^### (CON-\d{2}) — (.+)$")
+    if not contributions:
+        failures.append(f"{label}: nenhuma contribuição proposta (CON-*)")
+    if len(contributions) > 3:
+        failures.append(f"{label}: mais de três contribuições propostas ({len(contributions)})")
+    for con_id, block in contributions:
+        for field in NOVELTY_CON_FIELDS:
+            if field_value(block, field) is None:
+                failures.append(f"{label}: {con_id} sem campo '{field}'")
+
+    if len(rows) >= 2 and "query_id" in rows[0] and "fase" in rows[0]:
+        qi, fi = rows[0].index("query_id"), rows[0].index("fase")
+        queries = {
+            row[qi] for row in rows[1:] if len(row) > max(qi, fi) and row[fi] == "L07"
+        }
+        for query in ("Q4", "Q5"):
+            if query not in queries:
+                failures.append(f"{label}: ledger sem consulta {query} em L07")
+
+    known = {item_id for _, item_id in parse_items(PLAN.read_text(encoding="utf-8").splitlines())}
+    refs = phase_refs(text)
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(gaps)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
@@ -1321,6 +1399,7 @@ def check_paths() -> tuple[list[str], int]:
         CELL_TYPE,
         SSL_REVIEW,
         METHODS,
+        NOVELTY,
     ):
         if not path.exists():
             continue
@@ -1358,6 +1437,7 @@ def main() -> int:
     cell_type_failures, cell_type_modalities = check_cell_type_review()
     ssl_failures, ssl_families = check_ssl_review()
     methods_failures, methods_count = check_methods_matrix()
+    novelty_failures, novelty_gaps = check_novelty()
     failures += (
         ref_failures
         + path_failures
@@ -1373,6 +1453,7 @@ def main() -> int:
         + cell_type_failures
         + ssl_failures
         + methods_failures
+        + novelty_failures
     )
 
     if failures:
@@ -1428,6 +1509,10 @@ def main() -> int:
     print(
         f"OK: research/literature/METHODS.md com {methods_count} métodos e "
         f"estimativas para 8 GB"
+    )
+    print(
+        f"OK: research/literature/NOVIDADE.md com {novelty_gaps} lacunas e no "
+        f"máximo três contribuições"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

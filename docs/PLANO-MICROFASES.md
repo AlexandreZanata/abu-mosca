@@ -461,7 +461,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   preservados fora do commit; commit
   c8f8d7907ffbb76c40b6719a0ba71dea2bbdfea7.
 
-- [ ] **L07 — Produzir mapa de lacuna e veredito de novidade provisório.**
+- [x] **L07 — Produzir mapa de lacuna e veredito de novidade provisório.**
   - Objetivo: distinguir contribuição possível de repetição.
   - Entregas: `research/literature/NOVIDADE.md`, claim por claim, com trabalhos
     mais próximos, diferenças e evidência conflitante.
@@ -471,6 +471,29 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: ausência em uma busca não prova novidade.
   - Dependências: L02–L06.
   - Orçamento: IA baixa + revisão humana.
+  Evidência (2026-09-14, executor): arquivos `research/literature/NOVIDADE.md`,
+  `research/literature/LEDGER.tsv` (LIT-0058 a LIT-0067),
+  `research/literature/QUERY-LOG.tsv` (consultas Q4/Q5 adversariais),
+  `tools/validate_research.py` (funções de L07) e esta linha; fontes/versões:
+  buscas adversariais de 2026-09-14 verificadas em fontes primárias — NTAC 2026
+  (10.1038/s41467-025-68044-1), alinhamento BANC-MANC (bioRxiv
+  10.64898/2026.06.14.732053v2), caso de falha de SSL (arXiv 2602.03217),
+  MaskGAE (arXiv 2205.10053), Bandana (arXiv 2402.03814), FlyGM
+  (arXiv 2602.17997), GraphDINO (arXiv 2112.12482), pré-treino de connectome
+  funcional (10.1523/ENEURO.0370-25.2026) e CAME (Genome Research 33:96);
+  Python 3.12.2 (stdlib); comandos e testes: `python3 tools/validate_research.py`
+  com smoke negativo inline (lacuna ausente, campo ausente, regra removida, LIT
+  inexistente, mais de três contribuições, consulta Q5 ausente e seção ausente),
+  `python3 tools/validate_plan.py`, `git diff --cached --check` e
+  `git status --porcelain`; resultado: 3 lacunas (zero-shot com encoder
+  congelado, SSL topológico com controles de grau e protocolo selado), 3
+  contribuições com versão mínima e riscos, alternativa “não há novidade
+  suficiente” registrada e buscas adversariais arquivadas; 67 registros no
+  ledger e 47 consultas no log; recursos: 17,6 MB de RAM e 0,08 s no validador,
+  sem GPU; decisão/limitação: veredito provisório, ausência em busca não prova
+  novidade e revisão humana obrigatória em G1; arquivos não relacionados
+  preservados fora do commit; commit
+  946dc2d853bdcec0de3eb261a1d88cf0bedd34e0.
 
 - [ ] **G1 — Aprovar viabilidade teórica e lacuna provisória.**
   - Objetivo: decidir se vale auditar dados e qual pergunta merece prioridade.
