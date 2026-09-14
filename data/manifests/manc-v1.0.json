@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "dataset": "MANC",
+  "release": "v1.0 (bucket flat; neuPrint serve v1.2.1)",
+  "source_page": "https://www.janelia.org/project-team/flyem/manc-connectome",
+  "license": "CC-BY-4.0",
+  "notes": "Bucket público flyem-manc-exports; MD5 do objeto conferido contra a API do GCS (D09).",
+  "files": [
+    {
+      "path": "data/raw/spikes/manc_neuron_properties.feather",
+      "url": "https://storage.googleapis.com/flyem-manc-exports/v1.0/manc-v1.0-neuron-properties.feather",
+      "bytes": 17188218,
+      "sha256": "0c4476528906bb0a20e05e1f01e83fc2e5a582761536171ede5463669ca0b891",
+      "md5_official": "f4673117559cc727e1befcb022b6a143",
+      "accessed_at": "2026-09-14"
+    },
+    {
+      "path": "data/raw/spikes/manc_traced_connections.csv",
+      "url": "https://storage.googleapis.com/flyem-manc-exports/v1.0/manc-traced-adjacencies-v1.0/traced-connections.csv",
+      "bytes": 75262163,
+      "sha256": "4553191e8fd0a198e3588e188b649b7cb39b0550e35d6a11d63b0cd7d8145fda",
+      "md5_official": "c543dc9a0c367d9f7c88901d892d78a0",
+      "accessed_at": "2026-09-14"
+    }
+  ]
+}

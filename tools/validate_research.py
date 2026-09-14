@@ -14,6 +14,7 @@ Sem dependências externas além de `tools/validate_plan.py`.
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 import re
 import sys
@@ -413,6 +414,32 @@ RESOURCES_SECTIONS = (
     "## 5. Consequências para 32 GB de RAM e 8 GB de VRAM (inferido)",
     "## 6. Falhas, descartes e limitações",
     "## 7. Reprodução",
+)
+PROVENANCE_DOC = ROOT / "docs" / "research" / "PROVENANCE.md"
+PROVENANCE_SCHEMA = ROOT / "schemas" / "manifest.schema.json"
+PROVENANCE_TOOL = ROOT / "tools" / "manifest.py"
+DOWNLOAD_TOOL = ROOT / "tools" / "download.py"
+PROVENANCE_SECTIONS = (
+    "## 1. Schema",
+    "## 2. Validador",
+    "## 3. Download idempotente",
+    "## 4. Manifestos versionados",
+    "## 5. Testes",
+    "## 6. Limitações",
+)
+PROVENANCE_TOKENS = (
+    "sha256",
+    "range",
+    "206",
+    ".part",
+    "credenciais",
+    "idempotente",
+    "nunca sobrescreve",
+    "licença",
+    "accessed_at",
+    "https",
+    "max-bytes",
+    "pytest",
 )
 ENVIRONMENT_README = ROOT / "environment" / "README.md"
 ENVIRONMENT_LOCK = ROOT / "environment" / "requirements.lock"
@@ -1779,6 +1806,53 @@ def check_dataset_inventory() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_provenance_phase() -> tuple[list[str], int]:
+    label = "R03"
+    failures: list[str] = []
+    for path in (
+        PROVENANCE_DOC,
+        PROVENANCE_SCHEMA,
+        PROVENANCE_TOOL,
+        DOWNLOAD_TOOL,
+        ROOT / "tests" / "test_manifest.py",
+        ROOT / "tests" / "test_download.py",
+    ):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+
+    doc = PROVENANCE_DOC.read_text(encoding="utf-8")
+    for section in PROVENANCE_SECTIONS:
+        if section not in doc:
+            failures.append(f"{label}: PROVENANCE.md sem seção '{section}'")
+    for token in PROVENANCE_TOKENS:
+        if token.lower() not in doc.lower():
+            failures.append(f"{label}: PROVENANCE.md sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(doc)
+    if leak:
+        failures.append(f"{label}: PROVENANCE.md com possível ID cru ('{leak.group(0)}')")
+
+    spec = importlib.util.spec_from_file_location("provenance_manifest", PROVENANCE_TOOL)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    schema = json.loads(PROVENANCE_SCHEMA.read_text(encoding="utf-8"))
+    if tuple(schema.get("required", ())) != module.TOP_LEVEL_REQUIRED:
+        failures.append(f"{label}: schema e validador divergem nos campos obrigatórios")
+    manifests = sorted((ROOT / "data" / "manifests").glob("*.json"))
+    if len(manifests) < 4:
+        failures.append(f"{label}: esperados ao menos 4 manifestos versionados (achados {len(manifests)})")
+    for path in manifests:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as error:
+            failures.append(f"{path.name}: JSON inválido ({error})")
+            continue
+        for failure in module.validate_manifest(payload, path.name):
+            failures.append(f"{label}: {failure}")
+    return failures, len(manifests)
+
+
 def check_environment_phase() -> tuple[list[str], int]:
     label = "R02"
     failures: list[str] = []
@@ -2227,6 +2301,7 @@ def main() -> int:
     gate_g2_failures, gate_g2_criteria, gate_g2_state = check_gate_g2()
     data_management_failures, data_management_sections = check_data_management()
     environment_failures, environment_tokens = check_environment_phase()
+    provenance_failures, provenance_manifests = check_provenance_phase()
     failures += (
         ref_failures
         + path_failures
@@ -2251,6 +2326,7 @@ def main() -> int:
         + gate_g2_failures
         + data_management_failures
         + environment_failures
+        + provenance_failures
     )
 
     if failures:
@@ -2342,6 +2418,10 @@ def main() -> int:
     print(
         f"OK: ambiente R02 com {environment_tokens} tokens, lock pinado e "
         f"operação CUDA medida na RTX 4060"
+    )
+    print(
+        f"OK: proveniência R03 com schema, validador e {provenance_manifests} "
+        f"manifestos sem credenciais"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

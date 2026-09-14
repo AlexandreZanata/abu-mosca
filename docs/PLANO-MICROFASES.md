@@ -963,7 +963,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   fora do Git, instalação byte a byte em outra máquina fica para P02; commit
   fff7f62bc640635c98c8bd79d82409d0214f8389.
 
-- [ ] **R03 — Implementar proveniência, manifests e download idempotente.**
+- [x] **R03 — Implementar proveniência, manifests e download idempotente.**
   - Objetivo: tornar toda entrada identificável e reobtível.
   - Entregas: schema de manifest, validador, comandos de download por release e
     testes com fixture/local HTTP; manifests versionados sem credenciais.
@@ -972,6 +972,34 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não automatizar bypass de termos nem registrar URL assinada/token.
   - Dependências: R01, R02, cards aprovados no G2.
   - Orçamento: IA baixa; CPU; fixture pequena.
+  Evidência (2026-09-14, executor): arquivos `schemas/manifest.schema.json`
+  (JSON Schema draft 2020-12), `tools/manifest.py` (validador stdlib com
+  `--check-files`/`--schema-only`), `tools/download.py` (download idempotente
+  com `.part`, `Range`/206, verificação e `--max-bytes`), `tests/test_manifest.py`
+  e `tests/test_download.py` (servidor HTTP local, fixture de 64 KiB),
+  `docs/research/PROVENANCE.md` (6 seções) e 4 manifestos versionados
+  (`data/manifests/flywire-783.json`, `manc-v1.0.json`, `mcns-v1.0.json`,
+  `banc-888.json`) cobrindo as 6 amostras de D09; fontes/versões: cards D02–D07,
+  D09/G2, GCS/Dataverse/Zenodo (URLs públicas, sem credenciais), Python 3.12.2
+  (stdlib; sem dependência nova e sem alterar o lock de R02); comandos e testes:
+  `.venv/bin/python -m pytest tests/ -q` (24 passaram em 4,57 s),
+  `python3 tools/manifest.py validate --check-files` (4 manifestos válidos com
+  bytes/sha256/md5 revalidados) e `--schema-only`,
+  `python3 tools/download.py --manifest … --path …` (dois arquivos `skipped`,
+  0 bytes transferidos e 0 requisições), nova checagem R03 no
+  `validate_research.py` com smoke negativo (seção, token, ID cru, URL com
+  credencial, licença e sha256 inválidos), `validate_plan.py` e
+  `git diff --cached --check`; resultado: toda entrada tem manifesto com URL,
+  release, licença, data, bytes e sha256; download retoma interrompido com 206,
+  nunca sobrescreve divergente e confere checksum antes de promover; falha
+  encontrada e corrigida pelo teste: transferência incompleta era tratada como
+  checksum divergente e apagava o `.part`, agora preserva para retomada;
+  recursos medidos: CPU apenas, ~0,1 s por manifesto, 4,57 s de suíte, sem GPU
+  e sem downloads externos; decisão/limitação: retomada não detecta mudança
+  remota com a mesma URL (sha256 final é a salvaguarda), MCNS sem checksum
+  oficial usa sha256 local, manifestos cobrem só as amostras D09 e o validador
+  é implementação própria (sem `jsonschema`) para não alterar o lock; commit
+  ab1836f6e1ee55f3d2745260e65de27ae2dc2352.
 
 - [ ] **R04 — Fixar contrato de configuração, run e determinismo.**
   - Objetivo: eliminar parâmetros escondidos e resultados sem linhagem.
