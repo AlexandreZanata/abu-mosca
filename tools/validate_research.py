@@ -150,6 +150,22 @@ INFEASIBLE_SECTIONS = (
 )
 CLM_ID_RE = re.compile(r"CLM-\d{3}")
 
+GATE_G0 = ROOT / "docs" / "gates" / "G0-CONTRATO.md"
+GATE_SECTIONS = (
+    "## Pacote de revisão",
+    "## Critérios",
+    "## Riscos e divergências",
+    "## Escopo liberado",
+    "## Assinaturas",
+)
+GATE_HEADER_FIELDS = ("Data/hora e fuso", "Commit e estado dirty", "Revisores", "Decisão")
+GATE_SIGNATURE_FIELDS = (
+    "Responsável científico",
+    "Custodiante do alvo, quando aplicável",
+    "Revisor de método/estatística",
+)
+CRITERION_RE = re.compile(r"^- .+: `(PASS|FAIL|NÃO VERIFICADO)` — .+$")
+
 ESTIMAND_SECTIONS = (
     "Estimando",
     "Hipótese primária",
@@ -634,10 +650,68 @@ def check_claim_ladder() -> tuple[list[str], int]:
     return failures, len(blocks)
 
 
+def check_gate_package() -> tuple[list[str], int]:
+    label = GATE_G0.name
+    if not GATE_G0.exists():
+        return [f"{label}: arquivo ausente"], 0
+    text = GATE_G0.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    failures: list[str] = []
+    for section in GATE_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for field in GATE_HEADER_FIELDS:
+        if field_value(lines, field) is None:
+            failures.append(f"{label}: cabeçalho sem campo '{field}'")
+    decision = field_value(lines, "Decisão")
+    if decision is None or not decision.startswith("AGUARDAR"):
+        failures.append(f"{label}: decisão deve começar com AGUARDAR enquanto pendente de revisão humana")
+    criteria = [line for line in lines if CRITERION_RE.match(line)]
+    if len(criteria) < 6:
+        failures.append(f"{label}: esperados ao menos 6 critérios no formato do modelo (achados {len(criteria)})")
+    if not any("`NÃO VERIFICADO`" in line for line in criteria):
+        failures.append(f"{label}: nenhum critério marcado 'NÃO VERIFICADO'")
+    if any("`FAIL`" in line for line in criteria):
+        failures.append(f"{label}: critério FAIL exige decisão REFORMULAR, não AGUARDAR")
+
+    start = next((i for i, line in enumerate(lines) if line.startswith("## Assinaturas")), None)
+    signature_lines = lines[start:] if start is not None else []
+    for field in GATE_SIGNATURE_FIELDS:
+        value = field_value(signature_lines, field)
+        if value is None:
+            failures.append(f"{label}: assinatura sem campo '{field}'")
+        elif "a preencher" not in value.lower():
+            failures.append(f"{label}: assinatura '{field}' não pode ser preenchida pela IA")
+
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    g0_line = next((line for line in plan_lines if "**G0 —" in line), None)
+    if g0_line is None:
+        failures.append(f"{label}: item G0 não encontrado no plano")
+    elif not g0_line.startswith("- [ ]"):
+        failures.append(f"{label}: G0 marcado como concluído enquanto a decisão é AGUARDAR")
+
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    refs = phase_refs(text)
+    for ref in sorted(ref for ref in refs if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(criteria)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
-    for path in (GLOSSARY, CLAIMS, RISKS, ESTIMAND, EQUIVALENCE, OUTCOMES, THREATS, LADDER, INFEASIBLE):
+    for path in (
+        GLOSSARY,
+        CLAIMS,
+        RISKS,
+        ESTIMAND,
+        EQUIVALENCE,
+        OUTCOMES,
+        THREATS,
+        LADDER,
+        INFEASIBLE,
+        GATE_G0,
+    ):
         if not path.exists():
             continue
         for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -667,6 +741,7 @@ def main() -> int:
     outcomes_failures, outcomes_tokens = check_outcomes()
     threat_failures, threats = check_threats()
     ladder_failures, levels = check_claim_ladder()
+    gate_failures, gate_criteria = check_gate_package()
     failures += (
         ref_failures
         + path_failures
@@ -675,6 +750,7 @@ def main() -> int:
         + outcomes_failures
         + threat_failures
         + ladder_failures
+        + gate_failures
     )
 
     if failures:
@@ -701,6 +777,10 @@ def main() -> int:
     print(
         f"OK: ESCADA-DE-CLAIMS.md com {levels} níveis e esqueleto de "
         f"inviabilidade com {len(INFEASIBLE_SECTIONS)} seções"
+    )
+    print(
+        f"OK: G0-CONTRATO.md com decisão AGUARDAR, {gate_criteria} critérios e "
+        f"G0 ainda aberto no plano"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

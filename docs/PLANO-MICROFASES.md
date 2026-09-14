@@ -239,6 +239,14 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: executor de IA não assina sozinho e `AGUARDAR` não vira `GO`.
   - Dependências: C01–C06.
   - Orçamento: IA baixa para pacote; revisão humana de método.
+  Bloqueio (2026-09-14, executor): pacote do gate preparado em
+  `docs/gates/G0-CONTRATO.md` com decisão `AGUARDAR` e 9 critérios; os critérios
+  científicos (H0/H1, equivalência, desfechos, falsificação, ameaças, firewall e
+  escada de claims) estão `NÃO VERIFICADO` aguardando revisão humana de método; a
+  IA não assinou nem aprovou; validação estrutural com smoke negativo em
+  `tools/validate_research.py` (15,3 MB de RAM, 0,07 s, sem GPU); próxima ação
+  humana: decidir GO/NO-GO/REFORMULAR e assinar; commit
+  505619c3a5e545044cbc29023f8376cb6ad38673.
 
 ### Literatura e novidade
 
