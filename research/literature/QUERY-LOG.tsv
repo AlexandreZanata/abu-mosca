@@ -1,0 +1,11 @@
+run_date	query_id	base	string_exata	filtros	periodo	idioma	n_resultados	export_formato	hash_export	operador	observacoes
+2026-09-14	Q0	websearch	FlyWire FAFB whole brain connectome data paper Dorkenwald 2024 Nature DOI	sem filtros	sem recorte	en	6	sem export	n/a	executor IA	Descoberta; fonte primaria verificada em nature.com (LIT-0001)
+2026-09-14	Q0	websearch	hemibrain connectome Scheffer 2020 eLife DOI adult Drosophila central brain	sem filtros	sem recorte	en	6	sem export	n/a	executor IA	Descoberta; fonte primaria verificada em elifesciences.org (LIT-0006)
+2026-09-14	Q0	websearch	BANC Drosophila brain nerve cord connectome official dataset paper	sem filtros	sem recorte	en	6	sem export	n/a	executor IA	Descoberta; fontes verificadas em nature.com e dataverse.harvard.edu (LIT-0009, LIT-0010)
+2026-09-14	Q0	websearch	MANC male adult nerve cord connectome Drosophila Takemura 2024 paper DOI	sem filtros	sem recorte	en	6	sem export	n/a	executor IA	Descoberta; fonte primaria verificada em elifesciences.org (LIT-0014)
+2026-09-14	Q0	websearch	MAOL Drosophila connectome optic lobe dataset paper	sem filtros	sem recorte	en	6	sem export	n/a	executor IA	Descoberta; fontes verificadas em nature.com e codex.flywire.ai (LIT-0019, LIT-0020)
+2026-09-14	Q0	websearch	MCNS male CNS connectome Drosophila whole central nervous system paper	sem filtros	sem recorte	en	6	sem export	n/a	executor IA	Descoberta; fontes verificadas em PMC e crossref.org (LIT-0023)
+2026-09-14	Q0	websearch	Schlegel Whole-brain annotation and multi-connectome cell typing Nature 2024 DOI	sem filtros	sem recorte	en	4	sem export	n/a	executor IA	Confirmacao do DOI do companion FlyWire (LIT-0002)
+2026-09-14	Q0	webfetch:pubmed.ncbi.nlm.nih.gov	https://pubmed.ncbi.nlm.nih.gov/42691995/	sem filtros	sem recorte	en	0	sem export	n/a	executor IA	FALHA descartada: pagina exige cookies; DOI do artigo Cell obtido via Crossref
+2026-09-14	Q0	Crossref API	query.title=Drosophila male central nervous system connectome	sem filtros	sem recorte	en	5	JSON	n/a	executor IA	Confirma DOI 10.1016/j.cell.2026.08.015 na Cell (LIT-0023)
+2026-09-14	Q0	webfetch:pmc.ncbi.nlm.nih.gov	https://pmc.ncbi.nlm.nih.gov/articles/PMC12636603/	sem filtros	sem recorte	en	1	markdown	n/a	executor IA	Confirma preprint v2 e existencia da versao publicada na Cell; contagens divergentes registradas

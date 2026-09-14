@@ -178,8 +178,49 @@ LIT_SECTIONS = (
     "## 8. Triagem e extração",
     "## 9. Reprodutibilidade e atualização",
     "## 10. Regras de evidência",
+    "## 11. Versões do protocolo",
 )
-LIT_QUERIES = ("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7")
+LIT_QUERIES = ("Q0", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7")
+LIT_LEDGER = ROOT / "research" / "literature" / "LEDGER.tsv"
+LIT_LEDGER_COLUMNS = (
+    "lit_id",
+    "run_date",
+    "base",
+    "query_id",
+    "titulo",
+    "autores",
+    "ano",
+    "venue",
+    "tipo",
+    "doi",
+    "url",
+    "versao",
+    "status_triagem",
+    "motivo_exclusao",
+    "claims_relacionados",
+    "dataset",
+    "claim_atomico",
+    "fase",
+    "nota",
+)
+LIT_TRIAGE_STATUSES = ("triagem", "incluido", "excluido", "pendente_fulltext")
+LIT_CANDIDATES = ("FlyWire/FAFB", "hemibrain", "BANC", "MANC", "MAOL", "MCNS")
+LIT_ID_RE = re.compile(r"^LIT-\d{4}$")
+LIT_QUERY_LOG = ROOT / "research" / "literature" / "QUERY-LOG.tsv"
+LIT_QUERY_LOG_COLUMNS = (
+    "run_date",
+    "query_id",
+    "base",
+    "string_exata",
+    "filtros",
+    "periodo",
+    "idioma",
+    "n_resultados",
+    "export_formato",
+    "hash_export",
+    "operador",
+    "observacoes",
+)
 LIT_QUERY_FIELDS = ("Objetivo", "String", "Bases", "Janela")
 LIT_TOPICS = (
     "neuron matching",
@@ -795,6 +836,75 @@ def check_literature_protocol() -> tuple[list[str], int]:
     return failures, len(queries)
 
 
+def check_literature_ledger() -> tuple[list[str], int, int]:
+    label = "LEDGER.tsv"
+    if not LIT_LEDGER.exists():
+        return [f"{label}: arquivo ausente em research/literature/"], 0, 0
+    rows = [
+        line.split("\t")
+        for line in LIT_LEDGER.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    if len(rows) < 2:
+        return [f"{label}: sem registros"], 0, 0
+    header = rows[0]
+    failures: list[str] = []
+    for column in LIT_LEDGER_COLUMNS:
+        if column not in header:
+            failures.append(f"{label}: coluna obrigatória ausente '{column}'")
+    if failures:
+        return failures, len(rows) - 1, 0
+    index = {name: header.index(name) for name in header}
+    seen: set[str] = set()
+    per_candidate_included = {candidate: 0 for candidate in LIT_CANDIDATES}
+    for number, row in enumerate(rows[1:], 2):
+        if len(row) != len(header):
+            failures.append(f"{label}:{number}: {len(row)} colunas para {len(header)} no cabeçalho")
+            continue
+        lit_id = row[index["lit_id"]]
+        if not LIT_ID_RE.match(lit_id):
+            failures.append(f"{label}:{number}: lit_id inválido '{lit_id}'")
+        if lit_id in seen:
+            failures.append(f"{label}:{number}: lit_id duplicado '{lit_id}'")
+        seen.add(lit_id)
+        status = row[index["status_triagem"]]
+        if status not in LIT_TRIAGE_STATUSES:
+            failures.append(f"{label}:{number}: status inválido '{status}'")
+        query_id = row[index["query_id"]]
+        if query_id not in LIT_QUERIES:
+            failures.append(f"{label}:{number}: query_id inválido '{query_id}'")
+        dataset = row[index["dataset"]]
+        if dataset not in LIT_CANDIDATES:
+            failures.append(f"{label}:{number}: dataset inesperado '{dataset}'")
+        elif status == "incluido":
+            if not row[index["doi"]].strip() and not row[index["url"]].strip():
+                failures.append(f"{label}:{number}: incluído sem DOI nem URL")
+            if row[index["claim_atomico"]].strip() in ("", "—"):
+                failures.append(f"{label}:{number}: incluído sem claim_atomico")
+            per_candidate_included[dataset] += 1
+    for candidate, count in per_candidate_included.items():
+        if count == 0:
+            failures.append(f"{label}: candidato sem fonte oficial incluída: {candidate}")
+
+    log_label = "QUERY-LOG.tsv"
+    log_rows: list[list[str]] = []
+    if not LIT_QUERY_LOG.exists():
+        failures.append(f"{log_label}: arquivo ausente em research/literature/")
+    else:
+        log_rows = [
+            line.split("\t")
+            for line in LIT_QUERY_LOG.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        if len(log_rows) < 2:
+            failures.append(f"{log_label}: sem consultas registradas")
+        else:
+            for column in LIT_QUERY_LOG_COLUMNS:
+                if column not in log_rows[0]:
+                    failures.append(f"{log_label}: coluna obrigatória ausente '{column}'")
+    return failures, len(rows) - 1, max(len(log_rows) - 1, 0)
+
+
 def check_paths() -> tuple[list[str], int]:
     failures: list[str] = []
     total = 0
@@ -842,6 +952,7 @@ def main() -> int:
     ladder_failures, levels = check_claim_ladder()
     gate_failures, gate_criteria, gate_state = check_gate_package()
     lit_failures, lit_queries = check_literature_protocol()
+    ledger_failures, ledger_rows, query_log_rows = check_literature_ledger()
     failures += (
         ref_failures
         + path_failures
@@ -852,6 +963,7 @@ def main() -> int:
         + ladder_failures
         + gate_failures
         + lit_failures
+        + ledger_failures
     )
 
     if failures:
@@ -886,6 +998,11 @@ def main() -> int:
     print(
         f"OK: research/literature/PROTOCOL.md com {lit_queries} consultas, "
         f"{len(LIT_TOPICS)} temas e {len(LIT_BASES)} bases"
+    )
+    print(
+        f"OK: research/literature/LEDGER.tsv com {ledger_rows} registros, "
+        f"{query_log_rows} consultas no QUERY-LOG e {len(LIT_CANDIDATES)} "
+        f"candidatos com fonte incluída"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

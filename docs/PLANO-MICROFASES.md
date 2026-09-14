@@ -293,7 +293,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   em G1; arquivos não relacionados preservados fora do commit; commit
   eca334e094c4127ab3d9a979b0ef36086401749e.
 
-- [ ] **L02 — Mapear papers primários dos connectomas candidatos.**
+- [x] **L02 — Mapear papers primários dos connectomas candidatos.**
   - Objetivo: localizar releases, papers de dados e estudos comparativos que
     definem o contexto biológico.
   - Entregas: ledger versionado com DOI/URL, data, dataset, claim atômico e status.
@@ -302,6 +302,26 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: ainda não preencher dataset cards por inferência.
   - Dependências: L01.
   - Orçamento: IA baixa; web; sem GPU; limite de fontes definido no protocolo.
+  Evidência (2026-09-14, executor): arquivos `research/literature/LEDGER.tsv`,
+  `research/literature/QUERY-LOG.tsv`, `research/literature/PROTOCOL.md` (v2 com
+  consulta Q0 e colunas `dataset`/`claim_atomico`, registrado na seção 11),
+  `tools/validate_research.py` (funções de L02) e esta linha; fontes/versões:
+  buscas web de 2026-09-14 com verificação em fontes primárias (Nature, eLife,
+  Zenodo, Dataverse, bioRxiv, Crossref, PMC, Codex, Janelia, banc.community e
+  male-cns.janelia.org), URLs/DOIs no ledger; Python 3.12.2 (stdlib); comandos e
+  testes: `python3 tools/validate_research.py` com smoke negativo inline
+  (candidato sem fonte incluída, `lit_id` duplicado, status inválido, incluído
+  sem DOI/URL, sem claim atômico, coluna ausente e query log ausente),
+  `python3 tools/validate_plan.py`, `git diff --cached --check` e
+  `git status --porcelain`; resultado: 25 registros, 10 consultas no log (inclui
+  1 run descartada do PubMed) e 6 candidatos com fonte oficial — FlyWire/FAFB
+  (release v783), hemibrain, BANC (v888 e v626), MANC (v1.0 e v1.2), MAOL (v1.1)
+  e MCNS (male-cns v1.0), com versões separadas e sem misturar subconjuntos;
+  recursos: 15,6 MB de RAM e 0,07 s no validador, sem GPU; decisão/limitação:
+  mapeamento provisório, contagens do MCNS divergentes entre resumo publicado e
+  PMC/preprint registradas como ambíguas, nenhum dataset card preenchido e
+  revisão humana em G1; arquivos não relacionados preservados fora do commit;
+  commit 581ae8d299f2182df1a36d31cdc1a992914071db.
 
 - [ ] **L03 — Revisar neuron matching e graph alignment.**
   - Objetivo: identificar métodos, supervisão, pressupostos e baselines publicados.

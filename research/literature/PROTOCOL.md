@@ -33,7 +33,18 @@ Padrão mínimo de evidência externa).
 ## 3. Strings de busca
 
 Sintaxe booleana genérica; cada base adapta campos e operadores, e a string
-exata usada é registrada no log de consultas. Os sete blocos cobrem o aceite.
+exata usada é registrada no log de consultas. Os sete blocos Q1–Q7 cobrem o
+aceite. O bloco Q0 foi acrescentado em 2026-09-14 (v2) para o mapeamento de
+datasets de L02.
+
+### Q0 — Mapeamento de datasets
+- Objetivo: localizar papers de dados, portais e releases oficiais de cada
+  connectoma candidato (L02) e registrar versões sem misturá-las.
+- String: `<candidato> connectome (data paper OR release OR download)` por
+  candidato, executada em busca web e verificada na fonte primária.
+- Bases: Europe PMC, bioRxiv, Semantic Scholar, OpenAlex, Crossref e portais
+  oficiais (janelia.org, codex.flywire.ai, banc.community, male-cns.janelia.org).
+- Janela: sem recorte rígido; registrar a release mais recente confirmada.
 
 ### Q1 — Neuron matching
 - Objetivo: métodos de correspondência de neurônios entre reconstruções.
@@ -116,11 +127,12 @@ ledger e os totais são reportados.
 Arquivo versionado em `research/literature/` (LEDGER.tsv, TSV, uma linha por
 registro), com colunas:
 
-`lit_id` (LIT-0001), `run_date`, `base`, `query_id` (Q1–Q7), `titulo`, `autores`,
-`ano`, `venue`, `tipo` (`journal | conference | preprint | thesis | outro`),
-`doi`, `url`, `versao`, `status_triagem`
+`lit_id` (LIT-0001), `run_date`, `base`, `query_id` (Q0–Q7), `titulo`, `autores`,
+`ano`, `venue`, `tipo` (`journal | conference | preprint | thesis | dataset |
+portal | outro`), `doi`, `url`, `versao`, `status_triagem`
 (`triagem | incluido | excluido | pendente_fulltext`), `motivo_exclusao`,
-`claims_relacionados` (IDs CLM e/ou GLO), `fase` (L02–L07), `nota`.
+`claims_relacionados` (IDs CLM e/ou GLO), `dataset` (candidato mapeado),
+`claim_atomico`, `fase` (L02–L07), `nota`.
 
 Log de consultas em `research/literature/` (QUERY-LOG.tsv):
 `run_date`, `query_id`, `base`, `string_exata`, `filtros`, `periodo`, `idioma`,
@@ -162,3 +174,13 @@ guardam-se apenas o hash e o log, e o motivo é registrado.
 - Segunda fonte independente quando o claim muda decisão experimental.
 - A ausência de resultado em uma busca não prova novidade (L07).
 - Validação estrutural desta entrega: `python3 tools/validate_research.py`.
+
+## 11. Versões do protocolo
+
+- v1 — 2026-09-14 (L01): versão inicial com Q1–Q7, oito bases, janelas W1/W2,
+  inclusão/exclusão, deduplicação e esquema de ledger/log.
+- v2 — 2026-09-14 (durante L02): acrescenta a consulta Q0 (mapeamento de
+  datasets), as colunas `dataset` e `claim_atomico` no ledger e esta seção;
+  motivo: L02 exige mapear releases oficiais por candidato com claim atômico e
+  versão declarada. Nenhuma busca Q1–Q7 havia sido executada até esta mudança;
+  Q1–Q7 e as janelas permanecem inalteradas.
