@@ -471,6 +471,22 @@ B08_TOKENS = (
     "não comparável zero-shot",
     "sem nenhum dado do alvo",
 )
+B09_TOOL = ROOT / "tools" / "null_controls.py"
+B09_REPORT = ROOT / "artifacts" / "reports" / "B09-CONTROLES.md"
+B09_METRICS = ROOT / "artifacts" / "reports" / "B09-CONTROLES.json"
+B09_MANIFEST = ROOT / "data" / "manifests" / "baselines-b09.json"
+B09_TOKENS = (
+    "permutação de rótulos",
+    "nulo",
+    "rewiring",
+    "preserva",
+    "ids",
+    "negativos pareados",
+    "congelado",
+    "source-only",
+    "melhor baseline",
+    "sem nenhum dado do alvo",
+)
 B04_TOOL = ROOT / "tools" / "artisanal_features.py"
 B04_REPORT = ROOT / "artifacts" / "reports" / "B04-ARTESANAL.md"
 B04_METRICS = ROOT / "artifacts" / "reports" / "B04-ARTESANAL.json"
@@ -2638,6 +2654,38 @@ def check_b08_regal() -> tuple[list[str], int]:
     return failures, len(B08_TOKENS)
 
 
+def check_b09_controls() -> tuple[list[str], int]:
+    label = "B09"
+    failures: list[str] = []
+    for path in (B09_TOOL, B09_REPORT, B09_METRICS, B09_MANIFEST, ROOT / "tests" / "test_null_controls.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    report = B09_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in B09_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+    source = B09_TOOL.read_text(encoding="utf-8")
+    for token in ("male-cns", "data/sealed", "target_labels", "crosswalk"):  # firewall-allow
+        if token in source:
+            failures.append(f"{label}: controles não podem referenciar o alvo ('{token}')")
+    spec = importlib.util.spec_from_file_location("null_controls", ROOT / "tools" / "null_controls.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    for failure in module.check_report(B09_METRICS, B09_MANIFEST):
+        failures.append(f"{label}: {failure}")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(B09_TOKENS)
+
+
 def check_b03_source_baselines() -> tuple[list[str], int]:
     label = "B03"
     failures: list[str] = []
@@ -4345,6 +4393,7 @@ def main() -> int:
     b06_failures, b06_tokens = check_b06_transductive()
     b07_failures, b07_tokens = check_b07_spectral()
     b08_failures, b08_tokens = check_b08_regal()
+    b09_failures, b09_tokens = check_b09_controls()
     failures += (
         ref_failures
         + path_failures
@@ -4394,6 +4443,7 @@ def main() -> int:
         + b06_failures
         + b07_failures
         + b08_failures
+        + b09_failures
     )
 
     if failures:
@@ -4583,6 +4633,10 @@ def main() -> int:
     print(
         f"OK: reprodução B08 com {b08_tokens} tokens, commit/licença fixados e "
         f"paridade de artefato honesta"
+    )
+    print(
+        f"OK: controles nulos B09 com {b09_tokens} tokens, nulos e invariantes "
+        f"verificados e pacote de baselines congelado"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

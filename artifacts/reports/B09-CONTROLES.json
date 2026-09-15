@@ -1,0 +1,233 @@
+{
+  "controls": {
+    "degree_matched_negatives": {
+      "all_features": {
+        "coarse": {
+          "chance": 0.090909,
+          "fallback_queries": 208,
+          "hit_rate": 0.766908,
+          "hits": 2438,
+          "matching": "coarse",
+          "negatives_per_query": 10,
+          "queries": 3179
+        },
+        "fine": {
+          "chance": 0.090909,
+          "fallback_queries": 0,
+          "hit_rate": 0.754325,
+          "hits": 2398,
+          "matching": "fine",
+          "negatives_per_query": 10,
+          "queries": 3179
+        },
+        "none": {
+          "chance": 0.090909,
+          "fallback_queries": 0,
+          "hit_rate": 0.853728,
+          "hits": 2714,
+          "matching": "none",
+          "negatives_per_query": 10,
+          "queries": 3179
+        }
+      },
+      "comment": "acaso = 1/(negativos+1); fine = B classes de mediana de log-grau mais próxima da consulta; coarse = bin de piso do log-grau; none = sorteio sem pareamento",
+      "degree_features": {
+        "coarse": {
+          "chance": 0.090909,
+          "fallback_queries": 208,
+          "hit_rate": 0.492608,
+          "hits": 1566,
+          "matching": "coarse",
+          "negatives_per_query": 10,
+          "queries": 3179
+        },
+        "fine": {
+          "chance": 0.090909,
+          "fallback_queries": 0,
+          "hit_rate": 0.49481,
+          "hits": 1573,
+          "matching": "fine",
+          "negatives_per_query": 10,
+          "queries": 3179
+        },
+        "none": {
+          "chance": 0.090909,
+          "fallback_queries": 0,
+          "hit_rate": 0.677886,
+          "hits": 2155,
+          "matching": "none",
+          "negatives_per_query": 10,
+          "queries": 3179
+        }
+      }
+    },
+    "degree_preserving_rewiring": {
+      "accepted_target": 52435740,
+      "artisanal_all_macro_recall@1": 0.050154,
+      "artisanal_degree_macro_recall@1": 0.087579,
+      "artisanal_report_sha256": "c5d4fb1740f59ce1d9935e46c3eb7cca6e2cafcfd569cbe7551010abd18aeb12",
+      "comment": "degree-only é invariante por construção; o alvo do controle é o ganho estrutural além do grau",
+      "comment_pesos": "trocas preservam graus de contagem e o multiconjunto de pesos; os pesos ficam nos slots e os graus ponderados podem mudar (não são invariantes deste controle)",
+      "edge_count_preserved": true,
+      "in_degree_preserved": true,
+      "new_self_loops": 0,
+      "out_degree_preserved": true,
+      "snapshot": {
+        "edges": 5243574,
+        "edges_sha256": "af15ae43ba83cc3140b246c73fea9fef2b1caa5a106d92111dd46f8831c354f7",
+        "nodes": 23188,
+        "nodes_sha256": "ff546e778dd2a72b6ed1289e8751ac71765c373dc89c6010d1bf4e089efbc200"
+      },
+      "stats": {
+        "accepted": 52435740,
+        "attempts": 56636046,
+        "kept_self_loops": 1,
+        "rate_per_second": 293077,
+        "rejected_duplicate": 4182382,
+        "rejected_self_loop": 8205,
+        "seconds": 193.246
+      },
+      "unique_pairs_after": 5243574,
+      "unique_pairs_before": 5243574,
+      "weight_multiset_preserved": true,
+      "weighted_degrees_preserved": false
+    },
+    "id_permutation": {
+      "artisanal_degree_macro_recall@1": 0.174788,
+      "artisanal_report_sha256": "3bdd0266daf3bff77813d457b589e8c050408d7a769bc56e829c2a28e137dc78",
+      "carried_split_macro_recall@1": 0.383676,
+      "comment": "features são equívocas à permutação; o split por hash de ID muda e é registrado como sensibilidade técnica",
+      "edges": 5243574,
+      "features_equivariant": true,
+      "features_max_abs_diff": 0.0,
+      "label_mismatches": 0,
+      "labels_checked": 14899,
+      "labels_follow_permutation": true,
+      "nodes": 23188,
+      "permutation_sha256": "ef9cba40f2e78204ae762067d178f42b7a0855244913172b5da8358667ba0d61",
+      "properties_sha256": "e0565b0da9747678aa3ab659b446a5b5a40d39de65f11a8ec1b5f31c2e21199e",
+      "resplit_delta": 0.02813,
+      "resplit_macro_recall@1": 0.411806,
+      "seed": 866074319,
+      "snapshot": {
+        "edges": 5243574,
+        "edges_sha256": "446636c29307c6ab4cde748bc8cc91341834d878b6aed48ed469fb3fe6add885",
+        "nodes": 23188,
+        "nodes_sha256": "f924a571c29e51d04c016c927104993bc217b666d368b61d54fbe3cc41b419b0"
+      }
+    },
+    "label_permutation": {
+      "all_features": {
+        "comment": "nulo destrói a associação rótulo-estrutura; esperado cair ao acaso",
+        "draws": 20,
+        "exceedances": 0,
+        "null_max": 0.004817,
+        "null_mean": 0.00225,
+        "null_sd": 0.001293,
+        "null_values": [
+          0.00289,
+          0.001422,
+          0.001606,
+          0.001285,
+          0.002408,
+          0.00273,
+          0.003597,
+          0.002569,
+          0.002569,
+          0.004817,
+          0.000642,
+          0.001606,
+          0.003854,
+          0.002569,
+          0.004817,
+          0.000803,
+          0.001927,
+          0.000642,
+          0.0,
+          0.002248
+        ],
+        "p_value": 0.047619,
+        "real_macro_recall@1": 0.383676
+      },
+      "degree_features": {
+        "draws": 20,
+        "exceedances": 0,
+        "null_max": 0.004496,
+        "null_mean": 0.002175,
+        "null_sd": 0.001009,
+        "null_values": [
+          0.001285,
+          0.001927,
+          0.001285,
+          0.00289,
+          0.000642,
+          0.000921,
+          0.002248,
+          0.001766,
+          0.002847,
+          0.003265,
+          0.00167,
+          0.002248,
+          0.00273,
+          0.002569,
+          0.003326,
+          0.001927,
+          0.003532,
+          0.001285,
+          0.004496,
+          0.000642
+        ],
+        "p_value": 0.047619,
+        "real_macro_recall@1": 0.149547
+      }
+    }
+  },
+  "declared": {
+    "best_baseline_rule": "maior mediana de Macro Recall@1 na fonte; empate → mais simples",
+    "chance_tolerance": 0.02,
+    "label_draws": 20,
+    "negatives": 10,
+    "rewire_multiplier": 10
+  },
+  "frozen_package": {
+    "best_classical": "artesanal (todas)",
+    "best_comparator": "MLP pareado 1-3M",
+    "path": "data/manifests/baselines-b09.json",
+    "predictions_ok": 27,
+    "predictions_total": 27,
+    "schema": "b09-baseline-package",
+    "sha256": "9359862d398f90370d68588e64ce6bd0e838a1b550d278e0c3fb269076163c52"
+  },
+  "interpretation": {
+    "degree_matched_all_features": "manteve vantagem (0.754325 vs acaso 0.090909) — investigar",
+    "degree_matched_degree_features": "manteve vantagem (0.494810 vs acaso 0.090909) — investigar",
+    "degree_preserving_rewiring": "degradou como esperado",
+    "id_permutation": "invariante como esperado",
+    "label_permutation_all_features": "degradou como esperado",
+    "label_permutation_degree_features": "degradou como esperado"
+  },
+  "label_meta": {
+    "classes_k_min": 525,
+    "nodes_labeled": 15304,
+    "types_total": 2448
+  },
+  "peak_rss_mib": 6466.7,
+  "pending_investigation": [
+    "degree_matched_all_features",
+    "degree_matched_degree_features"
+  ],
+  "schema": "b09-null-controls",
+  "scope": "diagnóstico within-source; nenhum dado do alvo usado",
+  "seconds": 840.582,
+  "seeds": {
+    "id_permutation": 6292075957920415439,
+    "label_permutation": 816807013630705660,
+    "negatives": 7563371160896750405,
+    "rewire": 1925769471648939788
+  },
+  "split": {
+    "classes": 519,
+    "train": 11668,
+    "val": 3179
+  }
+}

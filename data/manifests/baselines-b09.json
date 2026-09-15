@@ -1,0 +1,223 @@
+{
+  "best_classical": "artesanal (todas)",
+  "best_comparator": "MLP pareado 1-3M",
+  "edge_primary_sha256": "b0713dea584003c05f35bc3aa4ab02b67f8a91fbead987591c55f8abffa2c68d",
+  "predictions": [
+    {
+      "path": "runs/b03/predictions-random-seed0.json",
+      "sha256": "220127018a287fa0ce80554ed82a7754f0d41f167628511733246217bc438613",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b03/predictions-random-seed1.json",
+      "sha256": "2e832e9acd5fe9451d3b8d28c50ce5cb6facfb0a303042bc1e88be77786e0735",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b03/predictions-random-seed2.json",
+      "sha256": "f3cca6324b02319d3ad3cf29b9bcb0d2bee42bf26bcd2dea424b6851843ed30a",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b03/predictions-degree-only.json",
+      "sha256": "744fa65f9f5293908d19531f4458c031f9e194f0a06c0eafa21834ca02eb4368",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b03/predictions-majority.json",
+      "sha256": "9e6c7d06a8ef6f4136a4bd0a4dff455d1f1ba77973de56ba1089c67e5a10421f",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b04/predictions-artesanal-all.json",
+      "sha256": "aac5bd726a9f9f6699d248f944d9e4aba827877bd1756e7dd6bc24b859b6c145",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b05/predictions-mlp-s-seed0.json",
+      "sha256": "96f3b17b27c5dfc908a36877ebdf959fe483351fc08ae2c92726c14cf3b85b1d",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b05/predictions-mlp-s-seed1.json",
+      "sha256": "2d9e919d68af13143107975d5dfe47ba4c5c90330815d44167eaa27b8838d073",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b05/predictions-mlp-s-seed2.json",
+      "sha256": "ae232d9af024d1b9e23f34e4cec17294018fdcdf195df5c08a29c002de58497a",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b05/predictions-mlp-m-seed0.json",
+      "sha256": "5516dd8ca04b4da44a1d50c9cce9e375187b9fcca3574f060a57d449fafbd65e",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b05/predictions-mlp-m-seed1.json",
+      "sha256": "b2f33920366bf1409218c6c20ede99e3de9b0e0da5c97be2c74b9ed7b184916b",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b05/predictions-mlp-m-seed2.json",
+      "sha256": "240bc5153abc8946e64d4fbe0dca4b0ea8531d7082b5dc4219fa0733868ab74e",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b05/predictions-mlp-l-seed0.json",
+      "sha256": "5a9ae36bb553c7f56478bc73861a63c5df3998be89b719f4fd682c84601496e7",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b05/predictions-mlp-l-seed1.json",
+      "sha256": "d39ffd82ca42741bd1cd0de06a9a303646a68da212d8678b72569d0baf86c00a",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b05/predictions-mlp-l-seed2.json",
+      "sha256": "df126bb4db5e5d68fcc40ee5bf013b7ac3512ca25ae3d8d665dfa0df4a75c5eb",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b06/predictions-deepwalk-seed0.json",
+      "sha256": "bb432b6fbf30214213d8bdb2c771da0e6e505a676dee5fea43129cd0c697ff60",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b06/predictions-deepwalk-seed1.json",
+      "sha256": "7ca28157fd71bc8ce0edecf77b77d1e0c1d3fd8ad1397c9d102a853ea76be15e",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b06/predictions-deepwalk-seed2.json",
+      "sha256": "bfbacc072a0dd1b7654172685a08b349a4adbd5d309a25c28346a601a4bd9d47",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b06/predictions-node2vec-seed0.json",
+      "sha256": "32a61a5b97234c8a378967e843726115ddc541619920f6e8de71235d1e952260",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b06/predictions-node2vec-seed1.json",
+      "sha256": "e679566ce0d27424683c55217e2fab23616ce91d2a1faabbdf85bab20089569c",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b06/predictions-node2vec-seed2.json",
+      "sha256": "970e6b9f1c423c5d52bbb03b5f8d29733a7e47dfa5e34f32380fa3dc7b65fc43",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b07/predictions-svd_dirigido-seed0.json",
+      "sha256": "acb4ce8c445e23febf1b18fdae87940d362fbc5debe6af1067bf9a06b878a4cc",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b07/predictions-svd_dirigido-seed1.json",
+      "sha256": "acb4ce8c445e23febf1b18fdae87940d362fbc5debe6af1067bf9a06b878a4cc",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b07/predictions-svd_dirigido-seed2.json",
+      "sha256": "acb4ce8c445e23febf1b18fdae87940d362fbc5debe6af1067bf9a06b878a4cc",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b07/predictions-ase_simetrizado-seed0.json",
+      "sha256": "cb53c1b01549f81ad383c45bc61a4d1897555ef154dbd50599f53e31c3b2efcf",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b07/predictions-ase_simetrizado-seed1.json",
+      "sha256": "cb53c1b01549f81ad383c45bc61a4d1897555ef154dbd50599f53e31c3b2efcf",
+      "status": "ok"
+    },
+    {
+      "path": "runs/b07/predictions-ase_simetrizado-seed2.json",
+      "sha256": "cb53c1b01549f81ad383c45bc61a4d1897555ef154dbd50599f53e31c3b2efcf",
+      "status": "ok"
+    }
+  ],
+  "ranking": [
+    {
+      "macro_recall@1": 0.579626,
+      "method": "MLP pareado 1-3M",
+      "report": "artifacts/reports/B05-MLP.json",
+      "report_sha256": "906e9de5fd6c723613cb72e4738eb47da0a0ee9e564d5ebd8d359680b2c998d1"
+    },
+    {
+      "macro_recall@1": 0.554048,
+      "method": "MLP 500k",
+      "report": "artifacts/reports/B05-MLP.json",
+      "report_sha256": "906e9de5fd6c723613cb72e4738eb47da0a0ee9e564d5ebd8d359680b2c998d1"
+    },
+    {
+      "macro_recall@1": 0.472795,
+      "method": "MLP 100k",
+      "report": "artifacts/reports/B05-MLP.json",
+      "report_sha256": "906e9de5fd6c723613cb72e4738eb47da0a0ee9e564d5ebd8d359680b2c998d1"
+    },
+    {
+      "macro_recall@1": 0.383676,
+      "method": "artesanal (todas)",
+      "report": "artifacts/reports/B04-ARTESANAL.json",
+      "report_sha256": "05e3fbdb33086fc41d020415a5a0089baff856fa455a75601a90afd8c48a1dd6"
+    },
+    {
+      "macro_recall@1": 0.324158,
+      "method": "svd dirigido",
+      "report": "artifacts/reports/B07-ESPECTRAL.json",
+      "report_sha256": "062781f5f722348510b7fcf34747d022b8c1a59867dc2bdda0e6da65fdd0866e"
+    },
+    {
+      "macro_recall@1": 0.310022,
+      "method": "ase simetrizado",
+      "report": "artifacts/reports/B07-ESPECTRAL.json",
+      "report_sha256": "062781f5f722348510b7fcf34747d022b8c1a59867dc2bdda0e6da65fdd0866e"
+    },
+    {
+      "macro_recall@1": 0.168601,
+      "method": "deepwalk",
+      "report": "artifacts/reports/B06-NODE2VEC.json",
+      "report_sha256": "e905227484bb94b4ea5e7b12d024fa8a2796f8e38bb94e4023753b80b780ba65"
+    },
+    {
+      "macro_recall@1": 0.158941,
+      "method": "node2vec",
+      "report": "artifacts/reports/B06-NODE2VEC.json",
+      "report_sha256": "e905227484bb94b4ea5e7b12d024fa8a2796f8e38bb94e4023753b80b780ba65"
+    },
+    {
+      "macro_recall@1": 0.149547,
+      "method": "degree-only",
+      "report": "artifacts/reports/B03-BASELINES-FONTE.json",
+      "report_sha256": "8eb8cea701898b9cae4129763d7a341e5aea589453e26b90ca6be3dfb51a19e0"
+    },
+    {
+      "macro_recall@1": 0.005662,
+      "method": "random estratificado",
+      "report": "artifacts/reports/B03-BASELINES-FONTE.json",
+      "report_sha256": "8eb8cea701898b9cae4129763d7a341e5aea589453e26b90ca6be3dfb51a19e0"
+    },
+    {
+      "macro_recall@1": 0.001927,
+      "method": "majority",
+      "report": "artifacts/reports/B03-BASELINES-FONTE.json",
+      "report_sha256": "8eb8cea701898b9cae4129763d7a341e5aea589453e26b90ca6be3dfb51a19e0"
+    }
+  ],
+  "rule": "maior mediana de Macro Recall@1 na validação da fonte (source-only); empate → método mais simples",
+  "schema": "b09-baseline-package",
+  "status": "frozen-within-source (schema próprio; sem dados do alvo)",
+  "target_data_used": false,
+  "tools_sha256": {
+    "artisanal_features.py": "39d1c9e342c47ce162fb1923e31122e0ccf44a63fd33762ba5714d21410ed136",
+    "baselines_source.py": "76694b1a68ee22be0be001fbcdf517337272a4bc90ce653fd0100b82831d4195",
+    "mlp_control.py": "782cdb10eece3d18efbe548194fa58644b0d4521d0c25d30390cc69ad59467d0",
+    "node2vec_baseline.py": "66cd1c1220da08b38a69cfa21d1e1dd2c861c44d57480cf5aa2daf42666489d5",
+    "regal_repro.py": "b8f11bb8c3f9d07cd43578e2faf87531ac911d37f28990f66473a2c8bd974112",
+    "spectral_baseline.py": "24e9a9a62c2a7720e89d0bdbdee3d38a7acd8925c9015bb7ba72d1566481d26b"
+  },
+  "top_non_classical": "MLP pareado 1-3M"
+}

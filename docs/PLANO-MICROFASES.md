@@ -1918,7 +1918,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   B06/B07); a paridade é de artefato do repositório, não da figura da
   publicação; commit e70219cb0bae0b27708ab9bbd756b0d8680c4e56.
 
-- [ ] **B09 — Executar controles nulos e congelar pacote de baselines.**
+- [x] **B09 — Executar controles nulos e congelar pacote de baselines.**
   - Objetivo: provar que o harness detecta atalhos e que todos os comparadores
     obedecem ao mesmo protocolo.
   - Entregas: label permutation na fonte, rewiring preservando grau, IDs
@@ -1930,6 +1930,48 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não descartar baseline forte para favorecer GNN.
   - Dependências: B01–B08.
   - Orçamento: IA baixa; CPU/GPU piloto limitado pelo R07.
+  Evidência (2026-09-15, executor; somente fonte, sem nenhum dado do alvo):
+  arquivos `tools/null_controls.py` (controles nulos declarados, derivação
+  única de interpretações, `refresh`/`package` determinísticos),
+  `tests/test_null_controls.py` (8 casos: permutação de rótulos, invariantes
+  do rewiring, permutação de IDs com rótulos, negativos pareados, pacote
+  congelado e detecção de registro desonesto), `artifacts/reports/B09-CONTROLES.md`
+  + `.json`, `data/manifests/baselines-b09.json` e a nova checagem B09 no
+  `validate_research.py`; regras declaradas antes de rodar: 20 sorteios de
+  permutação de rótulos (p = (1+excedências)/21), rewiring com alvo de 10×E
+  trocas aceitas, B = 10 negativos por consulta (acaso 0,090909) e melhor
+  baseline por maior mediana de Macro Recall@1 na fonte (source-only);
+  resultados: permutação de rótulos com nulos ≤ 0,004817 contra reais
+  0,383676 (todas as features) e 0,149547 (grau), p = 0,047619 → degradou;
+  rewiring com 52.435.740 trocas aceitas em 56.636.046 tentativas (~293 mil/s),
+  graus in/out de contagem preservados, 0 self-loops novos, 0 multiedges e
+  multiconjunto de pesos preservado, artesanal 0,383676 → 0,050154 (graus
+  ponderados não são invariantes, registrado); permutação de IDs com features
+  equívocas (diferença máxima 0,0), 0 rótulos divergentes e partição carregada
+  idêntica (0,383676), com re-sorteio por hash medindo Δ +0,028130 (sensibilidade
+  técnica registrada); negativos pareados por grau manteram o degree-only em
+  0,494810 contra acaso 0,090909 → falha investigada: pareamento por mediana de
+  classe não remove informação distribucional de grau, o comparador apropriado
+  é o degree-only pré-registrado e controles por estrato ficam pendentes para
+  M09 (pendências gravadas no JSON); pacote congelado com 11 comparadores,
+  melhor comparador MLP pareado 1-3M (0,579626), melhor clássico artesanal
+  (0,383676), 27/27 predições verificadas por SHA-256 e `target_data_used:
+  false`; fontes/versões: snapshot H08 e propriedades públicas do MANC, seeds
+  derivadas do mestre via `tools/seeds.py`, sem fonte externa e sem downloads,
+  Python 3.12.2 com numpy/scipy do lock R02; comandos e testes:
+  `.venv/bin/python tools/null_controls.py run --report
+  artifacts/reports/B09-CONTROLES.json --manifest
+  data/manifests/baselines-b09.json` (840,6 s; pico 6.466,7 MiB; rewiring em
+  193,2 s), `check` (valida nulos, invariantes, interpretações e pacote),
+  `.venv/bin/python -m pytest tests/ -q` (215 testes), checagem B09 com smoke
+  negativo (nulo corrompido reprova como esperado), `validate_plan.py`,
+  `check_data_hygiene.py` e `firewall.py scan`; resultado: harness
+  demonstradamente sensível a rótulo e estrutura, invariante a IDs no nível de
+  features, com limitações dos controles registradas e baseline congelado para
+  o G5; recursos medidos: CPU apenas, sem GPU; decisão/limitação: resultados
+  internos à fonte e sem métricas do alvo; pesos acompanham os slots das
+  arestas no rewiring; a partição determinística por hash depende do ID;
+  commit 1e199c3b1176261da0019a71b36b44fc3a8fa340.
 
 - [ ] **G5 — Aprovar o benchmark e liberar o MVP neural.**
   - Objetivo: confirmar que avaliação, nulos e baselines são confiáveis.
