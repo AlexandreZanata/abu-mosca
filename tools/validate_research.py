@@ -428,6 +428,19 @@ B05_TOKENS = (
     "determinístico",
     "sem nenhum dado do alvo",
 )
+B06_TOOL = ROOT / "tools" / "node2vec_baseline.py"
+B06_REPORT = ROOT / "artifacts" / "reports" / "B06-NODE2VEC.md"
+B06_METRICS = ROOT / "artifacts" / "reports" / "B06-NODE2VEC.json"
+B06_TOKENS = (
+    "node2vec",
+    "deepwalk",
+    "transdutivo",
+    "não comparável zero-shot",
+    "rotação",
+    "permutação",
+    "source-fit",
+    "sem nenhum dado do alvo",
+)
 B04_TOOL = ROOT / "tools" / "artisanal_features.py"
 B04_REPORT = ROOT / "artifacts" / "reports" / "B04-ARTESANAL.md"
 B04_METRICS = ROOT / "artifacts" / "reports" / "B04-ARTESANAL.json"
@@ -2377,6 +2390,83 @@ def check_b05_mlp() -> tuple[list[str], int]:
     return failures, len(B05_TOKENS)
 
 
+def check_b06_transductive() -> tuple[list[str], int]:
+    label = "B06"
+    failures: list[str] = []
+    for path in (B06_TOOL, B06_REPORT, B06_METRICS, ROOT / "tests" / "test_node2vec_baseline.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    report = B06_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in B06_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+    source = B06_TOOL.read_text(encoding="utf-8")
+    for token in ("male-cns", "data/sealed", "target_labels", "crosswalk"):  # firewall-allow
+        if token in source:
+            failures.append(f"{label}: baseline transdutivo não pode referenciar o alvo ('{token}')")
+    metrics = json.loads(B06_METRICS.read_text(encoding="utf-8"))
+    if metrics.get("schema") != "b06-node2vec":
+        failures.append(f"{label}: schema do relatório divergente")
+    if metrics.get("verdict") != "não comparável zero-shot":
+        failures.append(f"{label}: veredito deve marcar não comparável zero-shot")
+    results = metrics.get("results", {})
+    if set(results) != {"deepwalk", "node2vec"}:
+        failures.append(f"{label}: configs divergentes (esperado deepwalk/node2vec)")
+    if results.get("deepwalk", {}).get("p") != 1.0 or results.get("deepwalk", {}).get("q") != 1.0:
+        failures.append(f"{label}: deepwalk deve ser p=q=1")
+    if results.get("node2vec", {}).get("p") != 1.0 or results.get("node2vec", {}).get("q") != 0.5:
+        failures.append(f"{label}: node2vec deve ser p=1, q=0.5")
+    for name, data in results.items():
+        value = float(data.get("median_macro_recall@1", -1))
+        if not 0.0 <= value <= 1.0:
+            failures.append(f"{label}: macro fora de [0,1] em '{name}'")
+        if len(data.get("per_seed", [])) != 3:
+            failures.append(f"{label}: config '{name}' sem as 3 seeds do pré-registro")
+        agreement = float(data.get("rotation_agreement", -1))
+        if not 0.0 <= agreement <= 1.0:
+            failures.append(f"{label}: concordância pós-rotação fora de [0,1] em '{name}'")
+        cosines = data.get("seed_cosine", {})
+        if set(cosines) != {"0x1", "0x2", "1x2"}:
+            failures.append(f"{label}: pares de cosseno entre seeds incompletos em '{name}'")
+        for pair, cosine in cosines.items():
+            if not -1.0 <= float(cosine) <= 1.0:
+                failures.append(f"{label}: cosseno fora de [-1,1] em '{name}/{pair}'")
+            if abs(float(cosine)) >= 0.2:
+                failures.append(f"{label}: coordenadas entre seeds deveriam ser arbitrárias em '{name}/{pair}'")
+    if list(metrics.get("seeds", [])) != [297979363399525401, 1699981902186354598, 3729859090210297070]:
+        failures.append(f"{label}: seeds divergentes do pré-registro")
+    hyper = metrics.get("hyperparameters", {})
+    for key, expected in (("walks_per_node", 4), ("walk_length", 25), ("window", 5), ("dim", 64),
+                          ("epochs", 2), ("negatives", 5), ("batch", 16384)):
+        if hyper.get(key) != expected:
+            failures.append(f"{label}: hiperparâmetro '{key}' divergente do fixado ({expected})")
+    if str(hyper.get("device", "")) != "cpu":
+        failures.append(f"{label}: dispositivo deve ser cpu nesta fase")
+    for entry in metrics.get("predictions", []):
+        if not re.fullmatch(r"[0-9a-f]{64}", str(entry.get("sha256", ""))):
+            failures.append(f"{label}: predição sem hash válido")
+    if len(metrics.get("predictions", [])) != 6:
+        failures.append(f"{label}: esperado 6 pacotes de predições (2 configs x 3 seeds)")
+    for entry in metrics.get("embeddings", []):
+        if not re.fullmatch(r"[0-9a-f]{64}", str(entry.get("sha256", ""))):
+            failures.append(f"{label}: embedding sem hash válido")
+        if not (ROOT / entry.get("path", "")).exists():
+            failures.append(f"{label}: arquivo de embedding ausente '{entry.get('path', '')}'")
+    if len(metrics.get("embeddings", [])) != 6:
+        failures.append(f"{label}: esperado 6 pacotes de embeddings (2 configs x 3 seeds)")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(B06_TOKENS)
+
+
 def check_b03_source_baselines() -> tuple[list[str], int]:
     label = "B03"
     failures: list[str] = []
@@ -4081,6 +4171,7 @@ def main() -> int:
     b03_failures, b03_tokens = check_b03_source_baselines()
     b04_failures, b04_tokens = check_b04_artisanal()
     b05_failures, b05_tokens = check_b05_mlp()
+    b06_failures, b06_tokens = check_b06_transductive()
     failures += (
         ref_failures
         + path_failures
@@ -4127,6 +4218,7 @@ def main() -> int:
         + b03_failures
         + b04_failures
         + b05_failures
+        + b06_failures
     )
 
     if failures:
@@ -4304,6 +4396,10 @@ def main() -> int:
     print(
         f"OK: MLP de controle B05 com {b05_tokens} tokens, 3 budgets e "
         f"mesmas features de B04"
+    )
+    print(
+        f"OK: transdutivos B06 com {b06_tokens} tokens, 2 configs e "
+        f"veredito não comparável zero-shot"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

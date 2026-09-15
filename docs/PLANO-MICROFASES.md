@@ -1773,7 +1773,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   pareamento definitivo com o encoder aguarda M02; commit
   6540da2e5ee9e4fb2f00b34d9fc0a9a520c7bf34.
 
-- [ ] **B06 — Implementar Node2Vec/DeepWalk com caveat transdutivo.**
+- [x] **B06 — Implementar Node2Vec/DeepWalk com caveat transdutivo.**
   - Objetivo: medir baselines clássicos sem fingir alinhamento entre espaços.
   - Entregas: execução dentro da fonte, teste de estabilidade a rotação/permutação
     e proposta de uso cross-graph somente se houver mecanismo não supervisionado
@@ -1785,6 +1785,38 @@ compra de serviço, contato com autores ou uso de dados não públicos.
     arbitrárias não entra como zero-shot.
   - Dependências: L03, L06, B01, H09.
   - Orçamento: IA baixa; CPU/GPU piloto apenas se aplicável.
+  Evidência (2026-09-15, executor; modo exploratório e somente na fonte):
+  arquivos `tools/node2vec_baseline.py` (caminhadas de 1ª ordem p=q=1 e de 2ª
+  ordem p=1/q=0,5 sobre o grafo dirigido ponderado + Skip-gram esparso em CPU
+  determinística, mesmo split/seeds/avaliador de B01/B03, ordem canônica de
+  nós), `tests/test_node2vec_baseline.py` (9 casos: pesos enviesados exatos,
+  determinismo das caminhadas, cobertura de janela, invariância a rotação e à
+  ordem da tabela, coordenadas arbitrárias entre seeds, determinismo ponta a
+  ponta, smoke e ausência de referências proibidas) e
+  `artifacts/reports/B06-NODE2VEC.md` + `.json`; resultados na mesma partição
+  de B03–B05 (14.847 nodes, 519 classes): deepwalk mediana macro Recall@1
+  0,168601, node2vec 0,158941, contra 0,149547 do degree-only, 0,383676 do
+  artesanal e 0,579626 do MLP; estabilidade: concordância pós-rotação
+  0,8748/0,8757 e cosseno entre seeds com |x| < 0,08 sem alinhamento (espaços
+  arbitrários); veredito `não comparável zero-shot`, sem proposta de uso
+  entre grafos e sem nenhum alinhamento com o alvo; fontes/versões: LIT-0049
+  (10.1145/2939672.2939754) e LIT-0050 (10.1145/2623330.2623732) via L03/L06,
+  snapshot H08, propriedades públicas do MANC, B01/B03/H09, Python 3.12.2 com
+  torch do lock R02, sem GPU e sem qualquer dado do alvo; comandos e testes:
+  `python3 tools/node2vec_baseline.py --snapshot runs/h08/source --properties
+  data/raw/spikes/manc_neuron_properties.feather --out-dir runs/b06 --report
+  artifacts/reports/B06-NODE2VEC.json` (1434,7 s de processo; pico 3437 MiB),
+  `.venv/bin/python -m pytest tests/ -q` (190 testes), nova checagem B06 no
+  `validate_research.py` (p/q das configs, seeds do pré-registro,
+  hiperparâmetros fixos, 6 predições + 6 embeddings hashados, veredito e
+  ausência de referências ao alvo; smoke negativo: veredito corrompido
+  reprova como esperado) e `python3 tools/validate_plan.py`; resultado:
+  baseline clássico medido com honestidade transdutiva, restrito a
+  diagnóstico within-source; recursos medidos: CPU apenas, sem downloads;
+  decisão/limitação: esforço em escala de piloto (2 épocas, 4 caminhadas/nó
+  de 25 passos); 4 pilotos de 1 config/1 seed descartados por extrapolarem o
+  teto de 30 min antes dos hiperparâmetros finais, sem nenhuma escolha
+  orientada por métrica; commit a262ccf36cc81b1a0fb6221f49913a2deb88de25.
 
 - [ ] **B07 — Implementar fatoração/espectral com o mesmo rigor.**
   - Objetivo: comparar contra estrutura global linear de baixo custo.

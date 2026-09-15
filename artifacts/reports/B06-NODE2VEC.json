@@ -1,0 +1,209 @@
+{
+  "configs": {
+    "deepwalk": {
+      "p": 1.0,
+      "q": 1.0
+    },
+    "node2vec": {
+      "p": 1.0,
+      "q": 0.5
+    }
+  },
+  "embeddings": [
+    {
+      "config": "deepwalk",
+      "path": "runs/b06/embeddings-deepwalk-seed0.npy",
+      "seed_index": 0,
+      "sha256": "f03b0e92e99fb5ccd7a933aee44aa5b207b880405525601603ad71b1b471f37a"
+    },
+    {
+      "config": "deepwalk",
+      "path": "runs/b06/embeddings-deepwalk-seed1.npy",
+      "seed_index": 1,
+      "sha256": "67e7be13224ba16a8ecb72d667381d695a353c7db8ba1c63621a2115dbc8ac92"
+    },
+    {
+      "config": "deepwalk",
+      "path": "runs/b06/embeddings-deepwalk-seed2.npy",
+      "seed_index": 2,
+      "sha256": "05b42d9811c910dcc8e74706e752d6185dff70f9905c432091b73ef4667adedb"
+    },
+    {
+      "config": "node2vec",
+      "path": "runs/b06/embeddings-node2vec-seed0.npy",
+      "seed_index": 0,
+      "sha256": "530f600f338724a1ae83ced813ecdef311c5091d6d6e074ae8f6120c9e18187a"
+    },
+    {
+      "config": "node2vec",
+      "path": "runs/b06/embeddings-node2vec-seed1.npy",
+      "seed_index": 1,
+      "sha256": "559310af23b4a76a8f66ed6ce300cda5005a9bd63e56fa1f0e3da7df0def0fb2"
+    },
+    {
+      "config": "node2vec",
+      "path": "runs/b06/embeddings-node2vec-seed2.npy",
+      "seed_index": 2,
+      "sha256": "10db8799bae65d9de9d40783a95870cf8b81374b3dee60eb2dddff13857f8e04"
+    }
+  ],
+  "hyperparameters": {
+    "batch": 16384,
+    "device": "cpu",
+    "dim": 64,
+    "epochs": 2,
+    "lr": 0.001,
+    "negatives": 5,
+    "walk_length": 25,
+    "walks_per_node": 4,
+    "window": 5
+  },
+  "label_meta": {
+    "classes_k_min": 525,
+    "nodes_labeled": 15304,
+    "types_total": 2448
+  },
+  "nodes_total": 23188,
+  "nodes_used": 14847,
+  "peak_rss_mib": 3437.4,
+  "predictions": [
+    {
+      "config": "deepwalk",
+      "path": "runs/b06/predictions-deepwalk-seed0.json",
+      "seed_index": 0,
+      "sha256": "bb432b6fbf30214213d8bdb2c771da0e6e505a676dee5fea43129cd0c697ff60"
+    },
+    {
+      "config": "deepwalk",
+      "path": "runs/b06/predictions-deepwalk-seed1.json",
+      "seed_index": 1,
+      "sha256": "7ca28157fd71bc8ce0edecf77b77d1e0c1d3fd8ad1397c9d102a853ea76be15e"
+    },
+    {
+      "config": "deepwalk",
+      "path": "runs/b06/predictions-deepwalk-seed2.json",
+      "seed_index": 2,
+      "sha256": "bfbacc072a0dd1b7654172685a08b349a4adbd5d309a25c28346a601a4bd9d47"
+    },
+    {
+      "config": "node2vec",
+      "path": "runs/b06/predictions-node2vec-seed0.json",
+      "seed_index": 0,
+      "sha256": "32a61a5b97234c8a378967e843726115ddc541619920f6e8de71235d1e952260"
+    },
+    {
+      "config": "node2vec",
+      "path": "runs/b06/predictions-node2vec-seed1.json",
+      "seed_index": 1,
+      "sha256": "e679566ce0d27424683c55217e2fab23616ce91d2a1faabbdf85bab20089569c"
+    },
+    {
+      "config": "node2vec",
+      "path": "runs/b06/predictions-node2vec-seed2.json",
+      "seed_index": 2,
+      "sha256": "970e6b9f1c423c5d52bbb03b5f8d29733a7e47dfa5e34f32380fa3dc7b65fc43"
+    }
+  ],
+  "results": {
+    "deepwalk": {
+      "median_macro_recall@1": 0.168601,
+      "p": 1.0,
+      "per_seed": [
+        {
+          "macro_recall@1": 0.163047,
+          "micro_recall@1": 0.131173,
+          "pair_seconds": 0.5,
+          "pairs": 19786692,
+          "seed_index": 0,
+          "train_seconds": 195.3,
+          "walk_seconds": 5.6,
+          "walk_tokens": 2256121
+        },
+        {
+          "macro_recall@1": 0.170178,
+          "micro_recall@1": 0.138723,
+          "pair_seconds": 0.8,
+          "pairs": 19775606,
+          "seed_index": 1,
+          "train_seconds": 162.6,
+          "walk_seconds": 6.7,
+          "walk_tokens": 2254997
+        },
+        {
+          "macro_recall@1": 0.168601,
+          "micro_recall@1": 0.140296,
+          "pair_seconds": 0.5,
+          "pairs": 19773740,
+          "seed_index": 2,
+          "train_seconds": 130.0,
+          "walk_seconds": 7.0,
+          "walk_tokens": 2254835
+        }
+      ],
+      "q": 1.0,
+      "rotation_agreement": 0.8748033972947468,
+      "seed_cosine": {
+        "0x1": 0.01239839382469654,
+        "0x2": 0.0789000391960144,
+        "1x2": -0.009160537272691727
+      }
+    },
+    "node2vec": {
+      "median_macro_recall@1": 0.158941,
+      "p": 1.0,
+      "per_seed": [
+        {
+          "macro_recall@1": 0.158941,
+          "micro_recall@1": 0.127399,
+          "pair_seconds": 0.6,
+          "pairs": 19785120,
+          "seed_index": 0,
+          "train_seconds": 143.1,
+          "walk_seconds": 173.9,
+          "walk_tokens": 2255946
+        },
+        {
+          "macro_recall@1": 0.156781,
+          "micro_recall@1": 0.134319,
+          "pair_seconds": 1.1,
+          "pairs": 19780914,
+          "seed_index": 1,
+          "train_seconds": 132.5,
+          "walk_seconds": 150.7,
+          "walk_tokens": 2255534
+        },
+        {
+          "macro_recall@1": 0.163043,
+          "micro_recall@1": 0.132432,
+          "pair_seconds": 0.6,
+          "pairs": 19787096,
+          "seed_index": 2,
+          "train_seconds": 134.5,
+          "walk_seconds": 154.9,
+          "walk_tokens": 2256200
+        }
+      ],
+      "q": 0.5,
+      "rotation_agreement": 0.8757470902799622,
+      "seed_cosine": {
+        "0x1": 0.01173301599919796,
+        "0x2": 0.025019226595759392,
+        "1x2": -0.014482974074780941
+      }
+    }
+  },
+  "schema": "b06-node2vec",
+  "seconds": 1434.655,
+  "seeds": [
+    297979363399525401,
+    1699981902186354598,
+    3729859090210297070
+  ],
+  "split": {
+    "classes": 519,
+    "train": 11668,
+    "val": 3179
+  },
+  "torch_version": "2.14.0+cu130",
+  "verdict": "não comparável zero-shot"
+}
