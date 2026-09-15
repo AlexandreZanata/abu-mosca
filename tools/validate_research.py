@@ -441,6 +441,21 @@ B06_TOKENS = (
     "source-fit",
     "sem nenhum dado do alvo",
 )
+B07_TOOL = ROOT / "tools" / "spectral_baseline.py"
+B07_REPORT = ROOT / "artifacts" / "reports" / "B07-ESPECTRAL.md"
+B07_METRICS = ROOT / "artifacts" / "reports" / "B07-ESPECTRAL.json"
+B07_TOKENS = (
+    "espectral",
+    "sparse",
+    "svd",
+    "simetriz",
+    "direção",
+    "sinal",
+    "rotação",
+    "within-source",
+    "não comparável zero-shot",
+    "sem nenhum dado do alvo",
+)
 B04_TOOL = ROOT / "tools" / "artisanal_features.py"
 B04_REPORT = ROOT / "artifacts" / "reports" / "B04-ARTESANAL.md"
 B04_METRICS = ROOT / "artifacts" / "reports" / "B04-ARTESANAL.json"
@@ -2467,6 +2482,115 @@ def check_b06_transductive() -> tuple[list[str], int]:
     return failures, len(B06_TOKENS)
 
 
+def check_b07_spectral() -> tuple[list[str], int]:
+    label = "B07"
+    failures: list[str] = []
+    for path in (B07_TOOL, B07_REPORT, B07_METRICS, ROOT / "tests" / "test_spectral_baseline.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    report = B07_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in B07_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+    source = B07_TOOL.read_text(encoding="utf-8")
+    for token in ("male-cns", "data/sealed", "target_labels", "crosswalk"):  # firewall-allow
+        if token in source:
+            failures.append(f"{label}: espectral não pode referenciar o alvo ('{token}')")
+    for token in (".toarray(", ".todense(", "todense()", "asmatrix("):
+        if token in source:
+            failures.append(f"{label}: código não pode densificar a matriz ('{token}')")
+    for token in ("spla.svds(", "spla.eigsh("):
+        if token not in source:
+            failures.append(f"{label}: solver esparso ausente ('{token}')")
+    metrics = json.loads(B07_METRICS.read_text(encoding="utf-8"))
+    if metrics.get("schema") != "b07-spectral":
+        failures.append(f"{label}: schema do relatório divergente")
+    if metrics.get("verdict") != "restrito ao diagnóstico within-source (não comparável zero-shot)":
+        failures.append(f"{label}: veredito deve restringir a within-source e não comparável zero-shot")
+    results = metrics.get("results", {})
+    if set(results) != {"svd_dirigido", "ase_simetrizado"}:
+        failures.append(f"{label}: configs divergentes (esperado svd_dirigido/ase_simetrizado)")
+    expected_dims = {"svd_dirigido": 64, "ase_simetrizado": 32}
+    for name, data in results.items():
+        if int(data.get("k_components", -1)) != 32:
+            failures.append(f"{label}: componentes divergentes em '{name}'")
+        if int(data.get("dims", -1)) != expected_dims.get(name, -1):
+            failures.append(f"{label}: dimensões divergentes em '{name}'")
+        if len(data.get("per_seed", [])) != 3:
+            failures.append(f"{label}: config '{name}' sem as 3 seeds do pré-registro")
+        value = float(data.get("median_macro_recall@1", -1))
+        if not 0.0 <= value <= 1.0:
+            failures.append(f"{label}: macro fora de [0,1] em '{name}'")
+        equivariant = float(data.get("rotation_agreement_equivariant_probe", -1))
+        if equivariant != 1.0:
+            failures.append(f"{label}: rotação com probe equívariante deve ser 1,0 em '{name}'")
+        sign = float(data.get("sign_agreement", -1))
+        if sign != 1.0:
+            failures.append(f"{label}: sinal deve preservar decisões em '{name}'")
+        standard = float(data.get("rotation_agreement_standard_probe", -1))
+        if not 0.0 <= standard <= 1.0:
+            failures.append(f"{label}: sensibilidade padrão fora de [0,1] em '{name}'")
+        seed_agreement = data.get("prediction_agreement_seed0", {})
+        if set(seed_agreement) != {"0x1", "0x2"}:
+            failures.append(f"{label}: concordância entre seeds incompleta em '{name}'")
+        for pair, agreement in seed_agreement.items():
+            if float(agreement) != 1.0:
+                failures.append(f"{label}: predições entre seeds devem concordar em '{name}/{pair}'")
+        subspaces = data.get("subspace_cosines", {})
+        if set(subspaces) != {"0x1", "0x2", "1x2"}:
+            failures.append(f"{label}: pares de subespaço incompletos em '{name}'")
+        for pair, angles in subspaces.items():
+            for key in ("min_cos", "mean_cos"):
+                value = float(angles.get(key, -1))
+                if not 0.0 <= value <= 1.0:
+                    failures.append(f"{label}: cosseno de subespaço fora de [0,1] em '{name}/{pair}/{key}'")
+                if value < 0.999:
+                    failures.append(f"{label}: subespaço entre seeds deve ser estável em '{name}/{pair}/{key}'")
+    if list(metrics.get("seeds", [])) != [297979363399525401, 1699981902186354598, 3729859090210297070]:
+        failures.append(f"{label}: seeds divergentes do pré-registro")
+    hyper = metrics.get("hyperparameters", {})
+    if int(hyper.get("components", -1)) != 32:
+        failures.append(f"{label}: componentes do pré-registro divergentes")
+    if "sparse" not in str(hyper.get("solver", "")).lower():
+        failures.append(f"{label}: solver deve declarar operador esparso")
+    resources = metrics.get("resources", {})
+    if int(resources.get("nodes", -1)) != 23188 or int(resources.get("directed_nnz", -1)) != 5243574:
+        failures.append(f"{label}: contagens do snapshot H08 divergentes")
+    matrix_bytes = float(resources.get("directed_matrix_bytes", -1))
+    dense_bytes = float(resources.get("directed_dense_equivalent_bytes", -1))
+    if dense_bytes <= 0 or matrix_bytes <= 0 or matrix_bytes >= dense_bytes / 10:
+        failures.append(f"{label}: matriz deveria permanecer esparsa (sem densificação)")
+    if int(resources.get("ram_cap_gib", -1)) != 24:
+        failures.append(f"{label}: teto de RAM da fase divergente")
+    if str(resources.get("device", "")) != "cpu":
+        failures.append(f"{label}: dispositivo deve ser cpu nesta fase")
+    for entry in metrics.get("predictions", []):
+        if not re.fullmatch(r"[0-9a-f]{64}", str(entry.get("sha256", ""))):
+            failures.append(f"{label}: predição sem hash válido")
+        if not (ROOT / entry.get("path", "")).exists():
+            failures.append(f"{label}: arquivo de predição ausente '{entry.get('path', '')}'")
+    if len(metrics.get("predictions", [])) != 6:
+        failures.append(f"{label}: esperado 6 pacotes de predições (2 configs x 3 seeds)")
+    for entry in metrics.get("embeddings", []):
+        if not re.fullmatch(r"[0-9a-f]{64}", str(entry.get("sha256", ""))):
+            failures.append(f"{label}: embedding sem hash válido")
+        if not (ROOT / entry.get("path", "")).exists():
+            failures.append(f"{label}: arquivo de embedding ausente '{entry.get('path', '')}'")
+    if len(metrics.get("embeddings", [])) != 6:
+        failures.append(f"{label}: esperado 6 pacotes de embeddings (2 configs x 3 seeds)")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(B07_TOKENS)
+
+
 def check_b03_source_baselines() -> tuple[list[str], int]:
     label = "B03"
     failures: list[str] = []
@@ -4172,6 +4296,7 @@ def main() -> int:
     b04_failures, b04_tokens = check_b04_artisanal()
     b05_failures, b05_tokens = check_b05_mlp()
     b06_failures, b06_tokens = check_b06_transductive()
+    b07_failures, b07_tokens = check_b07_spectral()
     failures += (
         ref_failures
         + path_failures
@@ -4219,6 +4344,7 @@ def main() -> int:
         + b04_failures
         + b05_failures
         + b06_failures
+        + b07_failures
     )
 
     if failures:
@@ -4400,6 +4526,10 @@ def main() -> int:
     print(
         f"OK: transdutivos B06 com {b06_tokens} tokens, 2 configs e "
         f"veredito não comparável zero-shot"
+    )
+    print(
+        f"OK: espectral B07 com {b07_tokens} tokens, 2 configs, ambiguidade de "
+        f"sinal/rotação controlada e matriz esparsa"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

@@ -1818,7 +1818,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   teto de 30 min antes dos hiperparâmetros finais, sem nenhuma escolha
   orientada por métrica; commit a262ccf36cc81b1a0fb6221f49913a2deb88de25.
 
-- [ ] **B07 — Implementar fatoração/espectral com o mesmo rigor.**
+- [x] **B07 — Implementar fatoração/espectral com o mesmo rigor.**
   - Objetivo: comparar contra estrutura global linear de baixo custo.
   - Entregas: método sparse, tratamento de direção/peso, orientação/alinhamento
     documentado, teste em fixture e perfil de recursos.
@@ -1827,6 +1827,45 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não executar decomposição densa que exceda RAM estimada.
   - Dependências: B01, H09, D09.
   - Orçamento: IA baixa; CPU; teto de 24 GB RAM.
+  Evidência (2026-09-15, executor; modo exploratório e somente na fonte):
+  arquivos `tools/spectral_baseline.py` (SVD truncada esparsa da adjacência
+  dirigida e ponderada com embedding `U·√S|V·√S`, 64 dims, e autodecomposição
+  da simetrizada `(A + Aᵀ)/2` com escala assinada, 32 dims; operadores
+  `scipy.sparse.linalg` com v0 determinístico por seed, convenção canônica de
+  sinal e nenhuma densificação), `tests/test_spectral_baseline.py` (10 casos:
+  matriz esparsa exata com agregamento, self-loop e peso zero, espectro
+  conhecido de SVD dirigida e de ASE senoidal, ambiguidade controlada,
+  ausência de densificação por teste estático, determinismo, invariância à
+  ordem, esparsidade e smoke ponta a ponta) e
+  `artifacts/reports/B07-ESPECTRAL.md` + `.json`; resultados na mesma partição
+  de B03–B06 (14.847 nodes, 519 classes): mediana macro Recall@1 0,324158
+  (svd_dirigido) e 0,310022 (ase_simetrizado), contra 0,149547 do degree-only,
+  0,168601 do deepwalk, 0,158941 do node2vec, 0,383676 do artesanal e 0,579626
+  do MLP; controles de ambiguidade: troca de sinal preserva decisões (1,0),
+  rotação com probe equívariante preserva (1,0), subespaço entre seeds
+  idêntico (cosseno mínimo/médio 1,0) e predições entre seeds iguais (1,0); a
+  sensibilidade do probe padrão (z-score por coluna, não equívariante) a
+  rotações arbitrárias mede 0,8616/0,8352 e está documentada; fontes/versões:
+  LIT-0033 (10.1162/netn_a_00283) e LIT-0028 (10.1162/netn_a_00287) via
+  L03/L06/M-07, snapshot H08 (`edges.parquet` sha256 `06b9e844…`, 23.188
+  nodes, 5.243.574 arestas), manifesto analítico H09, seeds e probe de
+  B01/B03, scipy 1.18.1 e numpy 2.5.3 do lock R02, sem GPU e sem qualquer
+  dado do alvo; comandos e testes: `python3 tools/spectral_baseline.py
+  --snapshot runs/h08/source --properties
+  data/raw/spikes/manc_neuron_properties.feather --out-dir runs/b07 --report
+  artifacts/reports/B07-ESPECTRAL.json` (134,5 s; pico 1.162,8 MiB; CSR de
+  63.015.644 bytes contra ~4,30 GB densos, razão 0,01465), `.venv/bin/python
+  -m pytest tests/ -q` (200 testes), nova checagem B07 no
+  `validate_research.py` (configs, k/dims, 3 seeds, controles de ambiguidade,
+  contagens do snapshot, esparsidade, 6 predições + 6 embeddings hashados e
+  proibição de densificação; smoke negativo: métrica de rotação corrompida
+  reprova como esperado) e `python3 tools/validate_plan.py`; resultado:
+  estrutura global linear medida com honestidade transdutiva e matriz sempre
+  esparsa; recursos medidos: CPU apenas, sem downloads; decisão/limitação:
+  veredito restrito ao diagnóstico within-source (não comparável zero-shot) e
+  sem alinhamento entre grafos; k = 32 fixo; as seeds só controlam o início do
+  ARPACK; a estimativa inferida de D09 (4–6 GB) não se confirmou porque nada
+  foi densificado; commit 57872f6c08ea28188f15b5a6c608bd68e21a7349.
 
 - [ ] **B08 — Reproduzir um baseline publicado de neuron matching.**
   - Objetivo: comparar com o trabalho mais próximo compatível encontrado em L03.

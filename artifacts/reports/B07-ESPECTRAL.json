@@ -1,0 +1,252 @@
+{
+  "configs": {
+    "ase_simetrizado": {
+      "dims": 32,
+      "k": 32,
+      "modo": "ase_simetrizada"
+    },
+    "svd_dirigido": {
+      "dims": 64,
+      "k": 32,
+      "modo": "svd_dirigida"
+    }
+  },
+  "embeddings": [
+    {
+      "config": "svd_dirigido",
+      "path": "runs/b07/embeddings-svd_dirigido-seed0.npy",
+      "seed_index": 0,
+      "sha256": "512fd19fce51314f094718c5ece8793b074f388e04a2722a5167c847a12cbc82"
+    },
+    {
+      "config": "svd_dirigido",
+      "path": "runs/b07/embeddings-svd_dirigido-seed1.npy",
+      "seed_index": 1,
+      "sha256": "2fe142f8e5a1d03420106c66de51f5b77362842c4e8a22cabdb38cc048552a48"
+    },
+    {
+      "config": "svd_dirigido",
+      "path": "runs/b07/embeddings-svd_dirigido-seed2.npy",
+      "seed_index": 2,
+      "sha256": "e5076bb80c310b152f2056a06937de91683ebcefa68805098c7519921000a158"
+    },
+    {
+      "config": "ase_simetrizado",
+      "path": "runs/b07/embeddings-ase_simetrizado-seed0.npy",
+      "seed_index": 0,
+      "sha256": "f2ae53f7aaf4c94dbeb16123d2884180f536e5235b16b2d99b09f0edb07387ed"
+    },
+    {
+      "config": "ase_simetrizado",
+      "path": "runs/b07/embeddings-ase_simetrizado-seed1.npy",
+      "seed_index": 1,
+      "sha256": "7808290574a810704abd517ecc43d1f043d975d09b4b730b2afbc06f45285fc0"
+    },
+    {
+      "config": "ase_simetrizado",
+      "path": "runs/b07/embeddings-ase_simetrizado-seed2.npy",
+      "seed_index": 2,
+      "sha256": "731cf0f72e5735550516d2495d30a481475f6b6239dbc55ddfd7a5f693992fe7"
+    }
+  ],
+  "hyperparameters": {
+    "alignment": "nenhum alinhamento entre grafos; matching com pares conhecidos é proibido",
+    "ambiguity_control": "sinal neutralizado por convenção canônica (probe exato); rotação demonstrada com probe equívariante (linha L2); o probe padrão de z-score por coluna não é equívariante e não autoriza girar a base",
+    "components": 32,
+    "directed_dims": 64,
+    "numpy_version": "2.5.3",
+    "scipy_version": "1.18.1",
+    "sign_convention": "maior carga em módulo positiva, empate pelo menor índice",
+    "solver": "scipy.sparse.linalg svds/eigsh (ARPACK) com v0 determinístico por seed",
+    "symmetric_dims": 32
+  },
+  "label_meta": {
+    "classes_k_min": 525,
+    "nodes_labeled": 15304,
+    "types_total": 2448
+  },
+  "nodes_used": 14847,
+  "peak_rss_mib": 1162.8,
+  "predictions": [
+    {
+      "config": "svd_dirigido",
+      "path": "runs/b07/predictions-svd_dirigido-seed0.json",
+      "seed_index": 0,
+      "sha256": "acb4ce8c445e23febf1b18fdae87940d362fbc5debe6af1067bf9a06b878a4cc"
+    },
+    {
+      "config": "svd_dirigido",
+      "path": "runs/b07/predictions-svd_dirigido-seed1.json",
+      "seed_index": 1,
+      "sha256": "acb4ce8c445e23febf1b18fdae87940d362fbc5debe6af1067bf9a06b878a4cc"
+    },
+    {
+      "config": "svd_dirigido",
+      "path": "runs/b07/predictions-svd_dirigido-seed2.json",
+      "seed_index": 2,
+      "sha256": "acb4ce8c445e23febf1b18fdae87940d362fbc5debe6af1067bf9a06b878a4cc"
+    },
+    {
+      "config": "ase_simetrizado",
+      "path": "runs/b07/predictions-ase_simetrizado-seed0.json",
+      "seed_index": 0,
+      "sha256": "cb53c1b01549f81ad383c45bc61a4d1897555ef154dbd50599f53e31c3b2efcf"
+    },
+    {
+      "config": "ase_simetrizado",
+      "path": "runs/b07/predictions-ase_simetrizado-seed1.json",
+      "seed_index": 1,
+      "sha256": "cb53c1b01549f81ad383c45bc61a4d1897555ef154dbd50599f53e31c3b2efcf"
+    },
+    {
+      "config": "ase_simetrizado",
+      "path": "runs/b07/predictions-ase_simetrizado-seed2.json",
+      "seed_index": 2,
+      "sha256": "cb53c1b01549f81ad383c45bc61a4d1897555ef154dbd50599f53e31c3b2efcf"
+    }
+  ],
+  "resources": {
+    "build_seconds": 2.089,
+    "device": "cpu",
+    "directed_dense_equivalent_bytes": 4301466752,
+    "directed_matrix_bytes": 63015644,
+    "directed_nnz": 5243574,
+    "directed_sparse_ratio": 0.01465,
+    "duplicate_rows": 0,
+    "edge_rows": 5243574,
+    "nodes": 23188,
+    "ram_cap_gib": 24,
+    "zero_entries": 0
+  },
+  "results": {
+    "ase_simetrizado": {
+      "dims": 32,
+      "k_components": 32,
+      "median_macro_recall@1": 0.310022,
+      "per_seed": [
+        {
+          "dims": 32,
+          "fit_seconds": 8.341,
+          "macro_recall@1": 0.310022,
+          "micro_recall@1": 0.279648,
+          "probe_seconds": 4.063,
+          "seed_index": 0,
+          "spectrum_min": 1444.830922115862,
+          "spectrum_top": 3929.0815880924506
+        },
+        {
+          "dims": 32,
+          "fit_seconds": 17.089,
+          "macro_recall@1": 0.310022,
+          "micro_recall@1": 0.279648,
+          "probe_seconds": 5.382,
+          "seed_index": 1,
+          "spectrum_min": 1444.8309221158638,
+          "spectrum_top": 3929.081588092439
+        },
+        {
+          "dims": 32,
+          "fit_seconds": 12.971,
+          "macro_recall@1": 0.310022,
+          "micro_recall@1": 0.279648,
+          "probe_seconds": 5.092,
+          "seed_index": 2,
+          "spectrum_min": 1444.8309221158613,
+          "spectrum_top": 3929.081588092436
+        }
+      ],
+      "prediction_agreement_seed0": {
+        "0x1": 1.0,
+        "0x2": 1.0
+      },
+      "rotation_agreement_equivariant_probe": 1.0,
+      "rotation_agreement_standard_probe": 0.8351682919156967,
+      "sign_agreement": 1.0,
+      "subspace_cosines": {
+        "0x1": {
+          "mean_cos": 1.0,
+          "min_cos": 0.9999999999999994
+        },
+        "0x2": {
+          "mean_cos": 1.0,
+          "min_cos": 0.9999999999999997
+        },
+        "1x2": {
+          "mean_cos": 1.0,
+          "min_cos": 0.9999999999999998
+        }
+      }
+    },
+    "svd_dirigido": {
+      "dims": 64,
+      "k_components": 32,
+      "median_macro_recall@1": 0.324158,
+      "per_seed": [
+        {
+          "dims": 64,
+          "fit_seconds": 5.142,
+          "macro_recall@1": 0.324158,
+          "micro_recall@1": 0.270211,
+          "probe_seconds": 3.587,
+          "seed_index": 0,
+          "spectrum_min": 2192.656041753814,
+          "spectrum_top": 4638.628940731069
+        },
+        {
+          "dims": 64,
+          "fit_seconds": 6.79,
+          "macro_recall@1": 0.324158,
+          "micro_recall@1": 0.270211,
+          "probe_seconds": 4.466,
+          "seed_index": 1,
+          "spectrum_min": 2192.656041753814,
+          "spectrum_top": 4638.6289407310705
+        },
+        {
+          "dims": 64,
+          "fit_seconds": 7.162,
+          "macro_recall@1": 0.324158,
+          "micro_recall@1": 0.270211,
+          "probe_seconds": 4.745,
+          "seed_index": 2,
+          "spectrum_min": 2192.6560417538144,
+          "spectrum_top": 4638.628940731072
+        }
+      ],
+      "prediction_agreement_seed0": {
+        "0x1": 1.0,
+        "0x2": 1.0
+      },
+      "rotation_agreement_equivariant_probe": 1.0,
+      "rotation_agreement_standard_probe": 0.8615916955017301,
+      "sign_agreement": 1.0,
+      "subspace_cosines": {
+        "0x1": {
+          "mean_cos": 0.9999999999999998,
+          "min_cos": 0.9999999999999993
+        },
+        "0x2": {
+          "mean_cos": 1.0,
+          "min_cos": 0.9999999999999994
+        },
+        "1x2": {
+          "mean_cos": 1.0,
+          "min_cos": 0.9999999999999997
+        }
+      }
+    }
+  },
+  "schema": "b07-spectral",
+  "seconds": 134.461,
+  "seeds": [
+    297979363399525401,
+    1699981902186354598,
+    3729859090210297070
+  ],
+  "split": {
+    "classes": 519,
+    "train": 11668,
+    "val": 3179
+  },
+  "verdict": "restrito ao diagnóstico within-source (não comparável zero-shot)"
+}
