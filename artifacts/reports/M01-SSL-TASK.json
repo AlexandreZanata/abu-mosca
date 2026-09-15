@@ -1,0 +1,99 @@
+{
+  "decoder_smoke": {
+    "gradients_finite": true,
+    "loss_decreased": true,
+    "loss_first": 25.378679,
+    "loss_last": 0.01411,
+    "parameters": 514,
+    "per_node_parameters": 0,
+    "steps": 60
+  },
+  "mask": {
+    "fraction": 0.05,
+    "initial_hash_selected": 262330,
+    "reverse_co_masking": true,
+    "reverse_comasked": 75805,
+    "seed": 1240663212105590556,
+    "self_loops_in_validation": 0,
+    "train_edges": 4905439,
+    "validation_edges": 338135
+  },
+  "negatives": {
+    "class_far": 5,
+    "class_match_rate": 1.0,
+    "class_two": 24995,
+    "degree_abs_log_diff_max": 0.220446,
+    "degree_abs_log_diff_median": 0.0004,
+    "degree_abs_log_diff_p90": 0.00173,
+    "negatives_per_positive": 5,
+    "negatives_total": 25000,
+    "sample_positives": 5000,
+    "shortfall_positives": 0
+  },
+  "resources": {
+    "device": "cpu",
+    "peak_rss_mib": 1904.0,
+    "seconds": 31.949
+  },
+  "schema": "m01-ssl-task",
+  "seeds": {
+    "audit-positive-sample": 2334196847618239455,
+    "decoder-smoke": 7196756226318025175,
+    "degree-baseline": 2671351762858038357,
+    "mask": 1240663212105590556
+  },
+  "separation": {
+    "held_out_absent_from_train_view": true,
+    "leaks": 0,
+    "reverse_absent_from_train_view": true
+  },
+  "shortcut_degree_baseline": {
+    "training": {
+      "features": [
+        "log1p(grau_in/out de u)",
+        "log1p(grau_in/out de v)",
+        "log1p(grau total de u/v)"
+      ],
+      "negative_pairs": 20000,
+      "negative_rule": "mesma faixa de grau total, sem aresta verdadeira (treino)",
+      "positive_pairs": 20000
+    },
+    "validation_matched": {
+      "ap": 0.192378,
+      "auc": 0.554359,
+      "negatives": 25000,
+      "positives": 5000
+    },
+    "validation_unmatched": {
+      "ap": 0.581502,
+      "auc": 0.621656,
+      "negatives": 5000,
+      "positives": 5000
+    }
+  },
+  "source": {
+    "dataset": "MANC",
+    "edges": 5243574,
+    "edges_sha256": "06b9e844b8583ab924307aa4307dc7aab5a4cf93f2f02cd5b2c05f7cea01d1d9",
+    "nodes": 23188,
+    "nodes_sha256": "3b168c5fd6fe71127f6bcb99760e1e80bdd3a14933349c7ae144c43190a00a41",
+    "release": "manc:v1.2.1",
+    "snapshot": "runs/h08/source"
+  },
+  "status": "exploratory-only; sem nenhum dado do alvo",
+  "task": {
+    "decoder": "duas cabeças bilineares z_u^T W z_v + b (existência e peso); sem parâmetros por node ID",
+    "decoder_module": "tools/ssl_decoder.py",
+    "lambda_weight": 1.0,
+    "loss": {
+      "existence": "bce_with_logits",
+      "weight": "mse sobre log1p(peso)"
+    },
+    "negatives_per_positive": 5,
+    "reverse_co_masking": true,
+    "selection_metric": "Macro Recall@1 na fonte (R07 §5); métrica SSL apenas para monitoramento",
+    "ssl_validation_metric": "average precision de existência em arestas retiradas (monitoramento/early stop)",
+    "validation_fraction": 0.05,
+    "weight_transform": "log1p"
+  }
+}

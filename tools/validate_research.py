@@ -581,6 +581,23 @@ GATE_G5_TOKENS = (
     "H07",
 )
 B09_PACKAGE = ROOT / "data" / "manifests" / "baselines-b09.json"
+M01_TOOL = ROOT / "tools" / "ssl_task.py"
+M01_REPORT = ROOT / "artifacts" / "reports" / "M01-SSL-TASK.md"
+M01_METRICS = ROOT / "artifacts" / "reports" / "M01-SSL-TASK.json"
+M01_TOKENS = (
+    "máscara",
+    "holdout",
+    "negativos",
+    "grau",
+    "distância",
+    "decoder",
+    "log1p",
+    "atalho",
+    "reverso",
+    "separação",
+    "exploratório",
+    "sem nenhum dado do alvo",
+)
 H09_TOOL = ROOT / "tools" / "data_quality.py"
 H09_REPORT = ROOT / "artifacts" / "reports" / "DATA-QUALITY.md"
 H09_METRICS = ROOT / "artifacts" / "reports" / "DATA-QUALITY.json"
@@ -2712,6 +2729,38 @@ def check_b09_controls() -> tuple[list[str], int]:
     return failures, len(B09_TOKENS)
 
 
+def check_m01_ssl_task() -> tuple[list[str], int]:
+    label = "M01"
+    failures: list[str] = []
+    for path in (M01_TOOL, M01_REPORT, M01_METRICS, ROOT / "tests" / "test_ssl_task.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    report = M01_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in M01_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+    source = M01_TOOL.read_text(encoding="utf-8")
+    for token in ("male-cns", "data/sealed", "target_labels", "crosswalk"):  # firewall-allow
+        if token in source:
+            failures.append(f"{label}: tarefa SSL não pode referenciar o alvo ('{token}')")
+    spec = importlib.util.spec_from_file_location("ssl_task", ROOT / "tools" / "ssl_task.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    for failure in module.check_report(M01_METRICS):
+        failures.append(f"{label}: {failure}")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(M01_TOKENS)
+
+
 def check_b03_source_baselines() -> tuple[list[str], int]:
     label = "B03"
     failures: list[str] = []
@@ -4510,6 +4559,7 @@ def main() -> int:
     b07_failures, b07_tokens = check_b07_spectral()
     b08_failures, b08_tokens = check_b08_regal()
     b09_failures, b09_tokens = check_b09_controls()
+    m01_failures, m01_tokens = check_m01_ssl_task()
     failures += (
         ref_failures
         + path_failures
@@ -4561,6 +4611,7 @@ def main() -> int:
         + b07_failures
         + b08_failures
         + b09_failures
+        + m01_failures
     )
 
     if failures:
@@ -4758,6 +4809,10 @@ def main() -> int:
     print(
         f"OK: controles nulos B09 com {b09_tokens} tokens, nulos e invariantes "
         f"verificados e pacote de baselines congelado"
+    )
+    print(
+        f"OK: tarefa SSL M01 com {m01_tokens} tokens, máscara/reverso, negativos "
+        f"pareados e atalho de grau auditado"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

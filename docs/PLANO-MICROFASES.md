@@ -2008,7 +2008,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
 
 ### MVP auto-supervisionado
 
-- [ ] **M01 — Fixar masked-edge/weight task e auditar atalhos.**
+- [x] **M01 — Fixar masked-edge/weight task e auditar atalhos.**
   - Objetivo: definir o objetivo SSL primário sem memorizar identidade do nó.
   - Entregas: máscara determinística por seed, negativos degree/distance-matched,
     decoder por pares de embeddings e testes de separação train/validation.
@@ -2018,6 +2018,41 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não mascarar no alvo durante treino confirmatório.
   - Dependências: G5, H06, R07.
   - Orçamento: IA baixa; CPU/GPU smoke.
+  Evidência (2026-09-15, executor; modo exploratório, somente na fonte e sem
+  nenhum dado do alvo): arquivos `tools/ssl_task.py` (máscara determinística por
+  seed com co-mascaramento do reverso, negativos pareados por grau e distância,
+  baseline de grau e validação do registro), `tools/ssl_decoder.py` (decoder
+  bilinear de duas cabeças e loss de existência + peso, sem parâmetros por node
+  ID), `tests/test_ssl_task.py` (13 casos) e `artifacts/reports/M01-SSL-TASK.md`
+  + `.json`; especificação: 5% das arestas retiradas por hash splitmix64 de
+  `u,v` + seed, reverso co-mascarado, negativos 5 por positivo na mesma classe
+  de distância e com menor diferença de grau, loss `BCEWithLogits` +
+  1,0 × `MSE` sobre `log1p(peso)`, métrica SSL de AP/AUC nas arestas retiradas
+  e seleção por Macro Recall@1 (R07 §5); resultados no smoke de CPU: 338.135
+  arestas de validação (262.330 por hash + 75.805 reversos) e 4.905.439 de
+  treino, 0 vazamentos de frente/reverso, 25.000 negativos para 5.000 positivos
+  com 100% de pareamento de classe e diferença de grau mediana 0,0004; baseline
+  de grau na distribuição pareada AUC 0,554359 / AP 0,192378 contra prevalência
+  0,167, e sem pareamento AUC 0,621656 / AP 0,581502; decoder com 514
+  parâmetros (0 por node ID), gradientes finitos e loss 25,38 → 0,014; máscara
+  recomputada a cada execução (nenhum cache lido); fontes/versões: snapshot H08
+  (sha256 das arestas registrado), semântica primária de H06, R07 §4/§5, seeds
+  derivadas do mestre via `tools/seeds.py`, Python 3.12.2 com numpy/scipy/torch
+  do lock R02, sem fonte externa, sem GPU e sem downloads; comandos e testes:
+  `.venv/bin/python tools/ssl_task.py run --positives 5000 --train-pairs 20000
+  --workdir runs/m01 --report artifacts/reports/M01-SSL-TASK.json` (~32 s com
+  cache quente; pico 1,90 GiB) e `check`, `.venv/bin/python -m pytest tests/ -q`
+  (228 testes), nova checagem M01 no `validate_research.py` com smoke negativo
+  (co-mascaramento desligado reprova como esperado), `python3
+  tools/validate_plan.py`, `check_data_hygiene.py` e `firewall.py scan`;
+  resultado: tarefa SSL fixada com separação treino/validação verificada,
+  distribuição de negativos registrada e atalho de grau medido; recursos
+  medidos: CPU apenas; decisão/limitação: auditoria por amostra declarada
+  (5.000 positivos; 20.000 pares de treino do baseline), grafo denso limita as
+  classes de distância a {2, "far"}, resta sinal residual de grau sob
+  pareamento (a GNN deverá superar o baseline de grau na mesma distribuição),
+  fonte única e sem claim de transferência; commit
+  c4ab7de9f812f4e3ce420bd194e37a86acebc264.
 
 - [ ] **M02 — Implementar GraphSAGE indutivo de 1–3M parâmetros.**
   - Objetivo: criar o candidato primário compatível com neighbor sampling.
