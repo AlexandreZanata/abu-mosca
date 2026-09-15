@@ -1,0 +1,156 @@
+{
+  "candidate_status": {
+    "decision_needed_from": "revisor humano (G5, condição 6) se uma variante normalizada for desejada",
+    "summary": "GIN com soma não normalizada é incompatível com o grafo denso como implementado (divergência numérica); R07 §4 prevê relatar a incompatibilidade, não silenciá-la",
+    "usable_in_m05_as_implemented": false
+  },
+  "config": {
+    "activation": "relu",
+    "aggregation": "sum",
+    "edge_weight_mode": "binary (H06)",
+    "epsilon": "aprendível por camada",
+    "features": [
+      "in_degree",
+      "out_degree",
+      "weighted_in",
+      "weighted_out",
+      "reciprocity",
+      "self_loop_weight"
+    ],
+    "max_source_nodes": null,
+    "per_node_parameters": 0
+  },
+  "discarded_runs": [
+    {
+      "device": "cuda",
+      "diverged": true,
+      "edge_weight_mode": "raw",
+      "loss_first": 2.14472799355241e+23,
+      "loss_last": 9.230402696305056e+23,
+      "reason": "divergência numérica por soma não normalizada no grafo denso (magnitude explosiva)",
+      "steps": 10
+    }
+  ],
+  "fixture_smoke": {
+    "deterministic_same_seed": true,
+    "encoder_parameters": 930,
+    "fixture_training": {
+      "lr": 0.001,
+      "note": "taxa do grid; GIN com soma não normalizada precisa de mais passos que a média ponderada para estabilizar no fixture",
+      "steps": 4000
+    },
+    "gradients_finite": true,
+    "graph_edges": 110,
+    "loss_first": 86.21199,
+    "loss_last": 0.11732,
+    "nodes": 40,
+    "overfit_train_auc": 0.994318,
+    "parameters_formula": 930,
+    "reloaded_config_matches": true,
+    "serialization_bytes": 8485,
+    "serialization_max_abs_diff": 0.0,
+    "validation_auc": 0.944215,
+    "validation_edges": 22
+  },
+  "inevitable_differences": [
+    "agregação por soma ponderada, sem normalização por grau (GraphSAGE usa média ponderada): embeddings podem crescer com o grau/prevalência e a escala não é invariante à densidade (no fixture, a loss inicial fica na casa de 10³ e o overfit exige ~4× mais passos que a média)",
+    "MLP interno (Linear→ReLU→Linear) por camada em vez de três projeções lineares (self/in/out), o que muda a forma funcional e exige dims diferentes para parear parâmetros",
+    "epsilon aprendível por camada (mais 1 parâmetro por camada), ausente no GraphSAGE implementado",
+    "direção tratada por duas somas separadas (entrada/saída) com os mesmos pesos, como em M02; GIN original não define direção, então a adaptação é explícita e não uma equivalência",
+    "soma ponderada com peso **bruto** divergiu numericamente no grafo denso (loss inicial ~1e23, run descartada e registrada); pela incompatibilidade documentada em L06/M-10 (soma pressupõe arestas sem peso), a tarefa do GIN usa a variante **binária pré-registrada de H06** como peso de mensagem, mantendo o mesmo objetivo (alvo de existência + log1p do peso bruto) e o mesmo decoder",
+    "com peso binário, mensagens ainda crescem com o número de vizinhos (sem normalização por grau): no fixture o overfit exige ~4× mais passos que a média ponderada do GraphSAGE"
+  ],
+  "pairing": {
+    "all_within_tolerance": true,
+    "rows": [
+      {
+        "both_in_mvp_range": true,
+        "delta_parameters": 1118,
+        "gin": {
+          "dim": 578,
+          "dropout": 0.1,
+          "fanout": [
+            10,
+            10
+          ],
+          "parameters": 1008034
+        },
+        "graphsage": {
+          "dim": 576,
+          "fanout": [
+            10,
+            10
+          ],
+          "parameters": 1009152,
+          "trial": "T01"
+        },
+        "layers": 2,
+        "relative_delta": 0.001108,
+        "within_tolerance": true
+      },
+      {
+        "both_in_mvp_range": true,
+        "delta_parameters": 901,
+        "gin": {
+          "dim": 448,
+          "dropout": 0.1,
+          "fanout": [
+            15,
+            10,
+            10
+          ],
+          "parameters": 1008899
+        },
+        "graphsage": {
+          "dim": 408,
+          "fanout": [
+            15,
+            10
+          ],
+          "parameters": 1009800,
+          "trial": "T03"
+        },
+        "layers": 3,
+        "relative_delta": 0.000892,
+        "within_tolerance": true
+      }
+    ],
+    "rule": "menor dim de GIN cuja contagem de parâmetros minimiza a diferença para o trial do grid emendado com o mesmo número de camadas; fanout e dropout do trial pareado",
+    "tolerance": 0.05
+  },
+  "real_graph_smoke": {
+    "batch": 64,
+    "cuda_available": true,
+    "dense_equivalent_bytes": 8602933504,
+    "device": "cuda",
+    "dim": 448,
+    "diverged": true,
+    "edge_weight_mode": "binary",
+    "edges_per_layer": [
+      1896,
+      34608,
+      286509
+    ],
+    "encoder_parameters": 1008899,
+    "fanout": [
+      15,
+      10,
+      10
+    ],
+    "loss_first": 5099685412864.0,
+    "loss_last": 3821527105536.0,
+    "sampled_nodes": 22879,
+    "seconds": 6.484,
+    "sparse_bytes": 117916048,
+    "sparse_ratio": 0.013706,
+    "steps": 10,
+    "train_edges": 4905439,
+    "vram_peak_mib": 1778.7
+  },
+  "resources": {
+    "peak_rss_mib": 2546.1,
+    "seconds": 51.035
+  },
+  "schema": "m03-gin",
+  "status": "exploratory-only; somente fonte; sem nenhum dado do alvo"
+}

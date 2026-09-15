@@ -2099,7 +2099,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   (293.687 arestas na última camada para 64 alvos) exige calibração em M04;
   permanece o modo exploratório e nenhum claim de transferência; commit 5390161c7cc9c33d38729b8e338f25cb7d087a52.
 
-- [ ] **M03 — Implementar GIN como candidato comparável.**
+- [x] **M03 — Implementar GIN como candidato comparável.**
   - Objetivo: testar agregação alternativa sob o mesmo orçamento e harness.
   - Entregas: encoder GIN, configuração pareada em parâmetros/dimensão, testes e
     relatório de diferenças inevitáveis.
@@ -2108,6 +2108,38 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não favorecer um modelo com budget ou features extras.
   - Dependências: M01, M02.
   - Orçamento: IA baixa; GPU smoke.
+  Evidência (2026-09-15, executor; modo exploratório e somente na fonte, sem
+  nenhum dado do alvo): arquivos `tools/gnn_gin.py` (GIN com MLP interno,
+  epsilon aprendível e soma separada de entrada/saída sob o mesmo sampler,
+  decoder e loss de M01/M02), `tests/test_gin.py` (9 casos),
+  `artifacts/reports/M03-GIN.md` + `.json`, checagem M03 no
+  `validate_research.py` e refactor mínimo em `tools/gnn_graphsage.py`
+  (agregação parametrizável média/soma, suporte a device e remoção de uma
+  duplicata morta), com os 13 testes de M02 preservados; pareamento exato com o
+  grid emendado: 2 camadas GIN dim 578 (1.008.034 parâmetros) contra T01
+  GraphSAGE dim 576 (1.009.152; Δ 0,11%) e 3 camadas GIN dim 448 (1.008.899)
+  contra T03 dim 408 (1.009.800; Δ 0,09%), mesmo fanout/dropout/objective/
+  decoder; fixture com overfit controlado (AUC de treino 0,994318; loss
+  86,211990 → 0,117320), determinismo, serialização com diferença 0,0,
+  gradientes finitos e nenhum parâmetro por node ID; o smoke no grafo real
+  **divergiu** com peso binário (loss 5,1e12) e com peso bruto (2,1e23, run
+  descartada e registrada), então `usable_in_m05_as_implemented = false` e a
+  incompatibilidade de agregação sem normalização fica explicitada conforme a
+  provisão do R07 §4; fontes/versões: R07 §4/§5 (grid emendado), variante
+  binária pré-registrada de H06, features de H05, snapshot H08, torch do lock
+  R02, sem fonte externa; comandos e testes: `.venv/bin/python tools/gnn_gin.py
+  run --workdir runs/m03 --report artifacts/reports/M03-GIN.json` (70,1 s;
+  pico 2,35 GB; smoke binário em CUDA com 13,5 s e pico de 1.778,7 MiB de
+  VRAM) e `check`, `.venv/bin/python -m pytest tests/ -q` (250 testes),
+  `python3 tools/validate_research.py` (M03 coerente, com smoke negativo de
+  pareamento e de status de candidato), `python3 tools/validate_plan.py`,
+  `check_data_hygiene.py` e `firewall.py scan`; resultado: candidato GIN
+  implementado e comparável em orçamento e harness, com incompatibilidade
+  numérica relatada e não silenciada; recursos medidos: CPU e smoke CUDA, sem
+  downloads; decisão/limitação: o GIN **não entra no M05 como implementado**;
+  uma variante normalizada mudaria arquitetura/orçamento e exige decisão humana
+  (G5, condição 6); resultados internos à fonte e exploratórios, sem claim de
+  transferência; commit e5236c7fd365e2a508fa7c211d4c5bdb3a1667f8.
 
 - [ ] **M04 — Fazer smoke e calibrar sampling/recursos.**
   - Objetivo: encontrar batch/fanout seguro antes do treino completo.

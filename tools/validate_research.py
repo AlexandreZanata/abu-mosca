@@ -587,6 +587,23 @@ M01_METRICS = ROOT / "artifacts" / "reports" / "M01-SSL-TASK.json"
 M02_TOOL = ROOT / "tools" / "gnn_graphsage.py"
 M02_REPORT = ROOT / "artifacts" / "reports" / "M02-GRAPHSAGE.md"
 M02_METRICS = ROOT / "artifacts" / "reports" / "M02-GRAPHSAGE.json"
+M03_TOOL = ROOT / "tools" / "gnn_gin.py"
+M03_REPORT = ROOT / "artifacts" / "reports" / "M03-GIN.md"
+M03_METRICS = ROOT / "artifacts" / "reports" / "M03-GIN.json"
+M03_TOKENS = (
+    "gin",
+    "pareamento",
+    "parâmetros",
+    "soma",
+    "normalização",
+    "incompatibilidade",
+    "determinismo",
+    "serialização",
+    "overfit",
+    "divergência",
+    "exploratório",
+    "sem nenhum dado do alvo",
+)
 M02_TOKENS = (
     "graphsage",
     "indutivo",
@@ -2819,6 +2836,42 @@ def check_m02_graphsage() -> tuple[list[str], int]:
     return failures, len(M02_TOKENS)
 
 
+def check_m03_gin() -> tuple[list[str], int]:
+    label = "M03"
+    failures: list[str] = []
+    for path in (M03_TOOL, M03_REPORT, M03_METRICS, ROOT / "tests" / "test_gin.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    report = M03_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in M03_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+    source = M03_TOOL.read_text(encoding="utf-8")
+    for token in ("male-cns", "data/sealed", "target_labels", "crosswalk"):  # firewall-allow
+        if token in source:
+            failures.append(f"{label}: GIN não pode referenciar o alvo ('{token}')")
+    spec = importlib.util.spec_from_file_location("gnn_gin", ROOT / "tools" / "gnn_gin.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    for failure in module.check_report(M03_METRICS):
+        failures.append(f"{label}: {failure}")
+    metrics = json.loads(M03_METRICS.read_text(encoding="utf-8"))
+    status = metrics.get("candidate_status", {})
+    if metrics.get("real_graph_smoke", {}).get("diverged") and status.get("usable_in_m05_as_implemented") is not False:
+        failures.append(f"{label}: divergência no smoke sem status de candidato incompatível")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(M03_TOKENS)
+
+
 def check_b03_source_baselines() -> tuple[list[str], int]:
     label = "B03"
     failures: list[str] = []
@@ -4619,6 +4672,7 @@ def main() -> int:
     b09_failures, b09_tokens = check_b09_controls()
     m01_failures, m01_tokens = check_m01_ssl_task()
     m02_failures, m02_tokens = check_m02_graphsage()
+    m03_failures, m03_tokens = check_m03_gin()
     failures += (
         ref_failures
         + path_failures
@@ -4672,6 +4726,7 @@ def main() -> int:
         + b09_failures
         + m01_failures
         + m02_failures
+        + m03_failures
     )
 
     if failures:
@@ -4877,6 +4932,10 @@ def main() -> int:
     print(
         f"OK: encoder GraphSAGE M02 com {m02_tokens} tokens, verificado "
         f"(grid vigente dentro de 1–3M; sem bloqueio aberto)"
+    )
+    print(
+        f"OK: GIN M03 com {m03_tokens} tokens, pareado em parâmetros e com "
+        f"incompatibilidade de agregação registrada"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

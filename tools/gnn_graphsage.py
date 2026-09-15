@@ -234,35 +234,39 @@ def weighted_mean(hidden, source_index, destination_index, edge_weight, n_rows: 
     return aggregated / denominator.clamp(min=1e-6).unsqueeze(1)
 
 
-def forward_full(encoder, features: np.ndarray, in_edges, out_edges, training: bool = False):
+AGGREGATION_MODES = ("mean", "sum")
+
+
+def aggregate(hidden, source_index, destination_index, edge_weight, n_rows: int, mode: str = "mean"):
+    import torch
+
+    if mode not in AGGREGATION_MODES:
+        raise GraphSageError(f"agregação desconhecida: {mode}")
+    source_index = source_index.to(hidden.device)
+    destination_index = destination_index.to(hidden.device)
+    edge_weight = edge_weight.to(hidden.device)
+    if len(source_index) == 0:
+        return torch.zeros(n_rows, hidden.shape[1], dtype=hidden.dtype, device=hidden.device)
+    messages = hidden[source_index] * edge_weight.unsqueeze(1)
+    aggregated = torch.zeros(n_rows, hidden.shape[1], dtype=hidden.dtype, device=hidden.device).index_add_(0, destination_index, messages)
+    if mode == "sum":
+        return aggregated
+    denominator = torch.zeros(n_rows, dtype=hidden.dtype, device=hidden.device).index_add_(0, destination_index, edge_weight)
+    return aggregated / denominator.clamp(min=1e-6).unsqueeze(1)
+
+
+def forward_full(encoder, features: np.ndarray, in_edges, out_edges, training: bool = False, aggregation: str = "mean", device: str = "cpu"):
     """Passagem completa (sem sampling); edges = (origem visualizada, destino, peso)."""
     import torch
 
     encoder.train(training)
-    hidden = torch.as_tensor(np.asarray(features), dtype=torch.float32)
+    hidden = torch.as_tensor(np.asarray(features), dtype=torch.float32, device=device)
     n_rows = features.shape[0]
     for layer in encoder.layers:
-        in_agg = weighted_mean(hidden, _index_tensor(in_edges[0]), _index_tensor(in_edges[1]), _weight_tensor(in_edges[2]), n_rows)
-        out_agg = weighted_mean(hidden, _index_tensor(out_edges[0]), _index_tensor(out_edges[1]), _weight_tensor(out_edges[2]), n_rows)
+        in_agg = aggregate(hidden, _index_tensor(in_edges[0]), _index_tensor(in_edges[1]), _weight_tensor(in_edges[2]), n_rows, aggregation)
+        out_agg = aggregate(hidden, _index_tensor(out_edges[0]), _index_tensor(out_edges[1]), _weight_tensor(out_edges[2]), n_rows, aggregation)
         hidden = encoder.dropout(layer(hidden, in_agg, out_agg))
     return hidden
-
-
-def forward_sampled(encoder, features: np.ndarray, subgraph: dict, training: bool = False):
-    import torch
-
-    encoder.train(training)
-    hidden = torch.as_tensor(np.asarray(features[subgraph["nodes"]]), dtype=torch.float32)
-    n_rows = hidden.shape[0]
-    n_layers = len(subgraph["layer_edges"])
-    for step, depth in enumerate(range(n_layers - 1, -1, -1)):
-        in_edges, out_edges = subgraph["layer_edges"][depth]
-        in_agg = weighted_mean(hidden, _index_tensor(in_edges[0]), _index_tensor(in_edges[1]), _weight_tensor(in_edges[2]), n_rows)
-        out_agg = weighted_mean(hidden, _index_tensor(out_edges[0]), _index_tensor(out_edges[1]), _weight_tensor(out_edges[2]), n_rows)
-        hidden = encoder.layers[step](hidden, in_agg, out_agg)
-        if training:
-            hidden = encoder.dropout(hidden)
-    return hidden[subgraph["targets_local"]]
 
 
 def save_encoder(path: Path, encoder, config: EncoderConfig) -> dict:
@@ -375,17 +379,17 @@ def sample_subgraph(targets: np.ndarray, in_csr: sp.csr_matrix, out_csr: sp.csr_
     }
 
 
-def forward_sampled(encoder, features: np.ndarray, subgraph: dict, training: bool = False):
+def forward_sampled(encoder, features: np.ndarray, subgraph: dict, training: bool = False, aggregation: str = "mean", device: str = "cpu"):
     import torch
 
     encoder.train(training)
-    hidden = torch.as_tensor(np.asarray(features[subgraph["nodes"]]), dtype=torch.float32)
+    hidden = torch.as_tensor(np.asarray(features[subgraph["nodes"]]), dtype=torch.float32, device=device)
     n_rows = hidden.shape[0]
     in_source, in_destination, in_weight = subgraph["in_edges"]
     out_source, out_destination, out_weight = subgraph["out_edges"]
     for layer in encoder.layers:
-        in_agg = weighted_mean(hidden, _index_tensor(in_source), _index_tensor(in_destination), _weight_tensor(in_weight), n_rows)
-        out_agg = weighted_mean(hidden, _index_tensor(out_source), _index_tensor(out_destination), _weight_tensor(out_weight), n_rows)
+        in_agg = aggregate(hidden, _index_tensor(in_source), _index_tensor(in_destination), _weight_tensor(in_weight), n_rows, aggregation)
+        out_agg = aggregate(hidden, _index_tensor(out_source), _index_tensor(out_destination), _weight_tensor(out_weight), n_rows, aggregation)
         hidden = encoder.dropout(layer(hidden, in_agg, out_agg))
     return hidden[subgraph["targets_local"]]
 
