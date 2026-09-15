@@ -244,7 +244,7 @@ def aggregate(hidden, source_index, destination_index, edge_weight, n_rows: int,
         raise GraphSageError(f"agregação desconhecida: {mode}")
     source_index = source_index.to(hidden.device)
     destination_index = destination_index.to(hidden.device)
-    edge_weight = edge_weight.to(hidden.device)
+    edge_weight = edge_weight.to(device=hidden.device, dtype=hidden.dtype)
     if len(source_index) == 0:
         return torch.zeros(n_rows, hidden.shape[1], dtype=hidden.dtype, device=hidden.device)
     messages = hidden[source_index] * edge_weight.unsqueeze(1)
@@ -379,7 +379,7 @@ def sample_subgraph(targets: np.ndarray, in_csr: sp.csr_matrix, out_csr: sp.csr_
     }
 
 
-def forward_sampled(encoder, features: np.ndarray, subgraph: dict, training: bool = False, aggregation: str = "mean", device: str = "cpu"):
+def forward_sampled(encoder, features: np.ndarray, subgraph: dict, training: bool = False, aggregation: str = "mean", device: str = "cpu", checkpoint: bool = False):
     import torch
 
     encoder.train(training)
@@ -387,10 +387,21 @@ def forward_sampled(encoder, features: np.ndarray, subgraph: dict, training: boo
     n_rows = hidden.shape[0]
     in_source, in_destination, in_weight = subgraph["in_edges"]
     out_source, out_destination, out_weight = subgraph["out_edges"]
+    in_index = (_index_tensor(in_source), _index_tensor(in_destination), _weight_tensor(in_weight))
+    out_index = (_index_tensor(out_source), _index_tensor(out_destination), _weight_tensor(out_weight))
+
+    def layer_step(h, layer):
+        in_agg = aggregate(h, in_index[0], in_index[1], in_index[2], n_rows, aggregation)
+        out_agg = aggregate(h, out_index[0], out_index[1], out_index[2], n_rows, aggregation)
+        return encoder.dropout(layer(h, in_agg, out_agg))
+
     for layer in encoder.layers:
-        in_agg = aggregate(hidden, _index_tensor(in_source), _index_tensor(in_destination), _weight_tensor(in_weight), n_rows, aggregation)
-        out_agg = aggregate(hidden, _index_tensor(out_source), _index_tensor(out_destination), _weight_tensor(out_weight), n_rows, aggregation)
-        hidden = encoder.dropout(layer(hidden, in_agg, out_agg))
+        if checkpoint:
+            from torch.utils.checkpoint import checkpoint as torch_checkpoint
+
+            hidden = torch_checkpoint(layer_step, hidden, layer, use_reentrant=False)
+        else:
+            hidden = layer_step(hidden, layer)
     return hidden[subgraph["targets_local"]]
 
 

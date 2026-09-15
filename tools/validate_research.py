@@ -590,6 +590,25 @@ M02_METRICS = ROOT / "artifacts" / "reports" / "M02-GRAPHSAGE.json"
 M03_TOOL = ROOT / "tools" / "gnn_gin.py"
 M03_REPORT = ROOT / "artifacts" / "reports" / "M03-GIN.md"
 M03_METRICS = ROOT / "artifacts" / "reports" / "M03-GIN.json"
+M04_TOOL = ROOT / "tools" / "resource_smoke.py"
+M04_REPORT = ROOT / "artifacts" / "reports" / "M04-RECURSOS.md"
+M04_METRICS = ROOT / "artifacts" / "reports" / "M04-RECURSOS.json"
+M04_TOKENS = (
+    "m04",
+    "fanout",
+    "neighbor sampling",
+    "workers",
+    "mixed precision",
+    "checkpoint",
+    "época",
+    "envelope",
+    "vram",
+    "oom",
+    "r07",
+    "exploratório",
+    "sem nenhum dado do alvo",
+    "somente fonte",
+)
 M03_TOKENS = (
     "gin",
     "pareamento",
@@ -2872,6 +2891,65 @@ def check_m03_gin() -> tuple[list[str], int]:
     return failures, len(M03_TOKENS)
 
 
+def check_m04_resource_smoke() -> tuple[list[str], int]:
+    label = "M04"
+    failures: list[str] = []
+    for path in (M04_TOOL, M04_REPORT, M04_METRICS, ROOT / "tests" / "test_resource_smoke.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    report = M04_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in M04_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+    source = M04_TOOL.read_text(encoding="utf-8")
+    for token in ("male-cns", "data/sealed", "target_labels", "crosswalk"):  # firewall-allow
+        if token in source:
+            failures.append(f"{label}: smoke não pode referenciar o alvo ('{token}')")
+    spec = importlib.util.spec_from_file_location("resource_smoke", M04_TOOL)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    for failure in module.check_report(M04_METRICS):
+        failures.append(f"{label}: {failure}")
+    protocol = (ROOT / "preregistration" / "PROTOCOL.md").read_text(encoding="utf-8")
+    parsed: dict[str, tuple] = {}
+    for line in protocol.splitlines():
+        match = re.match(r"\| (T\d\d) \| (\d+) \| (\d+) \| ([\d,]+) \| ", line)
+        if match:
+            name, dim, layers, fanout = match.groups()
+            parsed[name] = (int(dim), int(layers), tuple(int(value) for value in fanout.split(",")))
+    if len(parsed) != 12:
+        failures.append(f"{label}: tabela do R07 §5 não encontrada ou incompleta")
+    for name, dim, layers, fanout, batch in module.PROTOCOL_TRIALS:
+        expected = parsed.get(name)
+        if expected is None:
+            failures.append(f"{label}: trial '{name}' ausente do PROTOCOL.md §5")
+            continue
+        table_dim, table_layers, table_fanout = expected
+        if (table_dim, table_layers) != (dim, layers) or tuple(module.gg.pad_fanout(layers, table_fanout)) != tuple(fanout):
+            failures.append(f"{label}: trial '{name}' divergente do PROTOCOL.md §5")
+        if batch not in (512, 1024):
+            failures.append(f"{label}: batch inesperado no trial '{name}'")
+    metrics = json.loads(M04_METRICS.read_text(encoding="utf-8"))
+    if not metrics.get("envelope", {}).get("all_within_cap"):
+        failures.append(f"{label}: envelope dos trials do R07 acima do teto")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    m04_line = next((line for line in plan_lines if "**M04 —" in line), None)
+    if m04_line is None:
+        failures.append(f"{label}: item M04 não encontrado no plano")
+    elif m04_line.startswith("- [ ]"):
+        failures.append(f"{label}: M04 deveria estar concluído sem bloqueio aberto")
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(M04_TOKENS)
+
+
 def check_b03_source_baselines() -> tuple[list[str], int]:
     label = "B03"
     failures: list[str] = []
@@ -4673,6 +4751,7 @@ def main() -> int:
     m01_failures, m01_tokens = check_m01_ssl_task()
     m02_failures, m02_tokens = check_m02_graphsage()
     m03_failures, m03_tokens = check_m03_gin()
+    m04_failures, m04_tokens = check_m04_resource_smoke()
     failures += (
         ref_failures
         + path_failures
@@ -4727,6 +4806,7 @@ def main() -> int:
         + m01_failures
         + m02_failures
         + m03_failures
+        + m04_failures
     )
 
     if failures:
@@ -4932,6 +5012,10 @@ def main() -> int:
     print(
         f"OK: encoder GraphSAGE M02 com {m02_tokens} tokens, verificado "
         f"(grid vigente dentro de 1–3M; sem bloqueio aberto)"
+    )
+    print(
+        f"OK: calibração de recursos M04 com {m04_tokens} tokens, envelope dos 12 "
+        f"trials abaixo do teto de 6,5 GB com margem e reproducibilidade de workers"
     )
     print(
         f"OK: GIN M03 com {m03_tokens} tokens, pareado em parâmetros e com "

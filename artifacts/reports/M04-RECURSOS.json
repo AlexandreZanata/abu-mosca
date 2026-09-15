@@ -1,0 +1,1237 @@
+{
+  "checkpoint_equivalence": {
+    "applicable": true,
+    "base_config": "mvp576_2l_f10_b512",
+    "dropout": 0.0,
+    "losses": {
+      "checkpoint": 71.232814,
+      "plain": 71.232813
+    },
+    "relative_difference": 0.0,
+    "within_tolerance": true
+  },
+  "choice": {
+    "batch": 512,
+    "checkpoint": false,
+    "chosen": "mvp576_2l_f10_b512",
+    "dim": 576,
+    "fanout": [
+      10,
+      10
+    ],
+    "layers": 2,
+    "peak_reserved_mib": 1582.0,
+    "peak_vram_mib": 772.5,
+    "rule": "entre as configurações do MVP sem OOM e com margem >= 25% sob o teto de 6,5 GB tanto no pico alocado quanto no reservado pelo allocator, escolhe a de maior margem mínima; desempate por menor tempo/passo (critério apenas de recursos, nunca de métrica)",
+    "vram_margin": 0.8839,
+    "vram_margin_reserved": 0.7623
+  },
+  "cuda_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "declared": {
+    "checkpoint_tolerance": 0.0001,
+    "combination_order": [
+      [
+        "fp32",
+        false
+      ],
+      [
+        "fp32",
+        true
+      ],
+      [
+        "amp",
+        false
+      ],
+      [
+        "amp",
+        true
+      ]
+    ],
+    "epoch_probe_steps": 10,
+    "epoch_tolerance": 0.25,
+    "grid_predeclared": [
+      "s64_2l_f10_b512",
+      "s64_2l_f15_b512",
+      "s64_2l_f10_b1024",
+      "s128_2l_f10_b512",
+      "s128_2l_f15_b1024",
+      "s128_3l_f15_b512",
+      "mvp576_2l_f10_b512",
+      "mvp408_3l_f1510_b512",
+      "mvp576_2l_f1510_b1024",
+      "mvp408_3l_f1510_b1024",
+      "mvp408_3l_f1510_b1024_ckpt",
+      "mvp576_2l_f10_b512_amp",
+      "mvp408_3l_f1510_b512_amp",
+      "mvp576_2l_f1510_b1024_amp",
+      "mvp408_3l_f1510_b1024_amp",
+      "mvp408_3l_f1510_b1024_ckpt_amp"
+    ],
+    "no_target_selection": "o critério de escolha usa apenas VRAM/tempo; nenhuma métrica do alvo existe ou foi aberta",
+    "precision_tolerance": 0.01,
+    "protocol_trials": [
+      [
+        "T01",
+        576,
+        2,
+        [
+          10,
+          10
+        ],
+        512
+      ],
+      [
+        "T02",
+        576,
+        2,
+        [
+          10,
+          10
+        ],
+        512
+      ],
+      [
+        "T03",
+        408,
+        3,
+        [
+          15,
+          10,
+          10
+        ],
+        1024
+      ],
+      [
+        "T04",
+        408,
+        3,
+        [
+          15,
+          10,
+          10
+        ],
+        1024
+      ],
+      [
+        "T05",
+        576,
+        2,
+        [
+          10,
+          10
+        ],
+        1024
+      ],
+      [
+        "T06",
+        576,
+        2,
+        [
+          10,
+          10
+        ],
+        512
+      ],
+      [
+        "T07",
+        408,
+        3,
+        [
+          15,
+          10,
+          10
+        ],
+        512
+      ],
+      [
+        "T08",
+        408,
+        3,
+        [
+          15,
+          10,
+          10
+        ],
+        1024
+      ],
+      [
+        "T09",
+        576,
+        2,
+        [
+          15,
+          10
+        ],
+        1024
+      ],
+      [
+        "T10",
+        408,
+        3,
+        [
+          10,
+          10,
+          10
+        ],
+        512
+      ],
+      [
+        "T11",
+        576,
+        2,
+        [
+          15,
+          10
+        ],
+        512
+      ],
+      [
+        "T12",
+        408,
+        3,
+        [
+          10,
+          10,
+          10
+        ],
+        1024
+      ]
+    ],
+    "short_steps": 8
+  },
+  "device": "cuda",
+  "envelope": {
+    "all_within_cap": true,
+    "precisions": [
+      "fp32"
+    ],
+    "precisions_with_checkpoint": [
+      "fp32+checkpoint"
+    ],
+    "rule": "cada trial congelado do R07 é limitado por dominância (mesmo dim/camadas, fanout e batch maiores ou iguais) pelo pico medido; a precisão/checkpoint vem da primeira combinação viável na ordem declarada (fp32, fp32+checkpoint, amp, amp+checkpoint), sempre com margem >= 25% sob o teto de 6,5 GB no pico alocado e no reservado",
+    "trials": [
+      {
+        "batch": 512,
+        "bound_margin_min": 0.7623,
+        "bound_peak_reserved_mib": 1582.0,
+        "bound_peak_vram_mib": 772.5,
+        "bound_row": "mvp576_2l_f10_b512",
+        "bound_vram_margin": 0.8839,
+        "bound_vram_margin_reserved": 0.7623,
+        "dim": 576,
+        "fanout": [
+          10,
+          10
+        ],
+        "layers": 2,
+        "recommended_checkpoint": false,
+        "recommended_precision": "fp32",
+        "trial": "T01",
+        "within_cap": true
+      },
+      {
+        "batch": 512,
+        "bound_margin_min": 0.7623,
+        "bound_peak_reserved_mib": 1582.0,
+        "bound_peak_vram_mib": 772.5,
+        "bound_row": "mvp576_2l_f10_b512",
+        "bound_vram_margin": 0.8839,
+        "bound_vram_margin_reserved": 0.7623,
+        "dim": 576,
+        "fanout": [
+          10,
+          10
+        ],
+        "layers": 2,
+        "recommended_checkpoint": false,
+        "recommended_precision": "fp32",
+        "trial": "T02",
+        "within_cap": true
+      },
+      {
+        "batch": 1024,
+        "bound_margin_min": 0.5328,
+        "bound_peak_reserved_mib": 3110.0,
+        "bound_peak_vram_mib": 1977.7,
+        "bound_row": "mvp408_3l_f1510_b1024_ckpt",
+        "bound_vram_margin": 0.7029,
+        "bound_vram_margin_reserved": 0.5328,
+        "dim": 408,
+        "fanout": [
+          15,
+          10,
+          10
+        ],
+        "layers": 3,
+        "recommended_checkpoint": true,
+        "recommended_precision": "fp32",
+        "trial": "T03",
+        "within_cap": true
+      },
+      {
+        "batch": 1024,
+        "bound_margin_min": 0.5328,
+        "bound_peak_reserved_mib": 3110.0,
+        "bound_peak_vram_mib": 1977.7,
+        "bound_row": "mvp408_3l_f1510_b1024_ckpt",
+        "bound_vram_margin": 0.7029,
+        "bound_vram_margin_reserved": 0.5328,
+        "dim": 408,
+        "fanout": [
+          15,
+          10,
+          10
+        ],
+        "layers": 3,
+        "recommended_checkpoint": true,
+        "recommended_precision": "fp32",
+        "trial": "T04",
+        "within_cap": true
+      },
+      {
+        "batch": 1024,
+        "bound_margin_min": 0.7581,
+        "bound_peak_reserved_mib": 1610.0,
+        "bound_peak_vram_mib": 1321.8,
+        "bound_row": "mvp576_2l_f1510_b1024",
+        "bound_vram_margin": 0.8014,
+        "bound_vram_margin_reserved": 0.7581,
+        "dim": 576,
+        "fanout": [
+          10,
+          10
+        ],
+        "layers": 2,
+        "recommended_checkpoint": false,
+        "recommended_precision": "fp32",
+        "trial": "T05",
+        "within_cap": true
+      },
+      {
+        "batch": 512,
+        "bound_margin_min": 0.7623,
+        "bound_peak_reserved_mib": 1582.0,
+        "bound_peak_vram_mib": 772.5,
+        "bound_row": "mvp576_2l_f10_b512",
+        "bound_vram_margin": 0.8839,
+        "bound_vram_margin_reserved": 0.7623,
+        "dim": 576,
+        "fanout": [
+          10,
+          10
+        ],
+        "layers": 2,
+        "recommended_checkpoint": false,
+        "recommended_precision": "fp32",
+        "trial": "T06",
+        "within_cap": true
+      },
+      {
+        "batch": 512,
+        "bound_margin_min": 0.5328,
+        "bound_peak_reserved_mib": 3110.0,
+        "bound_peak_vram_mib": 1977.7,
+        "bound_row": "mvp408_3l_f1510_b1024_ckpt",
+        "bound_vram_margin": 0.7029,
+        "bound_vram_margin_reserved": 0.5328,
+        "dim": 408,
+        "fanout": [
+          15,
+          10,
+          10
+        ],
+        "layers": 3,
+        "recommended_checkpoint": true,
+        "recommended_precision": "fp32",
+        "trial": "T07",
+        "within_cap": true
+      },
+      {
+        "batch": 1024,
+        "bound_margin_min": 0.5328,
+        "bound_peak_reserved_mib": 3110.0,
+        "bound_peak_vram_mib": 1977.7,
+        "bound_row": "mvp408_3l_f1510_b1024_ckpt",
+        "bound_vram_margin": 0.7029,
+        "bound_vram_margin_reserved": 0.5328,
+        "dim": 408,
+        "fanout": [
+          15,
+          10,
+          10
+        ],
+        "layers": 3,
+        "recommended_checkpoint": true,
+        "recommended_precision": "fp32",
+        "trial": "T08",
+        "within_cap": true
+      },
+      {
+        "batch": 1024,
+        "bound_margin_min": 0.7581,
+        "bound_peak_reserved_mib": 1610.0,
+        "bound_peak_vram_mib": 1321.8,
+        "bound_row": "mvp576_2l_f1510_b1024",
+        "bound_vram_margin": 0.8014,
+        "bound_vram_margin_reserved": 0.7581,
+        "dim": 576,
+        "fanout": [
+          15,
+          10
+        ],
+        "layers": 2,
+        "recommended_checkpoint": false,
+        "recommended_precision": "fp32",
+        "trial": "T09",
+        "within_cap": true
+      },
+      {
+        "batch": 512,
+        "bound_margin_min": 0.5328,
+        "bound_peak_reserved_mib": 3110.0,
+        "bound_peak_vram_mib": 1977.7,
+        "bound_row": "mvp408_3l_f1510_b1024_ckpt",
+        "bound_vram_margin": 0.7029,
+        "bound_vram_margin_reserved": 0.5328,
+        "dim": 408,
+        "fanout": [
+          10,
+          10,
+          10
+        ],
+        "layers": 3,
+        "recommended_checkpoint": true,
+        "recommended_precision": "fp32",
+        "trial": "T10",
+        "within_cap": true
+      },
+      {
+        "batch": 512,
+        "bound_margin_min": 0.7581,
+        "bound_peak_reserved_mib": 1610.0,
+        "bound_peak_vram_mib": 1321.8,
+        "bound_row": "mvp576_2l_f1510_b1024",
+        "bound_vram_margin": 0.8014,
+        "bound_vram_margin_reserved": 0.7581,
+        "dim": 576,
+        "fanout": [
+          15,
+          10
+        ],
+        "layers": 2,
+        "recommended_checkpoint": false,
+        "recommended_precision": "fp32",
+        "trial": "T11",
+        "within_cap": true
+      },
+      {
+        "batch": 1024,
+        "bound_margin_min": 0.5328,
+        "bound_peak_reserved_mib": 3110.0,
+        "bound_peak_vram_mib": 1977.7,
+        "bound_row": "mvp408_3l_f1510_b1024_ckpt",
+        "bound_vram_margin": 0.7029,
+        "bound_vram_margin_reserved": 0.5328,
+        "dim": 408,
+        "fanout": [
+          10,
+          10,
+          10
+        ],
+        "layers": 3,
+        "recommended_checkpoint": true,
+        "recommended_precision": "fp32",
+        "trial": "T12",
+        "within_cap": true
+      }
+    ]
+  },
+  "epoch_projection": {
+    "batch": 512,
+    "checkpoint": false,
+    "compute_seconds_mean": 0.076252,
+    "definition": "epoch = uma passagem por todos os nós da fonte como alvos (ceil(n_nodes/batch) passos)",
+    "epoch_block_seconds_mean": 0.34524,
+    "estimator": "mediana do tempo/passo nos primeiros probe_steps da própria época (bloco curto declarado)",
+    "free_after_mib": 6083.8,
+    "free_before_mib": 7625.8,
+    "measured_epoch_seconds": 15.89,
+    "n_nodes": 23188,
+    "name": "mvp576_2l_f10_b512",
+    "oom": false,
+    "peak_reserved_mib": 1582.0,
+    "peak_vram_mib": 777.2,
+    "precision": "fp32",
+    "probe_block_seconds_mean": 0.346138,
+    "probe_steps": 10,
+    "projected_epoch_seconds": 15.977,
+    "relative_error": 0.0054,
+    "sample_seconds_mean": 0.269183,
+    "seconds_per_step_epoch_mean": 0.345435,
+    "seconds_per_step_probe": 0.347315,
+    "step_seconds": [
+      0.3438,
+      0.3487,
+      0.3549,
+      0.3472,
+      0.3704,
+      0.3528,
+      0.3475,
+      0.3356,
+      0.3269,
+      0.3336,
+      0.3379,
+      0.3262,
+      0.342,
+      0.3553,
+      0.3453,
+      0.3467,
+      0.3546,
+      0.3539,
+      0.3288,
+      0.3309,
+      0.334,
+      0.3754,
+      0.3219,
+      0.3421,
+      0.3415,
+      0.3516,
+      0.3669,
+      0.3596,
+      0.3356,
+      0.3189,
+      0.3199,
+      0.3623,
+      0.3531,
+      0.3411,
+      0.3605,
+      0.3422,
+      0.3464,
+      0.3513,
+      0.3549,
+      0.3386,
+      0.3479,
+      0.3665,
+      0.3472,
+      0.3454,
+      0.3506,
+      0.3315
+    ],
+    "steps_per_epoch": 46,
+    "vram_margin": 0.8832,
+    "vram_margin_reserved": 0.7623,
+    "within_tolerance": true
+  },
+  "grid": [
+    {
+      "batch": 512,
+      "checkpoint": false,
+      "compute_seconds_mean": 0.008376,
+      "dim": 64,
+      "fanout": [
+        10,
+        10
+      ],
+      "free_after_mib": 7543.8,
+      "free_before_mib": 7701.8,
+      "group": "sampling",
+      "layers": 2,
+      "loss_first": 7.253985404968262,
+      "loss_last": 1.734971284866333,
+      "name": "s64_2l_f10_b512",
+      "oom": false,
+      "peak_reserved_mib": 128.0,
+      "peak_rss_mib": 2230.5,
+      "peak_vram_mib": 104.3,
+      "precision": "fp32",
+      "sample_seconds_mean": 0.293101,
+      "seconds_per_step_mean": 0.301477,
+      "skipped_steps": 0,
+      "step_seconds": [
+        0.3016,
+        0.3046,
+        0.3097,
+        0.2903,
+        0.2952,
+        0.321,
+        0.3151,
+        0.2742
+      ],
+      "steps": 8,
+      "steps_per_second": 3.317,
+      "total_seconds": 2.411817,
+      "variant_of": null,
+      "vram_margin": 0.9843,
+      "vram_margin_reserved": 0.9808
+    },
+    {
+      "batch": 512,
+      "checkpoint": false,
+      "compute_seconds_mean": 0.010729,
+      "dim": 64,
+      "fanout": [
+        15,
+        10
+      ],
+      "free_after_mib": 7521.8,
+      "free_before_mib": 7631.8,
+      "group": "sampling",
+      "layers": 2,
+      "loss_first": 4.772552490234375,
+      "loss_last": 2.301629066467285,
+      "name": "s64_2l_f15_b512",
+      "oom": false,
+      "peak_reserved_mib": 150.0,
+      "peak_rss_mib": 2235.4,
+      "peak_vram_mib": 125.6,
+      "precision": "fp32",
+      "sample_seconds_mean": 0.361782,
+      "seconds_per_step_mean": 0.372511,
+      "skipped_steps": 0,
+      "step_seconds": [
+        0.3396,
+        0.3689,
+        0.3952,
+        0.3865,
+        0.3828,
+        0.3743,
+        0.3654,
+        0.3674
+      ],
+      "steps": 8,
+      "steps_per_second": 2.6845,
+      "total_seconds": 2.980088,
+      "variant_of": null,
+      "vram_margin": 0.9811,
+      "vram_margin_reserved": 0.9775
+    },
+    {
+      "batch": 1024,
+      "checkpoint": false,
+      "compute_seconds_mean": 0.012461,
+      "dim": 64,
+      "fanout": [
+        10,
+        10
+      ],
+      "free_after_mib": 7503.8,
+      "free_before_mib": 7631.8,
+      "group": "sampling",
+      "layers": 2,
+      "loss_first": 5.666204929351807,
+      "loss_last": 2.555616617202759,
+      "name": "s64_2l_f10_b1024",
+      "oom": false,
+      "peak_reserved_mib": 168.0,
+      "peak_rss_mib": 2249.6,
+      "peak_vram_mib": 144.6,
+      "precision": "fp32",
+      "sample_seconds_mean": 0.472312,
+      "seconds_per_step_mean": 0.484773,
+      "skipped_steps": 0,
+      "step_seconds": [
+        0.4816,
+        0.4723,
+        0.464,
+        0.5937,
+        0.4735,
+        0.4825,
+        0.4646,
+        0.446
+      ],
+      "steps": 8,
+      "steps_per_second": 2.0628,
+      "total_seconds": 3.878181,
+      "variant_of": null,
+      "vram_margin": 0.9783,
+      "vram_margin_reserved": 0.9748
+    },
+    {
+      "batch": 512,
+      "checkpoint": false,
+      "compute_seconds_mean": 0.022027,
+      "dim": 128,
+      "fanout": [
+        10,
+        10
+      ],
+      "free_after_mib": 7425.8,
+      "free_before_mib": 7631.8,
+      "group": "sampling",
+      "layers": 2,
+      "loss_first": 5.825892448425293,
+      "loss_last": 3.1283583641052246,
+      "name": "s128_2l_f10_b512",
+      "oom": false,
+      "peak_reserved_mib": 246.0,
+      "peak_rss_mib": 2249.6,
+      "peak_vram_mib": 184.8,
+      "precision": "fp32",
+      "sample_seconds_mean": 0.327323,
+      "seconds_per_step_mean": 0.349349,
+      "skipped_steps": 0,
+      "step_seconds": [
+        0.2714,
+        0.2973,
+        0.3926,
+        0.3798,
+        0.313,
+        0.3867,
+        0.3856,
+        0.3685
+      ],
+      "steps": 8,
+      "steps_per_second": 2.8625,
+      "total_seconds": 2.794796,
+      "variant_of": null,
+      "vram_margin": 0.9722,
+      "vram_margin_reserved": 0.963
+    },
+    {
+      "batch": 1024,
+      "checkpoint": false,
+      "compute_seconds_mean": 0.020363,
+      "dim": 128,
+      "fanout": [
+        15,
+        10
+      ],
+      "free_after_mib": 7035.8,
+      "free_before_mib": 7631.8,
+      "group": "sampling",
+      "layers": 2,
+      "loss_first": 7.276015281677246,
+      "loss_last": 3.9556703567504883,
+      "name": "s128_2l_f15_b1024",
+      "oom": false,
+      "peak_reserved_mib": 636.0,
+      "peak_rss_mib": 2250.7,
+      "peak_vram_mib": 309.5,
+      "precision": "fp32",
+      "sample_seconds_mean": 0.544717,
+      "seconds_per_step_mean": 0.565081,
+      "skipped_steps": 0,
+      "step_seconds": [
+        0.5732,
+        0.5423,
+        0.5577,
+        0.5681,
+        0.5728,
+        0.537,
+        0.5582,
+        0.6114
+      ],
+      "steps": 8,
+      "steps_per_second": 1.7697,
+      "total_seconds": 4.520644,
+      "variant_of": null,
+      "vram_margin": 0.9535,
+      "vram_margin_reserved": 0.9044
+    },
+    {
+      "batch": 512,
+      "checkpoint": false,
+      "compute_seconds_mean": 0.051265,
+      "dim": 128,
+      "fanout": [
+        15,
+        10,
+        10
+      ],
+      "free_after_mib": 6633.8,
+      "free_before_mib": 7631.8,
+      "group": "sampling",
+      "layers": 3,
+      "loss_first": 6.093440055847168,
+      "loss_last": 1.0519776344299316,
+      "name": "s128_3l_f15_b512",
+      "oom": false,
+      "peak_reserved_mib": 1038.0,
+      "peak_rss_mib": 2275.9,
+      "peak_vram_mib": 929.9,
+      "precision": "fp32",
+      "sample_seconds_mean": 1.137626,
+      "seconds_per_step_mean": 1.188891,
+      "skipped_steps": 0,
+      "step_seconds": [
+        1.0978,
+        1.1088,
+        1.1029,
+        1.4266,
+        1.3228,
+        1.1696,
+        1.1415,
+        1.1412
+      ],
+      "steps": 8,
+      "steps_per_second": 0.8411,
+      "total_seconds": 9.511128,
+      "variant_of": null,
+      "vram_margin": 0.8603,
+      "vram_margin_reserved": 0.8441
+    },
+    {
+      "batch": 512,
+      "checkpoint": false,
+      "compute_seconds_mean": 0.076025,
+      "dim": 576,
+      "fanout": [
+        10,
+        10
+      ],
+      "free_after_mib": 6089.8,
+      "free_before_mib": 7631.8,
+      "group": "mvp",
+      "layers": 2,
+      "loss_first": 468.5417175292969,
+      "loss_last": 53.5711784362793,
+      "name": "mvp576_2l_f10_b512",
+      "oom": false,
+      "peak_reserved_mib": 1582.0,
+      "peak_rss_mib": 2275.9,
+      "peak_vram_mib": 772.5,
+      "precision": "fp32",
+      "sample_seconds_mean": 0.282314,
+      "seconds_per_step_mean": 0.358339,
+      "skipped_steps": 0,
+      "step_seconds": [
+        0.3845,
+        0.3534,
+        0.3588,
+        0.3617,
+        0.3507,
+        0.3502,
+        0.3546,
+        0.3527
+      ],
+      "steps": 8,
+      "steps_per_second": 2.7907,
+      "total_seconds": 2.86671,
+      "variant_of": null,
+      "vram_margin": 0.8839,
+      "vram_margin_reserved": 0.7623
+    },
+    {
+      "batch": 512,
+      "checkpoint": false,
+      "compute_seconds_mean": 0.185989,
+      "dim": 408,
+      "fanout": [
+        15,
+        10,
+        10
+      ],
+      "free_after_mib": 2469.8,
+      "free_before_mib": 7631.8,
+      "group": "mvp",
+      "layers": 3,
+      "loss_first": 30.322505950927734,
+      "loss_last": 6.7589826583862305,
+      "name": "mvp408_3l_f1510_b512",
+      "oom": false,
+      "peak_reserved_mib": 5202.0,
+      "peak_rss_mib": 2276.3,
+      "peak_vram_mib": 2874.6,
+      "precision": "fp32",
+      "sample_seconds_mean": 1.112744,
+      "seconds_per_step_mean": 1.298733,
+      "skipped_steps": 0,
+      "step_seconds": [
+        1.2255,
+        1.2312,
+        1.3171,
+        1.2638,
+        1.3045,
+        1.3396,
+        1.2892,
+        1.419
+      ],
+      "steps": 8,
+      "steps_per_second": 0.77,
+      "total_seconds": 10.389867,
+      "variant_of": null,
+      "vram_margin": 0.5681,
+      "vram_margin_reserved": 0.2184
+    },
+    {
+      "batch": 1024,
+      "checkpoint": false,
+      "compute_seconds_mean": 0.09876,
+      "dim": 576,
+      "fanout": [
+        15,
+        10
+      ],
+      "free_after_mib": 6061.8,
+      "free_before_mib": 7631.8,
+      "group": "mvp",
+      "layers": 2,
+      "loss_first": 243.61312866210938,
+      "loss_last": 232.0387420654297,
+      "name": "mvp576_2l_f1510_b1024",
+      "oom": false,
+      "peak_reserved_mib": 1610.0,
+      "peak_rss_mib": 2276.3,
+      "peak_vram_mib": 1321.8,
+      "precision": "fp32",
+      "sample_seconds_mean": 0.545573,
+      "seconds_per_step_mean": 0.644333,
+      "skipped_steps": 0,
+      "step_seconds": [
+        0.6271,
+        0.6601,
+        0.6728,
+        0.6259,
+        0.6471,
+        0.6784,
+        0.6301,
+        0.6132
+      ],
+      "steps": 8,
+      "steps_per_second": 1.552,
+      "total_seconds": 5.154663,
+      "variant_of": null,
+      "vram_margin": 0.8014,
+      "vram_margin_reserved": 0.7581
+    },
+    {
+      "batch": 1024,
+      "checkpoint": false,
+      "compute_seconds_mean": 0.203184,
+      "dim": 408,
+      "fanout": [
+        15,
+        10,
+        10
+      ],
+      "free_after_mib": 2233.8,
+      "free_before_mib": 7631.8,
+      "group": "mvp",
+      "layers": 3,
+      "loss_first": 156.96868896484375,
+      "loss_last": 2.9766488075256348,
+      "name": "mvp408_3l_f1510_b1024",
+      "oom": false,
+      "peak_reserved_mib": 5438.0,
+      "peak_rss_mib": 2289.4,
+      "peak_vram_mib": 3284.4,
+      "precision": "fp32",
+      "sample_seconds_mean": 1.260699,
+      "seconds_per_step_mean": 1.463883,
+      "skipped_steps": 0,
+      "step_seconds": [
+        1.4433,
+        1.4607,
+        1.4317,
+        1.4075,
+        1.4403,
+        1.4493,
+        1.4992,
+        1.5792
+      ],
+      "steps": 8,
+      "steps_per_second": 0.6831,
+      "total_seconds": 11.711063,
+      "variant_of": null,
+      "vram_margin": 0.5066,
+      "vram_margin_reserved": 0.183
+    },
+    {
+      "batch": 1024,
+      "checkpoint": true,
+      "compute_seconds_mean": 0.309174,
+      "dim": 408,
+      "fanout": [
+        15,
+        10,
+        10
+      ],
+      "free_after_mib": 4561.8,
+      "free_before_mib": 7631.8,
+      "group": "mvp",
+      "layers": 3,
+      "loss_first": 156.9687042236328,
+      "loss_last": 2.976646900177002,
+      "name": "mvp408_3l_f1510_b1024_ckpt",
+      "oom": false,
+      "peak_reserved_mib": 3110.0,
+      "peak_rss_mib": 2299.0,
+      "peak_vram_mib": 1977.7,
+      "precision": "fp32",
+      "sample_seconds_mean": 1.607578,
+      "seconds_per_step_mean": 1.916752,
+      "skipped_steps": 0,
+      "step_seconds": [
+        1.6831,
+        2.0597,
+        1.9905,
+        2.0935,
+        1.6945,
+        1.8389,
+        2.0192,
+        1.9546
+      ],
+      "steps": 8,
+      "steps_per_second": 0.5217,
+      "total_seconds": 15.334016,
+      "variant_of": null,
+      "vram_margin": 0.7029,
+      "vram_margin_reserved": 0.5328
+    },
+    {
+      "batch": 512,
+      "checkpoint": false,
+      "compute_seconds_mean": 0.035782,
+      "dim": 576,
+      "fanout": [
+        10,
+        10
+      ],
+      "free_after_mib": 6841.8,
+      "free_before_mib": 7631.8,
+      "group": "mvp",
+      "layers": 2,
+      "loss_first": 468.9222106933594,
+      "loss_last": 66.20869445800781,
+      "name": "mvp576_2l_f10_b512_amp",
+      "oom": false,
+      "peak_reserved_mib": 824.0,
+      "peak_rss_mib": 2452.8,
+      "peak_vram_mib": 416.2,
+      "precision": "amp",
+      "sample_seconds_mean": 0.27838,
+      "seconds_per_step_mean": 0.314162,
+      "skipped_steps": 0,
+      "step_seconds": [
+        0.3363,
+        0.3403,
+        0.3204,
+        0.3216,
+        0.3028,
+        0.3055,
+        0.2981,
+        0.2884
+      ],
+      "steps": 8,
+      "steps_per_second": 3.1831,
+      "total_seconds": 2.513295,
+      "variant_of": "mvp576_2l_f10_b512",
+      "vram_margin": 0.9375,
+      "vram_margin_reserved": 0.8762
+    },
+    {
+      "batch": 512,
+      "checkpoint": false,
+      "compute_seconds_mean": 0.092209,
+      "dim": 408,
+      "fanout": [
+        15,
+        10,
+        10
+      ],
+      "free_after_mib": 5279.8,
+      "free_before_mib": 7625.8,
+      "group": "mvp",
+      "layers": 3,
+      "loss_first": 397.028564453125,
+      "loss_last": 1.5857837200164795,
+      "name": "mvp408_3l_f1510_b512_amp",
+      "oom": false,
+      "peak_reserved_mib": 2386.0,
+      "peak_rss_mib": 2498.9,
+      "peak_vram_mib": 1473.8,
+      "precision": "amp",
+      "sample_seconds_mean": 1.013584,
+      "seconds_per_step_mean": 1.105792,
+      "skipped_steps": 0,
+      "step_seconds": [
+        1.114,
+        1.1027,
+        1.0801,
+        1.0926,
+        1.1118,
+        1.1283,
+        1.1015,
+        1.1153
+      ],
+      "steps": 8,
+      "steps_per_second": 0.9043,
+      "total_seconds": 8.84634,
+      "variant_of": "mvp408_3l_f1510_b512",
+      "vram_margin": 0.7786,
+      "vram_margin_reserved": 0.6415
+    },
+    {
+      "batch": 1024,
+      "checkpoint": false,
+      "compute_seconds_mean": 0.041429,
+      "dim": 576,
+      "fanout": [
+        15,
+        10
+      ],
+      "free_after_mib": 6835.8,
+      "free_before_mib": 7625.8,
+      "group": "mvp",
+      "layers": 2,
+      "loss_first": 179.41934204101562,
+      "loss_last": 18.14056396484375,
+      "name": "mvp576_2l_f1510_b1024_amp",
+      "oom": false,
+      "peak_reserved_mib": 830.0,
+      "peak_rss_mib": 2498.9,
+      "peak_vram_mib": 692.4,
+      "precision": "amp",
+      "sample_seconds_mean": 0.531349,
+      "seconds_per_step_mean": 0.572779,
+      "skipped_steps": 0,
+      "step_seconds": [
+        0.601,
+        0.5526,
+        0.5776,
+        0.5614,
+        0.5539,
+        0.5637,
+        0.5798,
+        0.5922
+      ],
+      "steps": 8,
+      "steps_per_second": 1.7459,
+      "total_seconds": 4.582228,
+      "variant_of": "mvp576_2l_f1510_b1024",
+      "vram_margin": 0.896,
+      "vram_margin_reserved": 0.8753
+    },
+    {
+      "batch": 1024,
+      "checkpoint": false,
+      "compute_seconds_mean": 0.111887,
+      "dim": 408,
+      "fanout": [
+        15,
+        10,
+        10
+      ],
+      "free_after_mib": 5497.8,
+      "free_before_mib": 7625.8,
+      "group": "mvp",
+      "layers": 3,
+      "loss_first": 87.3791275024414,
+      "loss_last": 6.043018817901611,
+      "name": "mvp408_3l_f1510_b1024_amp",
+      "oom": false,
+      "peak_reserved_mib": 2168.0,
+      "peak_rss_mib": 2507.9,
+      "peak_vram_mib": 1681.4,
+      "precision": "amp",
+      "sample_seconds_mean": 1.26669,
+      "seconds_per_step_mean": 1.378576,
+      "skipped_steps": 0,
+      "step_seconds": [
+        1.2591,
+        1.326,
+        1.3014,
+        1.5663,
+        1.4416,
+        1.3494,
+        1.3917,
+        1.393
+      ],
+      "steps": 8,
+      "steps_per_second": 0.7254,
+      "total_seconds": 11.028611,
+      "variant_of": "mvp408_3l_f1510_b1024",
+      "vram_margin": 0.7474,
+      "vram_margin_reserved": 0.6743
+    },
+    {
+      "batch": 1024,
+      "checkpoint": true,
+      "compute_seconds_mean": 0.177852,
+      "dim": 408,
+      "fanout": [
+        15,
+        10,
+        10
+      ],
+      "free_after_mib": 6081.8,
+      "free_before_mib": 7625.8,
+      "group": "mvp",
+      "layers": 3,
+      "loss_first": 95.91120910644531,
+      "loss_last": 5.208791732788086,
+      "name": "mvp408_3l_f1510_b1024_ckpt_amp",
+      "oom": false,
+      "peak_reserved_mib": 1584.0,
+      "peak_rss_mib": 2509.7,
+      "peak_vram_mib": 1012.4,
+      "precision": "amp",
+      "sample_seconds_mean": 1.40497,
+      "seconds_per_step_mean": 1.582821,
+      "skipped_steps": 0,
+      "step_seconds": [
+        1.4491,
+        1.467,
+        1.4012,
+        1.536,
+        2.5798,
+        1.4561,
+        1.4028,
+        1.3706
+      ],
+      "steps": 8,
+      "steps_per_second": 0.6318,
+      "total_seconds": 12.66257,
+      "variant_of": "mvp408_3l_f1510_b1024_ckpt",
+      "vram_margin": 0.8479,
+      "vram_margin_reserved": 0.762
+    }
+  ],
+  "margin_min": 0.25,
+  "precision_equivalence": {
+    "applicable": true,
+    "base_config": "mvp576_2l_f10_b512",
+    "dtype": "bfloat16",
+    "losses": {
+      "amp": 70.90729,
+      "fp32": 71.232818
+    },
+    "relative_difference": 0.00457,
+    "within_tolerance": true
+  },
+  "resources": {
+    "peak_rss_mib": 2509.7,
+    "seconds": 177.522
+  },
+  "schema": "m04-resource-smoke",
+  "status": "exploratory-only; somente fonte; sem nenhum dado do alvo",
+  "vram_cap_mib": 6656.0,
+  "worker_reproducibility": {
+    "batch": 512,
+    "cpu_count": 16,
+    "fanout": [
+      10,
+      10
+    ],
+    "hashes_by_worker_count": {
+      "0": [
+        "90f5e586e4852a1d2f38714afd0a9acd118a32ddb580f9495be79e8c322671ba",
+        "fd66a26d1b64cb98c5520fe22b8cbf9321ccf2dc8957777dc5e5eb35e94a6771",
+        "35ef50536a9aad47a9ffea711bb6c1059d01272a53a95dce109db5f1403e62b1",
+        "d66411721bb8928dcb95405047d173ad84ef5d6439155d802302562134c404c8"
+      ],
+      "2": [
+        "90f5e586e4852a1d2f38714afd0a9acd118a32ddb580f9495be79e8c322671ba",
+        "fd66a26d1b64cb98c5520fe22b8cbf9321ccf2dc8957777dc5e5eb35e94a6771",
+        "35ef50536a9aad47a9ffea711bb6c1059d01272a53a95dce109db5f1403e62b1",
+        "d66411721bb8928dcb95405047d173ad84ef5d6439155d802302562134c404c8"
+      ]
+    },
+    "identical": true,
+    "items": 4,
+    "workers": [
+      0,
+      2
+    ]
+  }
+}

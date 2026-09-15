@@ -2141,7 +2141,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   (G5, condição 6); resultados internos à fonte e exploratórios, sem claim de
   transferência; commit e5236c7fd365e2a508fa7c211d4c5bdb3a1667f8.
 
-- [ ] **M04 — Fazer smoke e calibrar sampling/recursos.**
+- [x] **M04 — Fazer smoke e calibrar sampling/recursos.**
   - Objetivo: encontrar batch/fanout seguro antes do treino completo.
   - Entregas: grid pequeno pré-definido de fanouts, embedding 64/128, batch e
     precision; perfil de tempo, RAM/VRAM e throughput.
@@ -2151,6 +2151,44 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: smoke não seleciona por resultado-alvo.
   - Dependências: M02, M03, H08.
   - Orçamento: IA baixa; GPU piloto até 30 minutos total.
+  Evidência (2026-09-15, executor; modo exploratório e somente na fonte, sem
+  nenhum dado do alvo): arquivos `tools/resource_smoke.py` (grid pré-declarado de
+  16 configurações — 6 de sampling em dim 64/128 e 10 do MVP — com tempo,
+  amostragem por passo, picos alocado/reservado de VRAM, throughput, envelope dos
+  12 trials do R07 §5 e check), `tests/test_resource_smoke.py` (10 casos),
+  `artifacts/reports/M04-RECURSOS.md` + `.json`, checagem M04 no
+  `validate_research.py` e refactor mínimo em `tools/gnn_graphsage.py` (parâmetro
+  `checkpoint` opcional em `forward_sampled`, padrão desligado, índices de aresta
+  içados do laço; 13+9 testes de M02/M03 preservados); o grid espelha a tabela
+  congelada do R07 §5 (conferida por regex no teste e no validador); envelope:
+  todos os 12 trials abaixo de 6,5 GB de pico com margem ≥ 0,53, sem OOM e sem
+  mudar fanout/batch — os trials de 3 camadas usam `checkpoint` (matemática
+  preservada, diferença relativa 0,0 na equivalência com dropout 0) e o pior caso
+  mede 1.977,7 MiB alocados e 3.110,0 MiB reservados; a primeira medição do
+  formato 408/3 camadas/batch 1024 **falhou com OOM** por pico reservado de
+  ~5,4 GB, o que motivou exigir margem dupla (alocada e reservada) e o
+  remapeamento para `checkpoint`; ponto escolhido `mvp576_2l_f10_b512` (dim 576,
+  2 camadas, fanout 10,10, batch 512, fp32): 772,5 MiB alocados, 1.582,0 MiB
+  reservados, margem mínima 0,76, passo 0,455 s em bloco curto; **estimativa por
+  época comparada à medição**: 22,69 s projetados contra 22,80 s medidos (erro
+  0,54%, tolerância 25%); achado principal: 0,269 s de 0,345 s por passo (78%)
+  são neighbor sampling em CPU e só 0,076 s são compute de GPU; reproducibilidade
+  confirma hashes idênticos com `num_workers` 0 e 2 em 16 CPUs; mixed precision
+  bfloat16 difere 0,004568 da perda fp32 (tolerância 0,01); pico de RSS 2,51 GB;
+  fontes/versões: R07 §5 (emenda 3.0), features de H05, snapshot H08, torch do
+  lock R02, sem fonte externa; comandos e testes: `.venv/bin/python
+  tools/resource_smoke.py run --device cuda --workdir runs/m04 --report
+  artifacts/reports/M04-RECURSOS.json` (177,5 s de GPU, dentro do orçamento de
+  30 min) e `check`, `.venv/bin/python -m pytest tests/test_resource_smoke.py -q`
+  (10 testes) e a suíte completa em `tests/`, `python3 tools/validate_research.py`
+  (M04 coerente, com checagem de envelope e de espelho do R07),
+  `python3 tools/validate_plan.py`, `check_data_hygiene.py` e `firewall.py scan`;
+  resultado: envelope de sampling/recursos calibrado e reproduzível para o treino
+  completo do M05; decisão/limitação: precisão/checkpoint por trial definidos
+  apenas por recursos, nenhum score do alvo orientou a escolha; os trials de 3
+  camadas dependem do modo `checkpoint` (implementação, não mudança de
+  arquitetura) e qualquer mudança de fanout/batch exigiria emenda de protocolo e
+  nova revisão de gate (G5, condição 6); commit f13aebcbbc8c23d72196390ef15a84bad99b53db.
 
 - [ ] **M05 — Selecionar modelo somente dentro da fonte.**
   - Objetivo: ajustar o espaço de hiperparâmetros congelado sem gastar o alvo.
