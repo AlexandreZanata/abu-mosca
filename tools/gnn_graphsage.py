@@ -33,23 +33,27 @@ MASTER_SEED = 20260914
 SOURCE_SNAPSHOT = ROOT / "runs" / "h08" / "source"
 SCHEMA = "m02-graphsage"
 MVP_RANGE = (1_000_000, 3_000_000)
+GRID_AMENDMENT = (
+    "R07 §5 emendado em 2026-09-15 (changelog 3.0; decisão humana opção (a) da nota de bloqueio da M02): "
+    "dim 576 para trials de 2 camadas e dim 408 para trials de 3 camadas"
+)
 FEATURE_NAMES = tf.FEATURE_NAMES
 AGGREGATOR = "mean"
 ACTIVATION = "relu"
 WEIGHT_MODE = "raw"
 GRID_TRIALS = (
-    ("T01", 64, 2, (10, 10)),
-    ("T02", 64, 2, (10, 10)),
-    ("T03", 64, 3, (15, 10)),
-    ("T04", 64, 3, (15, 10)),
-    ("T05", 128, 2, (10, 10)),
-    ("T06", 128, 2, (10, 10)),
-    ("T07", 128, 3, (15, 10)),
-    ("T08", 128, 3, (15, 10)),
-    ("T09", 64, 2, (15, 10)),
-    ("T10", 64, 3, (10, 10)),
-    ("T11", 128, 2, (15, 10)),
-    ("T12", 128, 3, (10, 10)),
+    ("T01", 576, 2, (10, 10)),
+    ("T02", 576, 2, (10, 10)),
+    ("T03", 408, 3, (15, 10)),
+    ("T04", 408, 3, (15, 10)),
+    ("T05", 576, 2, (10, 10)),
+    ("T06", 576, 2, (10, 10)),
+    ("T07", 408, 3, (15, 10)),
+    ("T08", 408, 3, (15, 10)),
+    ("T09", 576, 2, (15, 10)),
+    ("T10", 408, 3, (10, 10)),
+    ("T11", 576, 2, (15, 10)),
+    ("T12", 408, 3, (10, 10)),
 )
 CAPACITY_DIMS = (384, 408, 512, 576, 768, 1024)
 
@@ -689,6 +693,8 @@ def run(workdir: Path, report_path: Path, seed: int = MASTER_SEED) -> dict:
     workdir.mkdir(parents=True, exist_ok=True)
     grid = grid_parameter_counts()
     grid_values = [row["parameters"] for row in grid]
+    capacity = capacity_table()
+    grid_meets = bool(MVP_RANGE[0] <= min(grid_values) and max(grid_values) <= MVP_RANGE[1])
     report = {
         "schema": SCHEMA,
         "status": "exploratory-only; somente fonte; sem nenhum dado do alvo",
@@ -704,29 +710,43 @@ def run(workdir: Path, report_path: Path, seed: int = MASTER_SEED) -> dict:
         },
         "parameter_budget": {
             "mvp_range": list(MVP_RANGE),
+            "grid_source": GRID_AMENDMENT,
             "grid_min": int(min(grid_values)),
             "grid_max": int(max(grid_values)),
             "grid_rows": grid,
-            "capacity_rows": capacity_table(),
+            "capacity_rows": capacity,
             "smallest_in_range": smallest_dims_for_range(),
             "grid_meets_mvp_range": bool(MVP_RANGE[0] <= min(grid_values) and max(grid_values) <= MVP_RANGE[1]),
-            "meets_mvp_range": bool(any(row["meets_mvp_range"] for row in capacity_table())),
+            "meets_mvp_range": bool(any(row["meets_mvp_range"] for row in capacity)),
         },
         "fixture_smoke": fixture_smoke(seed=seed),
         "real_graph_smoke": real_graph_smoke(snapshot=SOURCE_SNAPSHOT, seed=seed),
         "cuda_probe": cuda_probe(),
-        "blocking_issue": {
-            "present": not bool(MVP_RANGE[0] <= max(grid_values) <= MVP_RANGE[1]),
-            "summary": "o grid congelado do R07 (dim 64/128; 2–3 camadas) produz no máximo "
-            f"{max(grid_values)} parâmetros, abaixo do intervalo de {MVP_RANGE[0]}–{MVP_RANGE[1]} declarado para o MVP",
-            "evidence": {"grid_min": int(min(grid_values)), "grid_max": int(max(grid_values)), "smallest_in_range": smallest_dims_for_range()},
-            "options": [
-                "emendar o grid do pré-registro (changelog + nova revisão do G5, condição 6) para incluir dim ≥ 408 (3 camadas) ou ≥ 576 (2 camadas)",
-                "aceitar encoder abaixo do intervalo declarado e atualizar README/ESCOPO/PROT com o desvio registrado",
-                "outra decisão humana documentada",
-            ],
-            "decision_required_from": "revisor humano do G5 (condição 6)",
-        },
+        "blocking_issue": (
+            {"present": False}
+            if grid_meets
+            else {
+                "present": True,
+                "summary": "o grid vigente do R07 produz no máximo "
+                f"{max(grid_values)} parâmetros, abaixo do intervalo de {MVP_RANGE[0]}–{MVP_RANGE[1]} declarado para o MVP",
+                "evidence": {"grid_min": int(min(grid_values)), "grid_max": int(max(grid_values)), "smallest_in_range": smallest_dims_for_range()},
+                "options": [
+                    "emendar o grid do pré-registro (changelog + nova revisão do G5, condição 6)",
+                    "aceitar encoder abaixo do intervalo e registrar o desvio",
+                    "outra decisão humana documentada",
+                ],
+                "decision_required_from": "revisor humano do G5 (condição 6)",
+            }
+        ),
+        "resolution": (
+            {
+                "summary": f"grid emendado produz {min(grid_values)}–{max(grid_values)} parâmetros, dentro de {MVP_RANGE[0]}–{MVP_RANGE[1]}",
+                "amendment": GRID_AMENDMENT,
+                "decision": "opção (a) da nota de bloqueio da M02 (2026-09-15)",
+            }
+            if grid_meets
+            else None
+        ),
         "resources": {"seconds": round(time.perf_counter() - started, 3), "peak_rss_mib": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1)},
     }
     report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -770,6 +790,12 @@ def check_report(path: Path) -> list[str]:
             failures.append("bloqueio de orçamento sem opções/decisor")
         if "grid" not in str(blocking.get("summary", "")):
             failures.append("bloqueio sem resumo do grid")
+    else:
+        resolution = report.get("resolution") or {}
+        if "R07" not in str(resolution.get("amendment", "")):
+            failures.append("sem bloqueio, a emenda do grid precisa estar registrada na resolução")
+        if "2026-" not in str(resolution.get("amendment", "")):
+            failures.append("resolução sem data da emenda")
     fixture = report.get("fixture_smoke", {})
     if float(fixture.get("overfit_train_auc", -1)) < 0.95:
         failures.append("overfit controlado de fixture abaixo do esperado")

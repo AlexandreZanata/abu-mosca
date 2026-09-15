@@ -4876,7 +4876,7 @@ def main() -> int:
     )
     print(
         f"OK: encoder GraphSAGE M02 com {m02_tokens} tokens, verificado "
-        f"(bloqueio de orçamento registrado aguardando decisão humana)"
+        f"(grid vigente dentro de 1–3M; sem bloqueio aberto)"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")

@@ -128,6 +128,17 @@ label set; M08–M10 não ficam automaticamente autorizadas.
 - Orçamento aprovado: IA baixa por microfase; GPU smoke/piloto conforme R07;
   teto de 6,5 GB de VRAM, sem aumento sem nova decisão.
 
+## Emenda 3.0 — revisão da condição 6 (2026-09-15)
+
+A emenda do grid de parâmetros do R07 §5 (changelog 3.0; decisão humana opção
+(a) da nota de bloqueio da M02, Alexandre Zanata, 2026-09-15) foi revisada
+conforme a condição 6 deste gate: o grid passa a produzir **1.009.152–1.009.800
+parâmetros** (dim 576/2 camadas e dim 408/3 camadas), dentro do intervalo de
+1–3M do MVP, sem qualquer outra alteração de protocolo. Verificações do M02
+regeradas com o grid emendado (`artifacts/reports/M02-GRAPHSAGE.md` e `.json`;
+teto de 6,5 GB de VRAM preservado, sonda CUDA em 68,4 MiB). As demais condições
+do G5 permanecem inalteradas e a liberação continua **apenas exploratória**.
+
 ## Assinaturas
 
 - Responsável científico: Alexandre Zanata — GO condicionado ao modo exploratório em 2026-09-15 (revisor único, papel acumulado, limitação declarada)

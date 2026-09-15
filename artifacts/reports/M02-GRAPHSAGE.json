@@ -1,29 +1,6 @@
 {
   "blocking_issue": {
-    "decision_required_from": "revisor humano do G5 (condição 6)",
-    "evidence": {
-      "grid_max": 101760,
-      "grid_min": 13824,
-      "smallest_in_range": [
-        {
-          "dim": 576,
-          "layers": 2,
-          "parameters": 1009152
-        },
-        {
-          "dim": 408,
-          "layers": 3,
-          "parameters": 1009800
-        }
-      ]
-    },
-    "options": [
-      "emendar o grid do pré-registro (changelog + nova revisão do G5, condição 6) para incluir dim ≥ 408 (3 camadas) ou ≥ 576 (2 camadas)",
-      "aceitar encoder abaixo do intervalo declarado e atualizar README/ESCOPO/PROT com o desvio registrado",
-      "outra decisão humana documentada"
-    ],
-    "present": true,
-    "summary": "o grid congelado do R07 (dim 64/128; 2–3 camadas) produz no máximo 101760 parâmetros, abaixo do intervalo de 1000000–3000000 declarado para o MVP"
+    "present": false
   },
   "config": {
     "activation": "relu",
@@ -139,143 +116,144 @@
         "parameters": 6319104
       }
     ],
-    "grid_max": 101760,
-    "grid_meets_mvp_range": false,
-    "grid_min": 13824,
+    "grid_max": 1009800,
+    "grid_meets_mvp_range": true,
+    "grid_min": 1009152,
     "grid_rows": [
       {
-        "dim": 64,
+        "dim": 576,
         "fanout": [
           10,
           10
         ],
         "layers": 2,
-        "parameters": 13824,
-        "parameters_two_projections": 9216,
+        "parameters": 1009152,
+        "parameters_two_projections": 672768,
         "trial": "T01"
       },
       {
-        "dim": 64,
+        "dim": 576,
         "fanout": [
           10,
           10
         ],
         "layers": 2,
-        "parameters": 13824,
-        "parameters_two_projections": 9216,
+        "parameters": 1009152,
+        "parameters_two_projections": 672768,
         "trial": "T02"
       },
       {
-        "dim": 64,
+        "dim": 408,
         "fanout": [
           15,
           10
         ],
         "layers": 3,
-        "parameters": 26304,
-        "parameters_two_projections": 17536,
+        "parameters": 1009800,
+        "parameters_two_projections": 673200,
         "trial": "T03"
       },
       {
-        "dim": 64,
+        "dim": 408,
         "fanout": [
           15,
           10
         ],
         "layers": 3,
-        "parameters": 26304,
-        "parameters_two_projections": 17536,
+        "parameters": 1009800,
+        "parameters_two_projections": 673200,
         "trial": "T04"
       },
       {
-        "dim": 128,
+        "dim": 576,
         "fanout": [
           10,
           10
         ],
         "layers": 2,
-        "parameters": 52224,
-        "parameters_two_projections": 34816,
+        "parameters": 1009152,
+        "parameters_two_projections": 672768,
         "trial": "T05"
       },
       {
-        "dim": 128,
+        "dim": 576,
         "fanout": [
           10,
           10
         ],
         "layers": 2,
-        "parameters": 52224,
-        "parameters_two_projections": 34816,
+        "parameters": 1009152,
+        "parameters_two_projections": 672768,
         "trial": "T06"
       },
       {
-        "dim": 128,
+        "dim": 408,
         "fanout": [
           15,
           10
         ],
         "layers": 3,
-        "parameters": 101760,
-        "parameters_two_projections": 67840,
+        "parameters": 1009800,
+        "parameters_two_projections": 673200,
         "trial": "T07"
       },
       {
-        "dim": 128,
+        "dim": 408,
         "fanout": [
           15,
           10
         ],
         "layers": 3,
-        "parameters": 101760,
-        "parameters_two_projections": 67840,
+        "parameters": 1009800,
+        "parameters_two_projections": 673200,
         "trial": "T08"
       },
       {
-        "dim": 64,
+        "dim": 576,
         "fanout": [
           15,
           10
         ],
         "layers": 2,
-        "parameters": 13824,
-        "parameters_two_projections": 9216,
+        "parameters": 1009152,
+        "parameters_two_projections": 672768,
         "trial": "T09"
       },
       {
-        "dim": 64,
+        "dim": 408,
         "fanout": [
           10,
           10
         ],
         "layers": 3,
-        "parameters": 26304,
-        "parameters_two_projections": 17536,
+        "parameters": 1009800,
+        "parameters_two_projections": 673200,
         "trial": "T10"
       },
       {
-        "dim": 128,
+        "dim": 576,
         "fanout": [
           15,
           10
         ],
         "layers": 2,
-        "parameters": 52224,
-        "parameters_two_projections": 34816,
+        "parameters": 1009152,
+        "parameters_two_projections": 672768,
         "trial": "T11"
       },
       {
-        "dim": 128,
+        "dim": 408,
         "fanout": [
           10,
           10
         ],
         "layers": 3,
-        "parameters": 101760,
-        "parameters_two_projections": 67840,
+        "parameters": 1009800,
+        "parameters_two_projections": 673200,
         "trial": "T12"
       }
     ],
+    "grid_source": "R07 §5 emendado em 2026-09-15 (changelog 3.0; decisão humana opção (a) da nota de bloqueio da M02): dim 576 para trials de 2 camadas e dim 408 para trials de 3 camadas",
     "meets_mvp_range": true,
     "mvp_range": [
       1000000,
@@ -313,16 +291,21 @@
     "loss_first": 4.774472,
     "loss_last": 0.981928,
     "sampled_nodes": 22933,
-    "seconds": 19.883,
+    "seconds": 62.939,
     "sparse_bytes": 117916048,
     "sparse_ratio": 0.013706,
     "steps": 20,
     "train_edges": 4905439,
     "vram_peak_mib": null
   },
+  "resolution": {
+    "amendment": "R07 §5 emendado em 2026-09-15 (changelog 3.0; decisão humana opção (a) da nota de bloqueio da M02): dim 576 para trials de 2 camadas e dim 408 para trials de 3 camadas",
+    "decision": "opção (a) da nota de bloqueio da M02 (2026-09-15)",
+    "summary": "grid emendado produz 1009152–1009800 parâmetros, dentro de 1000000–3000000"
+  },
   "resources": {
-    "peak_rss_mib": 2484.8,
-    "seconds": 35.648
+    "peak_rss_mib": 2344.8,
+    "seconds": 120.624
   },
   "schema": "m02-graphsage",
   "status": "exploratory-only; somente fonte; sem nenhum dado do alvo"

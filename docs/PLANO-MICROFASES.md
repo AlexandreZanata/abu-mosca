@@ -2054,7 +2054,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   fonte única e sem claim de transferência; commit
   c4ab7de9f812f4e3ce420bd194e37a86acebc264.
 
-- [ ] **M02 — Implementar GraphSAGE indutivo de 1–3M parâmetros.**
+- [x] **M02 — Implementar GraphSAGE indutivo de 1–3M parâmetros.**
   - Objetivo: criar o candidato primário compatível com neighbor sampling.
   - Entregas: encoder dirigido/ponderado conforme protocolo, contagem exata de
     parâmetros, inferência em grafo novo e testes em fixture.
@@ -2064,22 +2064,40 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: sem camada específica para número fixo de nós da fonte.
   - Dependências: M01, R04, H05.
   - Orçamento: IA baixa; GPU smoke.
-  - Bloqueio (2026-09-15, executor): encoder implementado e verificado
-    (`tools/gnn_graphsage.py`, `tests/test_graphsage.py` com 13 casos,
-    `artifacts/reports/M02-GRAPHSAGE.md` + `.json` e checagem M02 no
-    `validate_research.py`): overfit controlado com AUC de treino 0,984117,
-    gradientes finitos, determinismo, serialização com diferença 0,0,
-    inferência em grafo novo com equivalência sob permutação, fanout respeitado,
-    `forward_sampled` igual ao `forward_full` com fanout completo, nenhuma
-    tabela por node ID e representação esparsa (razão 0,013706; sonda CUDA com
-    68,4 MiB de VRAM em dim 576/2 camadas); a fase fica `[ ]` porque o grid
-    congelado do R07 (dim 64/128; 2–3 camadas) rende 13.824–101.760 parâmetros,
-    abaixo do intervalo de 1–3M declarado para o MVP, e alterar o grid exige
-    changelog e nova revisão do G5 (condição 6); opções registradas: (a)
-    emendar o grid para incluir dim ≥ 408 (3 camadas) ou ≥ 576 (2 camadas);
-    (b) aceitar o encoder abaixo do intervalo e registrar o desvio em
-    README/ESCOPO/PROT; (c) outra decisão documentada; próxima ação humana:
-    decidir o orçamento de parâmetros; commit 6caec0166445c96dcc22c2963d30771a50175da5.
+  Evidência (2026-09-15, executor + decisão humana): encoder implementado e
+  verificado em `tools/gnn_graphsage.py` (agregação dirigida e ponderada com
+  projeções separadas de entrada/saída, neighbor sampling determinístico,
+  serialização e contagem exata), `tests/test_graphsage.py` (13 casos),
+  `artifacts/reports/M02-GRAPHSAGE.md` + `.json` e checagem M02 no
+  `validate_research.py`; o bloqueio anterior (grid do R07 §5 rendia
+  13.824–101.760 parâmetros, abaixo do intervalo de 1–3M do MVP) foi resolvido
+  pela decisão humana opção (a) de 2026-09-15: emenda do grid registrada no
+  `preregistration/CHANGELOG.md` (3.0) e em `preregistration/PROTOCOL.md`
+  (dim 576 em trials de 2 camadas e dim 408 em trials de 3 camadas; demais
+  campos e o budget de 12 trials inalterados), com `REGISTRY.md` re-hashado
+  (`PROTOCOL.md` `1f5a90ab…`, pacote `1ef26bcb…`) e re-revisão dos gates G3 e
+  G5 (condição 6) nos respectivos documentos; resultados: grid vigente com
+  1.009.152–1.009.800 parâmetros (dentro do intervalo), overfit controlado com
+  AUC de treino 0,984117 e loss 2,040574 → 0,058172, gradientes finitos,
+  determinismo, serialização com diferença 0,0, inferência em grafo novo com
+  equivalência sob permutação (≤ 1e-4), `forward_sampled` igual ao `forward_full`
+  com fanout completo, fanout respeitado, nenhuma tabela por node ID e
+  representação esparsa (razão 0,013706); fontes/versões: R07 §4/§5 emendado,
+  features de H05, semântica primária de H06, snapshot H08, torch do lock R02,
+  sem fonte externa e sem dados do alvo; comandos e testes: `.venv/bin/python
+  tools/gnn_graphsage.py run --workdir runs/m02 --report
+  artifacts/reports/M02-GRAPHSAGE.json` (120,6 s; pico 2,34 GB) e `check`,
+  `.venv/bin/python -m pytest tests/ -q` (241 testes), `python3
+  tools/validate_research.py` (R07/G3/G4/M02 coerentes com os novos hashes),
+  `python3 tools/validate_plan.py`, `check_data_hygiene.py`, `firewall.py scan`
+  e smoke negativo (parâmetros por node reprovam como esperado); resultado:
+  encoder do MVP pronto para M04/M05, com sonda CUDA de 68,4 MiB de VRAM em
+  dim 576/2 camadas (teto de 6,5 GB preservado); recursos medidos: CPU e sonda
+  CUDA, sem downloads; decisão/limitação: emenda do grid autorizada por decisão
+  humana e registrada em changelog; o smoke usa configuração de mecânica
+  (dim 128) e não é o modelo do grid; a explosão de vizinhança em 3 camadas
+  (293.687 arestas na última camada para 64 alvos) exige calibração em M04;
+  permanece o modo exploratório e nenhum claim de transferência; commit 5390161c7cc9c33d38729b8e338f25cb7d087a52.
 
 - [ ] **M03 — Implementar GIN como candidato comparável.**
   - Objetivo: testar agregação alternativa sob o mesmo orçamento e harness.

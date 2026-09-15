@@ -45,8 +45,8 @@ circularidade** (H07; changelog 2.3).
 - SHA-256 `367f01446e312ba80da445f86ed9abe0554caba33587aac96d9c613c47fd1b2a` — `artifacts/reports/DATA-QUALITY.json`
 - SHA-256 `7bbd3f36bb4fda1348f14397490063c8c15118064452a9b186771824d6f439b6` — `artifacts/reports/H08-SNAPSHOTS.md`
 - SHA-256 `73e0d507cbd7ad4e5f6143a34c276169bbe167e5da5b8767568471bbc7867bdf` — `artifacts/reports/H08-SNAPSHOTS.json`
-- SHA-256 `c649a5a5763ac93de3e0ab83bcc32efd31ac5e5990d78cb12f58317e922253f7` — `preregistration/REGISTRY.md`
-- SHA-256 `6a7d0c8f9c6ae27bd85241b00f3f361ea258caf1708d42d9600cf896e575fce7` — `preregistration/CHANGELOG.md`
+- SHA-256 `a248a357274e4498c235834dd5bff28814a0291de8d4a46761be542300ac92ab` — `preregistration/REGISTRY.md`
+- SHA-256 `5645f30059315865a9455da530253376b99f19a7f359ad6e1eddc0f8482623ec` — `preregistration/CHANGELOG.md`
 - SHA-256 `8357d449c718a2ee2fb50b8fdda9eefcf664d4416dba19d31bec862e7c265cfb` — `docs/research/FIREWALL.md`
 
 ## Critérios

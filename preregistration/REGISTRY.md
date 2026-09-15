@@ -11,7 +11,7 @@ afetar o confirmatório.
 
 ## 1. Artefatos congelados
 
-- SHA-256 `fb54cafb92be40085b296417393e72276b99640c785acc99e9dc18253725ee6a` — `preregistration/PROTOCOL.md`
+- SHA-256 `1f5a90ab1e49f2988a46294035c941e8a0c5a0335a000897aea891fcf9884a26` — `preregistration/PROTOCOL.md`
 - SHA-256 `a83354403df32094342c3284f2dd4b2eb22c32f9a8e45fa9d00a73bc567c7501` — `preregistration/cards/E1-selecao-fonte.md`
 - SHA-256 `62eac8ab8917c9fd3ac648576044e87ec7798c7bfcab972ec6eb48d9e3c05b9f` — `preregistration/cards/E2-mvp-zero-shot.md`
 - SHA-256 `b89d37b4d5f9c8d4dfd7320030deb733f3fd6956c0a1c584dcf664bbb3aafa29` — `preregistration/cards/E3-nivel2-condicional.md`
@@ -30,7 +30,8 @@ afetar o confirmatório.
 - Revisor de estatística: Alexandre Zanata — 2026-09-14 (mesmo revisor acumulando papéis; limitação declarada)
 - Custodiante designado: Alexandre Zanata — 2026-09-14 (mesmo revisor acumulando papéis; limitação declarada)
 - Data da assinatura: 2026-09-14
-- Hash do pacote assinado: 9411af0ca15501b253934f5e2134d978a95526dcf2c4cb7923a677a685f658b1 (SHA-256 da concatenação das 12 linhas de artefatos congelados, na ordem, separadas por quebra de linha)
+- Emenda 3.0 (R07 §5, grid de parâmetros): Alexandre Zanata — 2026-09-15 (decisão humana opção (a) da nota de bloqueio da M02; executor apenas registrou)
+- Hash do pacote assinado: 1ef26bcb80f516dbca40f4aea192c1dba330625a83d1ecac5f5498678d7459e8 (SHA-256 da concatenação das 12 linhas de artefatos congelados, na ordem, separadas por quebra de linha)
 
 ## 3. Regras
 

@@ -190,11 +190,13 @@ def test_snapshot_features_equivalentes_h05(tmp_path):
     np.testing.assert_allclose(np.asarray(matrix, dtype=float), np.asarray(reference, dtype=float), atol=1e-9)
 
 
-def test_orcamento_registra_conflito():
+def test_orcamento_emendado_dentro_do_intervalo():
     grid = gg.grid_parameter_counts()
     values = [row["parameters"] for row in grid]
     assert len(grid) == 12
-    assert max(values) < gg.MVP_RANGE[0]
+    assert gg.MVP_RANGE[0] <= min(values) and max(values) <= gg.MVP_RANGE[1]
+    assert all(row["dim"] in (408, 576) for row in grid)
+    assert "R07" in gg.GRID_AMENDMENT and "2026-" in gg.GRID_AMENDMENT
     capacity = gg.capacity_table()
     assert any(row["meets_mvp_range"] for row in capacity)
     smallest = gg.smallest_dims_for_range()
@@ -230,8 +232,13 @@ def test_check_report_detecta_desonestidade(tmp_path):
     path = tmp_path / "dense.json"
     path.write_text(json.dumps(dense), encoding="utf-8")
     assert any("esparsa" in failure for failure in gg.check_report(path))
+    no_amendment = copy.deepcopy(report)
+    no_amendment["resolution"]["amendment"] = "sem emenda registrada"
+    path = tmp_path / "amendment.json"
+    path.write_text(json.dumps(no_amendment), encoding="utf-8")
+    assert any("emenda do grid" in failure for failure in gg.check_report(path))
     blocked = copy.deepcopy(report)
-    blocked["blocking_issue"]["options"] = []
+    blocked["blocking_issue"] = {"present": True, "summary": "grid antigo", "options": [], "decision_required_from": "x"}
     path = tmp_path / "blocked.json"
     path.write_text(json.dumps(blocked), encoding="utf-8")
     assert any("bloqueio" in failure for failure in gg.check_report(path))

@@ -21,7 +21,7 @@ unseal ou leitura de `data/sealed/`.
 
 - Pré-registro assinado: `preregistration/PROTOCOL.md` (15 seções) e
   `preregistration/REGISTRY.md` com 12 artefatos congelados e pacote
-  `9411af0ca15501b253934f5e2134d978a95526dcf2c4cb7923a677a685f658b1`.
+  `1ef26bcb80f516dbca40f4aea192c1dba330625a83d1ecac5f5498678d7459e8`.
 - Estatística: `docs/research/STATISTICAL-ANALYSIS-PLAN.md` (R06) e schemas de
   predições e métricas.
 - Firewall: `docs/research/FIREWALL.md` (R05), `tools/firewall.py` e testes
@@ -34,8 +34,8 @@ unseal ou leitura de `data/sealed/`.
 
 ## Artefatos e hashes
 
-- SHA-256 `c649a5a5763ac93de3e0ab83bcc32efd31ac5e5990d78cb12f58317e922253f7` — `preregistration/REGISTRY.md`
-- SHA-256 `fb54cafb92be40085b296417393e72276b99640c785acc99e9dc18253725ee6a` — `preregistration/PROTOCOL.md`
+- SHA-256 `a248a357274e4498c235834dd5bff28814a0291de8d4a46761be542300ac92ab` — `preregistration/REGISTRY.md`
+- SHA-256 `1f5a90ab1e49f2988a46294035c941e8a0c5a0335a000897aea891fcf9884a26` — `preregistration/PROTOCOL.md`
 - SHA-256 `2ae11d2bbe7589280b4dbf82433dd64b8839819fef49b2e65dc5a2a6bbd15160` — `docs/research/STATISTICAL-ANALYSIS-PLAN.md`
 - SHA-256 `8357d449c718a2ee2fb50b8fdda9eefcf664d4416dba19d31bec862e7c265cfb` — `docs/research/FIREWALL.md`
 - SHA-256 `7287021f722ec63fb72eecc3ae99400f5010e6939f98bd021135196c0f2c1f1f` — `schemas/predictions.schema.json`
@@ -86,6 +86,19 @@ unseal ou leitura de `data/sealed/`.
 - Trilhos não autorizados por este gate: unseal, leitura de `data/sealed/`,
   treino confirmatório e publicação.
 - Orçamento aprovado: IA baixa por microfase; sem GPU nesta etapa.
+
+## Emenda 3.0 — grid de parâmetros (revisão do G3 em 2026-09-15)
+
+Decisão humana (opção (a) da nota de bloqueio da M02, Alexandre Zanata,
+2026-09-15): o grid congelado do R07 §5 (dim 64/128; 2–3 camadas; 13.824–101.760
+parâmetros) foi emendado para o intervalo de 1–3M do MVP — coluna Dim passa a
+**576** (trials de 2 camadas; 1.009.152 parâmetros) e **408** (trials de 3
+camadas; 1.009.800 parâmetros), com Camadas, Fanout, LR, Batch, Dropout e o
+budget de 12 trials inalterados. Nenhum dado, desfecho, métrica, SESOI, seed,
+exclusão ou análise foi alterado. O pré-registro segue válido com os novos
+hashes: PROTOCOL.md `1f5a90ab1e49f2988a46294035c941e8a0c5a0335a000897aea891fcf9884a26`, REGISTRY.md `a248a357274e4498c235834dd5bff28814a0291de8d4a46761be542300ac92ab`, pacote
+`1ef26bcb80f516dbca40f4aea192c1dba330625a83d1ecac5f5498678d7459e8` (changelog 3.0). Assinaturas originais preservadas e emenda
+registrada na seção de assinaturas do REGISTRY.
 
 ## Assinaturas
 
