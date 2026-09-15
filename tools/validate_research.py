@@ -555,6 +555,32 @@ GATE_G4_SIGNATURE_FIELDS = (
     "Revisor de método/estatística",
 )
 GATE_G4_HASH_RE = re.compile(r"^- SHA-256 `([0-9a-f]{64})` — `([^`]+)`$")
+GATE_G5 = ROOT / "docs" / "gates" / "G5-BASELINES.md"
+GATE_G5_SECTIONS = (
+    "## Pacote de revisão",
+    "## Artefatos e hashes",
+    "## Critérios",
+    "## Riscos e divergências",
+    "## Condições do G5",
+    "## Escopo liberado",
+    "## Assinaturas",
+)
+GATE_G5_SIGNATURE_FIELDS = (
+    "Responsável científico",
+    "Custodiante do alvo",
+    "Revisor de método/estatística",
+)
+GATE_G5_TOKENS = (
+    "comparadores obrigatórios",
+    "nulos degradam",
+    "leakage",
+    "6,5 GB",
+    "M04",
+    "selado",
+    "exploratório",
+    "H07",
+)
+B09_PACKAGE = ROOT / "data" / "manifests" / "baselines-b09.json"
 H09_TOOL = ROOT / "tools" / "data_quality.py"
 H09_REPORT = ROOT / "artifacts" / "reports" / "DATA-QUALITY.md"
 H09_METRICS = ROOT / "artifacts" / "reports" / "DATA-QUALITY.json"
@@ -2888,6 +2914,95 @@ def check_gate_g4() -> tuple[list[str], int, str]:
     return failures, entries, state
 
 
+def check_gate_g5() -> tuple[list[str], int, str]:
+    label = "G5-BASELINES.md"
+    if not GATE_G5.exists():
+        return [f"{label}: arquivo ausente"], 0, "AUSENTE"
+    text = GATE_G5.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    failures: list[str] = []
+    for section in GATE_G5_SECTIONS:
+        if section not in text:
+            failures.append(f"{label}: seção obrigatória ausente '{section}'")
+    for field in GATE_HEADER_FIELDS:
+        if field_value(lines, field) is None:
+            failures.append(f"{label}: cabeçalho sem campo '{field}'")
+    decision = field_value(lines, "Decisão")
+    if decision is None or not decision.startswith(("AGUARDAR", "GO", "NO-GO", "REFORMULAR")):
+        failures.append(f"{label}: decisão inválida")
+    pending = decision is not None and decision.startswith("AGUARDAR")
+    approved = decision is not None and decision.startswith("GO")
+    entries = 0
+    for line in lines:
+        match = GATE_G4_HASH_RE.match(line)
+        if match is None:
+            continue
+        digest, rel = match.groups()
+        path = ROOT / rel
+        if not path.exists():
+            failures.append(f"{label}: artefato ausente '{rel}'")
+            continue
+        if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+            failures.append(f"{label}: SHA-256 divergente para '{rel}'")
+        entries += 1
+    if entries < 8:
+        failures.append(f"{label}: esperados ao menos 8 artefatos com hash (achados {entries})")
+    criteria = [line for line in lines if CRITERION_RE.match(line)]
+    if len(criteria) < 8:
+        failures.append(f"{label}: esperados ao menos 8 critérios (achados {len(criteria)})")
+    if pending and not any("`NÃO VERIFICADO`" in line for line in criteria):
+        failures.append(f"{label}: nenhum critério 'NÃO VERIFICADO' com decisão pendente")
+    if approved and any("`NÃO VERIFICADO`" in line for line in criteria):
+        failures.append(f"{label}: decisão GO com critério ainda 'NÃO VERIFICADO'")
+    if approved and any("`FAIL`" in line for line in criteria):
+        failures.append(f"{label}: critério FAIL exige decisão NO-GO/REFORMULAR")
+    start = next((i for i, line in enumerate(lines) if line.startswith("## Assinaturas")), None)
+    signature_lines = lines[start:] if start is not None else []
+    for field in GATE_G5_SIGNATURE_FIELDS:
+        value = field_value(signature_lines, field)
+        if value is None:
+            failures.append(f"{label}: assinatura sem campo '{field}'")
+            continue
+        if pending and "a preencher" not in value.lower():
+            failures.append(f"{label}: assinatura '{field}' preenchida antes da revisão humana")
+        if approved and "a preencher" in value.lower():
+            failures.append(f"{label}: assinatura '{field}' ainda pendente com decisão GO")
+    if approved and "2026-" not in "\n".join(signature_lines):
+        failures.append(f"{label}: assinaturas sem data")
+    flat = " ".join(text.split()).lower()
+    for token in GATE_G5_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: pacote sem token '{token}'")
+    if B09_PACKAGE.exists():
+        package = json.loads(B09_PACKAGE.read_text(encoding="utf-8"))
+        if package.get("target_data_used") is not False:
+            failures.append(f"{label}: pacote congelado deve declarar que não usou dados do alvo")
+        if hashlib.sha256(B09_PACKAGE.read_bytes()).hexdigest() not in text:
+            failures.append(f"{label}: hash do pacote congelado ausente no pacote do gate")
+        if str(package.get("best_comparator", "")) not in text:
+            failures.append(f"{label}: melhor comparador do pacote congelado ausente no gate")
+        if len(package.get("ranking", [])) < 8:
+            failures.append(f"{label}: ranking congelado insuficiente")
+    else:
+        failures.append(f"{label}: pacote congelado ausente 'data/manifests/baselines-b09.json'")
+    leak = PUBLIC_ID_RE.search(text)
+    if leak:
+        failures.append(f"{label}: possível ID cru ('{leak.group(0)}')")
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    g5_line = next((line for line in plan_lines if "**G5 —" in line), None)
+    if g5_line is None:
+        failures.append(f"{label}: item G5 não encontrado no plano")
+    elif pending and not g5_line.startswith("- [ ]"):
+        failures.append(f"{label}: G5 marcado concluído enquanto a decisão é AGUARDAR")
+    elif approved and g5_line.startswith("- [ ]"):
+        failures.append(f"{label}: decisão GO exige G5 marcado [x] no plano")
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(text) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    state = "GO" if approved else "AGUARDAR"
+    return failures, entries, state
+
+
 def check_h09_quality() -> tuple[list[str], int]:
     label = "H09"
     failures: list[str] = []
@@ -4385,6 +4500,7 @@ def main() -> int:
     h08_failures, h08_tokens = check_h08_snapshots()
     h09_failures, h09_tokens = check_h09_quality()
     gate_g4_failures, gate_g4_entries, gate_g4_state = check_gate_g4()
+    gate_g5_failures, gate_g5_entries, gate_g5_state = check_gate_g5()
     b01_failures, b01_tokens = check_b01_metrics()
     b02_failures, b02_tokens = check_b02_calibration()
     b03_failures, b03_tokens = check_b03_source_baselines()
@@ -4435,6 +4551,7 @@ def main() -> int:
         + h08_failures
         + h09_failures
         + gate_g4_failures
+        + gate_g5_failures
         + b01_failures
         + b02_failures
         + b03_failures
@@ -4601,6 +4718,10 @@ def main() -> int:
     )
     print(
         f"OK: gate G4 com {gate_g4_entries} hashes e decisão {gate_g4_state}"
+    )
+    print(
+        f"OK: gate G5 com {gate_g5_entries} hashes e decisão {gate_g5_state} "
+        f"(pacote de baselines aguardando revisão humana)"
     )
     print(
         f"OK: métricas B01 com {b01_tokens} tokens, exemplo canônico conferido e "

@@ -1982,6 +1982,19 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não liberar treino neural para mascarar evaluator inconsistente.
   - Dependências: B01–B09.
   - Orçamento: IA baixa para pacote; revisão humana de método.
+  - Pacote preparado (2026-09-15, executor): `docs/gates/G5-BASELINES.md` com 12
+    artefatos hashados (B01/B02, B04–B09, pacote congelado, firewall e
+    manifesto analítico), 10 critérios (8 `PASS` e 2 `NÃO VERIFICADO` para a
+    revisão humana de método e a confirmação científica), cobertura dos
+    comparadores obrigatórios (B03–B08 executados; NBLAST, NeuronBridge, SGM,
+    bisected graph matching e FINAL julgados inaplicáveis com motivo), nulos
+    degradando como esperado (B09) com a pendência dos negativos pareados por
+    grau registrada, budget do MVP dentro do teto de 6,5 GB de VRAM com medição
+    obrigatória na M04 e restrição de que H07 inconclusivo impede desfecho
+    confirmatório; decisão `AGUARDAR`; com `GO`, libera M01–M10 apenas em modo
+    exploratório, sem unseal, sem rótulos-alvo, sem claims confirmatórios e sem
+    publicação, e M08 exige decisão humana própria; commit
+    4c9a0dd8608c161e72a4527b89b0f9bf58b03940.
 
 ### MVP auto-supervisionado
 
