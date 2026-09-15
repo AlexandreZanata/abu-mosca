@@ -4721,7 +4721,7 @@ def main() -> int:
     )
     print(
         f"OK: gate G5 com {gate_g5_entries} hashes e decisão {gate_g5_state} "
-        f"(pacote de baselines aguardando revisão humana)"
+        f"(MVP liberado apenas como exploração conforme condições registradas)"
     )
     print(
         f"OK: métricas B01 com {b01_tokens} tokens, exemplo canônico conferido e "

@@ -1973,7 +1973,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   arestas no rewiring; a partição determinística por hash depende do ID;
   commit 1e199c3b1176261da0019a71b36b44fc3a8fa340.
 
-- [ ] **G5 — Aprovar o benchmark e liberar o MVP neural.**
+- [x] **G5 — Aprovar o benchmark e liberar o MVP neural.**
   - Objetivo: confirmar que avaliação, nulos e baselines são confiáveis.
   - Entregas: `docs/gates/G5-BASELINES.md` com cobertura, falhas e hashes.
   - Aceite: testes métricos e de leakage passam; comparadores obrigatórios foram
@@ -1982,19 +1982,29 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não liberar treino neural para mascarar evaluator inconsistente.
   - Dependências: B01–B09.
   - Orçamento: IA baixa para pacote; revisão humana de método.
-  - Pacote preparado (2026-09-15, executor): `docs/gates/G5-BASELINES.md` com 12
-    artefatos hashados (B01/B02, B04–B09, pacote congelado, firewall e
-    manifesto analítico), 10 critérios (8 `PASS` e 2 `NÃO VERIFICADO` para a
-    revisão humana de método e a confirmação científica), cobertura dos
-    comparadores obrigatórios (B03–B08 executados; NBLAST, NeuronBridge, SGM,
-    bisected graph matching e FINAL julgados inaplicáveis com motivo), nulos
-    degradando como esperado (B09) com a pendência dos negativos pareados por
-    grau registrada, budget do MVP dentro do teto de 6,5 GB de VRAM com medição
-    obrigatória na M04 e restrição de que H07 inconclusivo impede desfecho
-    confirmatório; decisão `AGUARDAR`; com `GO`, libera M01–M10 apenas em modo
-    exploratório, sem unseal, sem rótulos-alvo, sem claims confirmatórios e sem
-    publicação, e M08 exige decisão humana própria; commit
-    4c9a0dd8608c161e72a4527b89b0f9bf58b03940.
+  Evidência (2026-09-15, executor + revisor humano): decisão humana `GO`
+  **condicionada ao modo exploratório** registrada em 2026-09-15 por Alexandre
+  Zanata (revisor único acumulando responsável científico, custódia do alvo e
+  método/estatística; limitação declarada), aprovando
+  `docs/gates/G5-BASELINES.md` (12 artefatos hashados, 10 critérios todos
+  `PASS` para exploração, assinaturas registradas); o executor apenas registrou
+  o parecer, sem alterar os artefatos congelados; condições obrigatórias:
+  M01–M07 e a medição de recursos de M04 liberadas em modo exploratório;
+  M08–M10 não autorizadas (M08 exige nova decisão humana e desfecho
+  independente válido, pois H07 segue inconclusivo por circularidade e não
+  existe label set); proibidos unseal, acesso a rótulos-alvo, tuning no alvo,
+  publicação e claims confirmatórios; a pendência dos negativos pareados por
+  grau permanece aberta (degree-only obrigatório; novo pareamento/
+  estratificação por consulta a definir e testar antes de qualquer avaliação
+  futura); M04 deve medir VRAM, RAM e tempo antes de treino longo e o teto de
+  6,5 GB de VRAM não pode aumentar sem nova decisão; mudanças materiais exigem
+  nova versão e nova revisão do gate; resultados rotulados como exploratórios e
+  limitados à fonte observada; comandos e testes: `python3
+  tools/validate_research.py` (checagem G5 agora `GO`, 12 hashes conferidos e
+  coerência do plano), `python3 tools/validate_plan.py`,
+  `.venv/bin/python -m pytest tests/ -q` (215 testes) e `git diff --check`;
+  recursos medidos: CPU apenas, sem GPU, sem downloads e sem acesso a
+  `data/sealed`; commit 13aa9cf314d57ae3c4629d82f08938f9422fbced.
 
 ### MVP auto-supervisionado
 

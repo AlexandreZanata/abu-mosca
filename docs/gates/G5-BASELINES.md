@@ -1,16 +1,20 @@
 # Decisão do gate G5 — benchmark, baselines e liberação do MVP neural
 
 Pacote preparado pela IA executora em 2026-09-15 09:12 -04; **nenhum critério
-científico foi aprovado pela IA**. A decisão `AGUARDAR` cabe à revisão humana de
-método. O dataset permanece **exploratório** (G4) e o desfecho confirmatório
-segue **inconclusivo por circularidade** (H07; changelog 2.3), de modo que
-qualquer liberação só pode ser exploratória. O executor não inicia a fase
-seguinte antes da assinatura.
+científico foi aprovado pela IA**. A decisão `GO` foi tomada pela revisão humana
+em 2026-09-15, **condicionada ao modo exploratório**; o executor apenas
+registrou o parecer. O dataset permanece **exploratório** (G4) e o desfecho
+confirmatório segue **inconclusivo por circularidade** (H07; changelog 2.3), sem
+label set; M08–M10 não ficam automaticamente autorizadas.
 
-- Data/hora e fuso: preparação em 2026-09-15 09:12 -04 (commit desta fase)
-- Commit e estado dirty: preparação sobre HEAD `c6ce188` (B09); árvore de fase limpa
-- Revisores: revisão humana de método pendente (`a preencher`)
-- Decisão: AGUARDAR (pacote preparado; nenhum critério assinado pela IA)
+- Data/hora e fuso: pacote preparado em 2026-09-15 09:12 -04 (commit `4c9a0dd`);
+  decisão humana registrada em 2026-09-15 (hora não informada pelo revisor)
+- Commit e estado dirty: registro no commit desta fase; preparação sobre HEAD
+  `4c9a0dd`; árvore de fase limpa
+- Revisores: Alexandre Zanata (revisor único; responsável científico, custódia
+  do alvo e método/estatística acumulados; limitação declarada)
+- Decisão: GO condicionado ao modo exploratório (registrado pelo executor a
+  partir do parecer humano de 2026-09-15)
 
 ## Pacote de revisão
 
@@ -31,11 +35,12 @@ seguinte antes da assinatura.
 - **Nulos (B09):** permutação de rótulos degrada até 0,004817 (real 0,383676;
   p = 0,047619); rewiring preservando grau derruba o artesanal de 0,383676 para
   0,050154; permutação de IDs é invariante no nível de features (diferença
-  máxima 0,0) com partição carregada idêntica. Pendência registrada: negativos
+  máxima 0,0) com partição carregada idêntica. Pendência aberta: negativos
   pareados por grau mantiveram o degree-only acima do acaso (0,494810 vs
-  0,090909) — investigado como insuficiência do pareamento por mediana; o
-  comparador degree-only pré-registrado permanece o controle principal e
-  estratos por consulta ficam para M09.
+  0,090909) — insuficiência do pareamento por mediana; o comparador degree-only
+  pré-registrado permanece o controle principal e o novo pareamento/
+  estratificação por consulta deve ser definido e testado antes de qualquer
+  avaliação futura (M09).
 - **Congelamento:** `data/manifests/baselines-b09.json` (SHA-256
   `9359862d398f90370d68588e64ce6bd0e838a1b550d278e0c3fb269076163c52`),
   `target_data_used: false`, 11 comparadores ranqueados, melhor comparador
@@ -49,13 +54,12 @@ seguinte antes da assinatura.
   RAM (H08); as estimativas de L06 para GraphSAGE ficam em 3–5 GB. A medição
   real de sampling/recursos é da M04 e não foi antecipada aqui.
 - **Consequência de H07:** sem label set materializado, a avaliação selada
-  (M08) não tem desfecho; G5 pode liberar apenas o caminho exploratório
-  (M01–M07 e diagnósticos) e M08 exige decisão humana própria.
-- **Perguntas a decidir:** os testes métricos e de leakage são confiáveis? os
-  comparadores executados e os julgamentos de inaplicabilidade cobrem o
-  necessário? o budget planejado do MVP cabe no hardware com a medição da M04
-  como condição? liberar M01–M10 apenas em modo exploratório, sem unseal, sem
-  rótulos-alvo e sem claims confirmatórios?
+  (M08) não tem desfecho; o GO libera apenas o caminho exploratório (M01–M07 e
+  diagnósticos) e M08 exige decisão humana própria.
+- **Decisão do revisor (2026-09-15):** as quatro perguntas do pacote foram
+  respondidas com `GO` condicionado; os dois critérios humanos foram marcados
+  `PASS` exclusivamente para o escopo exploratório, sem representar validação
+  confirmatória.
 
 ## Artefatos e hashes
 
@@ -82,39 +86,50 @@ seguinte antes da assinatura.
 - Pacote congelado íntegro e melhor baseline pela regra source-only: `PASS` — manifesto `9359862d…`, 27/27 predições com SHA-256; melhor comparador MLP pareado 1-3M.
 - Nenhuma métrica, rótulo ou estatística do alvo usada em B01–B09: `PASS` — nenhum acesso a `data/sealed/`; manifesto analítico com `labels_used: false`.
 - Budget do MVP permanece dentro do hardware (planejado): `PASS` — teto de 6,5 GB de VRAM e 28 GB de RAM; estimativas 3–5 GB; medição obrigatória na M04.
-- Revisor de método/estatística confirma que avaliação, nulos e comparadores são confiáveis: `NÃO VERIFICADO` — revisão humana pendente.
-- Responsável científico confirma cobertura, limites (H07 inconclusivo) e libera o MVP apenas exploratório: `NÃO VERIFICADO` — revisão humana pendente.
+- Revisor de método/estatística confirma que avaliação, nulos e comparadores são confiáveis: `PASS` — PASS para exploração: implementação e controles suficientes para desenvolvimento e comparação interna na fonte; a pendência do pareamento por grau impede tratá-los como validação confirmatória (Alexandre Zanata, 2026-09-15).
+- Responsável científico confirma cobertura, limites (H07 inconclusivo) e libera o MVP apenas exploratório: `PASS` — PASS para exploração: H07 reconhecido como inconclusivo, limites aceitos e nenhuma autorização de avaliação selada ou claim confirmatório (Alexandre Zanata, 2026-09-15).
 
 ## Riscos e divergências
 
-- H07 inconclusivo: não existe desfecho confirmatório nem label set; M08/M09 ficam bloqueadas até decisão humana específica.
-- Pendência B09: negativos pareados por grau não neutralizam o grau (0,494810 vs acaso 0,090909); M09 deve usar o comparador degree-only e/ou estratos por consulta.
+- H07 inconclusivo: não existe desfecho confirmatório nem label set; M08–M10 ficam bloqueadas até decisão humana específica com desfecho independente válido.
+- Pendência B09 aberta: negativos pareados por grau não neutralizam o grau (0,494810 vs acaso 0,090909); não é mitigação concluída — M09 deve definir e testar novo pareamento/estratificação por consulta, mantendo o degree-only obrigatório.
 - B06/B07 são transdutivos e não comparáveis zero-shot; B08 é transdutivo e a paridade numérica com a publicação é não verificável (só figura).
-- Um único indivíduo-fonte e nenhuma réplica biológica; revisor único acumulando papéis.
+- Um único indivíduo-fonte e nenhuma réplica biológica; revisor único acumulando papéis (limitação declarada).
 - Rewiring preserva graus de contagem, não graus ponderados; a partição por hash depende do ID (sensibilidade +0,028130 registrada).
+- Todos os resultados são exploratórios e limitados à fonte observada; nenhum claim de transferência é autorizado.
 
 ## Condições do G5
 
-- Com `GO`: liberar M01–M10 apenas em modo exploratório, sobre o dataset
-  congelado, sem unseal, sem rótulos-alvo, sem claim confirmatório e sem
-  publicação.
-- M08 (avaliação selada) exige decisão humana prévia sobre H07/label set.
-- A medição de recursos da M04 é pré-condição para qualquer treino longo; o
-  teto de 6,5 GB de VRAM do R07 não pode ser elevado sem novo gate.
-- Qualquer alteração material em dataset, firewall ou pré-registro exige nova
-  versão e re-execução deste gate.
+1. Liberar imediatamente M01–M07 e a medição de recursos de M04, sempre em modo
+   exploratório.
+2. M08–M10 não ficam automaticamente autorizadas. M08 exige nova decisão humana
+   e um desfecho independente válido; H07 permanece inconclusivo por
+   circularidade e não existe label set confirmatório.
+3. Proibir unseal, acesso a rótulos-alvo, tuning no alvo, publicação e qualquer
+   claim confirmatório de transferência.
+4. A falha dos negativos pareados por grau permanece pendência aberta, não
+   mitigação concluída; o baseline degree-only continua obrigatório e o novo
+   pareamento/estratificação por consulta deve ser definido e testado antes de
+   qualquer avaliação futura.
+5. M04 deve medir VRAM, RAM e tempo antes de treino longo; o teto de 6,5 GB de
+   VRAM não pode ser aumentado sem nova decisão.
+6. Qualquer mudança em dataset, firewall, métricas, rótulos ou protocolo exige
+   nova versão e nova revisão do gate.
+7. Todos os resultados devem ser identificados claramente como exploratórios e
+   limitados à fonte observada.
 
 ## Escopo liberado
 
-- Próximas microfases autorizadas com `GO`: M01–M10 na ordem do plano e em modo
-  exploratório; implementações e smoke (M01–M04) imediatos.
-- Trilhos explicitamente não autorizados: unseal, leitura de dados selados,
-  tuning no alvo, alegação confirmatória, publicação e Experimento C.
-- Orçamento aprovado (proposto): IA baixa por microfase; GPU smoke/piloto
-  conforme R07; teto de 6,5 GB de VRAM.
+- Próximas microfases autorizadas: M01–M07 e a medição de recursos de M04, em
+  modo exploratório.
+- Não autorizadas: M08–M10 (M08 exige nova decisão humana e desfecho
+  independente válido), unseal, leitura de dados selados, acesso a rótulos-alvo,
+  tuning no alvo, publicação, claims confirmatórios e Experimento C.
+- Orçamento aprovado: IA baixa por microfase; GPU smoke/piloto conforme R07;
+  teto de 6,5 GB de VRAM, sem aumento sem nova decisão.
 
 ## Assinaturas
 
-- Responsável científico: a preencher
-- Custodiante do alvo: a preencher
-- Revisor de método/estatística: a preencher
+- Responsável científico: Alexandre Zanata — GO condicionado ao modo exploratório em 2026-09-15 (revisor único, papel acumulado, limitação declarada)
+- Custodiante do alvo: Alexandre Zanata — papel acumulado; nenhum unseal autorizado, 2026-09-15
+- Revisor de método/estatística: Alexandre Zanata — revisão única, válida somente para o escopo exploratório, 2026-09-15
