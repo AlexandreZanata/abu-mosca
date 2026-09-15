@@ -1,0 +1,154 @@
+{
+  "artifact_parity": {
+    "delta_accuracy": 0.0,
+    "hash_identical": false,
+    "max_abs_diff": 0.018588,
+    "mean_abs_diff": 4e-06,
+    "reference_accuracy": 0.905727,
+    "reference_sha256": "d9ca40acf96483bd5a579ea6520b8ffb2de3c15c93cfc2eb244b97917e59ce50",
+    "run_accuracy": 0.905727,
+    "run_sha256": "87b7fea23e41fef0a360dbd44702abac20c1d0d9e907eae29abb3f294b9a468c",
+    "status": "reproduzido",
+    "tolerance_accuracy": 0.002,
+    "tolerance_mean_abs": 0.0001
+  },
+  "command": {
+    "adaptation": "nenhuma no código oficial; ambiente separado fornece sklearn exigido por alignments.py",
+    "cwd": "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/abu-mosca/data/raw/vendor/regal-42ed9083",
+    "run": "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/abu-mosca/.local/regal-venv/bin/python regal.py --input data/arenas_combined_edges.txt --output /home/iiii/PESSOAL-PROJETOS-ALEXANDRE/abu-mosca/runs/b08/regal-shipped.npy"
+  },
+  "published_parity": {
+    "checked_sources": [
+      {
+        "location": "Tabela 4 (runtime), Tabela 5 (datasets), acurácia somente na Figura 4",
+        "sha256": "f0057edca4d052c29455eb78662bc018b73de015fefe309aefc7a4db07e17997",
+        "source": "arXiv:1802.06257v3 / DOI 10.1145/3269206.3271788"
+      },
+      {
+        "location": "seção 6.1: único valor numérico público (79,4%, REGAL-xNetMF) com instância não especificada (permutação e par conectado ausentes)",
+        "sha256": "5146b029c0864f5ffdb2f1b60ca96c69c40f1ce735d5d4f1a74c0281d847d07b",
+        "source": "arXiv:1802.06257v1 (título anterior, case study do mirrored Karate)"
+      }
+    ],
+    "numeric_reference": null,
+    "reason": "a publicação (arXiv:1802.06257v3 / CIKM 2018) reporta acurácia apenas graficamente na Figura 4; a Tabela 4 contém tempos e a Tabela 5 contém datasets, sem valor numérico de acurácia por dataset",
+    "status": "não verificável numericamente"
+  },
+  "recomputed": {
+    "reference_npy": {
+      "accuracy": 0.905727,
+      "correct": 1028,
+      "pairs": 1135
+    },
+    "reference_pickle": {
+      "accuracy": 0.000881,
+      "correct": 1,
+      "pairs": 1135
+    },
+    "run": {
+      "accuracy": 0.905727,
+      "correct": 1028,
+      "pairs": 1135
+    }
+  },
+  "reference_pickle_artifact": {
+    "accuracy": 0.000881,
+    "reason": "emb/arenas990-1.emb (pickle) não reproduz a partição; não é referência válida",
+    "status": "inconsistente com a partição"
+  },
+  "repro_environment": {
+    "packages": {
+      "networkx": "3.6.1",
+      "numpy": "2.5.3",
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1"
+    },
+    "python": "3.12.2",
+    "wheels": [
+      {
+        "name": "numpy",
+        "sha256": "b7e18c623bb5c95acb3b3328861272816ba199fb531921c5d6d0b675f1fde9e3",
+        "url": "https://files.pythonhosted.org/packages/65/af/aa78d1a88805456e212b65461354cd943197fb9acecc4c90fd12295123a3/numpy-2.5.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+        "version": "2.5.3"
+      },
+      {
+        "name": "scipy",
+        "sha256": "f55fa87b6c612ecd6b058f167c53231b1d14e412efe361d3d6e38b3631c73218",
+        "url": "https://files.pythonhosted.org/packages/df/64/ff35eb9e54894cf471ff4716abd3c81eb0a0626869217ce3e6ba4ccf17d7/scipy-1.18.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+        "version": "1.18.1"
+      },
+      {
+        "name": "networkx",
+        "sha256": "d47fbf302e7d9cbbb9e2555a0d267983d2aa476bac30e90dfbe5669bd57f3762",
+        "url": "https://files.pythonhosted.org/packages/9e/c9/b2622292ea83fbb4ec318f5b9ab867d0a28ab43c5717bb85b0a5f6b3b0a4/networkx-3.6.1-py3-none-any.whl",
+        "version": "3.6.1"
+      },
+      {
+        "name": "scikit-learn",
+        "sha256": "e5d7b18a5b9dca241a74695f3275fa4c895a9dadc72b3d8df5fa9d1083c9b83e",
+        "url": "https://files.pythonhosted.org/packages/8e/57/a50162f3d29feb979ab6347c6debda506dfb525bcff3c50dd17606651c7e/scikit_learn-1.9.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+        "version": "1.9.1"
+      },
+      {
+        "name": "joblib",
+        "sha256": "3dbbf9f6e4b592a2357b854608e980fe6390d131d7a82f011a377ef2ebef7aba",
+        "url": "https://files.pythonhosted.org/packages/18/53/84099323c2ec4be98d935f63c033ac4151ee83836ca1050ede3b3aadf155/joblib-1.6.0-py3-none-any.whl",
+        "version": "1.6.0"
+      },
+      {
+        "name": "narwhals",
+        "sha256": "29326d74f107c347fd1009bd58e38d9f7c7c5b51e6de97bc93dbc325d9038b54",
+        "url": "https://files.pythonhosted.org/packages/40/b5/1b84b2c784db76d69442334bc8b8748c840f13ca53be086f4f250ad4a0bc/narwhals-2.26.0-py3-none-any.whl",
+        "version": "2.26.0"
+      },
+      {
+        "name": "threadpoolctl",
+        "sha256": "43a0b8fd5a2928500110039e43a5eed8480b918967083ea48dc3ab9f13c4a7fb",
+        "url": "https://files.pythonhosted.org/packages/32/d5/f9a850d79b0851d1d4ef6456097579a9005b31fea68726a4ae5f2d82ddd9/threadpoolctl-3.6.0-py3-none-any.whl",
+        "version": "3.6.0"
+      },
+      {
+        "name": "cloudpickle",
+        "sha256": "9acb47f6afd73f60dc1df93bb801b472f05ff42fa6c84167d25cb206be1fbf4a",
+        "url": "https://files.pythonhosted.org/packages/88/39/799be3f2f0f38cc727ee3b4f1445fe6d5e4133064ec2e4115069418a5bb6/cloudpickle-3.1.2-py3-none-any.whl",
+        "version": "3.1.2"
+      }
+    ]
+  },
+  "resources": {
+    "device": "cpu",
+    "peak_child_rss_mib": 201.9,
+    "seconds": 5.442
+  },
+  "schema": "b08-regal-reproduction",
+  "scores": {
+    "top1": 0.905727
+  },
+  "stderr_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_digest": "37041f05530a26c0e5ba2a51e255c3060592c28cbb09d9fb7c96d8f0de4edcad",
+  "supervised_inputs": {
+    "attributed_variant": "não executada (trilho separado, informação extra)",
+    "declared": true,
+    "mapping_convention": "valores são índices locais do grafo 2 (0..n/2-1), conforme score_alignment_matrix do código oficial",
+    "usage": "mapeamento verdadeiro do benchmark usado somente para pontuar; xNetMF/REGAL é não supervisionado"
+  },
+  "vendor": {
+    "access_date": "2026-09-15",
+    "commit": "42ed9083f51ad481dc7d7acfb488b390e2013050",
+    "files": {
+      "alignments.py": "f51458865c9971a20ddbbcd7d7580906eb89e142ae78202b04324bb379481541",
+      "config.py": "fdc0a517ca480963bef57f318c2fc038a3248e916c227e0079d54c749c54e79d",
+      "data/arenas_combined_edges.txt": "6764808e5ed1e0d5dfc5ac52c76312b1a5d682d4f30fd38141527c4dc9c24f94",
+      "data/arenas_edges-mapping-permutation.txt": "0042dc4e05e38f6e655dfd7b4a7ea3f29dfbf3c514887c3421ec4168636e9705",
+      "emb/arenas990-1.emb": "cf0f346b20f59d7f91a9895b66cc09cb7ff277ae8691467ee55f18356711d9ed",
+      "emb/arenas990-1.emb.npy": "d9ca40acf96483bd5a579ea6520b8ffb2de3c15c93cfc2eb244b97917e59ce50",
+      "license.txt": "274384959992b3e3d2adac574927975275e499de77bc15b28a30d9b220037302",
+      "regal.py": "c066823e8114afb8a8cabe59a160f1b86a2441da0225db811655a04f83771a7b",
+      "xnetmf.py": "5dd27f08790b43ee7fb3a6e817038883087c9323e5e84b2b8a9806b875f5c1cb"
+    },
+    "license": "MIT",
+    "repository": "https://github.com/GemsLab/REGAL",
+    "tarball_sha256": "99443be72f3b0517b9763d3c45453af30ba9e90373068d699d9118ffedecd718",
+    "tarball_url": "https://codeload.github.com/GemsLab/REGAL/tar.gz/42ed9083f51ad481dc7d7acfb488b390e2013050"
+  }
+}

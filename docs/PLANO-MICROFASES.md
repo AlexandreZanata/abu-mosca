@@ -1867,7 +1867,7 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   ARPACK; a estimativa inferida de D09 (4–6 GB) não se confirmou porque nada
   foi densificado; commit 57872f6c08ea28188f15b5a6c608bd68e21a7349.
 
-- [ ] **B08 — Reproduzir um baseline publicado de neuron matching.**
+- [x] **B08 — Reproduzir um baseline publicado de neuron matching.**
   - Objetivo: comparar com o trabalho mais próximo compatível encontrado em L03.
   - Entregas: versão/licença fixadas, adaptação mínima documentada, teste de
     paridade com resultado público ou justificativa de não reprodutibilidade.
@@ -1877,6 +1877,46 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: não alterar protocolo do método até “funcionar” no alvo.
   - Dependências: L03, L06, B01, H09.
   - Orçamento: IA baixa; CPU/GPU piloto conforme método; gate se exceder 8 GB.
+  Evidência (2026-09-15, executor; modo exploratório; benchmark público, sem
+  nenhum dado do alvo): arquivos `tools/regal_repro.py` (executa o código
+  oficial **sem modificações**, lê a saída, repontua embeddings com o avaliador
+  oficial e valida o registro com regras de honestidade declaradas),
+  `tests/test_regal_repro.py` (7 casos: parser, critério de paridade,
+  honestidade do registro, fixture ponta a ponta com o código oficial e
+  ausência de referências proibidas) e `artifacts/reports/B08-REGAL.md` +
+  `.json`; método escolhido em L03: REGAL/xNetMF (ALN-05, LIT-0030), commit
+  `42ed9083f51ad481dc7d7acfb488b390e2013050`, licença MIT verificada, tarball
+  com sha256 `99443be7…`; ambiente de reprodução separado e pinado
+  (numpy 2.5.3, scipy 1.18.1, networkx 3.6.1, scikit-learn 1.9.1; sha256 dos
+  wheels no JSON), lock do projeto intocado; resultado no benchmark embarcado
+  `arenas990-1` (par de 1.135 nós, 1% de ruído): score top1 **0,905727
+  (1.028/1.135)**, determinístico (mesmo sha256 de embedding em execuções
+  repetidas); paridade de artefato público com `emb/arenas990-1.emb.npy` dos
+  autores, repontuado pelo avaliador oficial: acurácia idêntica (Δ = 0,0) e
+  diferença média 3,9e-6 (máxima 1,9e-2), dentro das tolerâncias declaradas
+  (0,002 e 1e-4) → `reproduzido`; o outro artefato embarcado
+  `emb/arenas990-1.emb` (pickle) pontua 0,000881 e fica sinalizado como
+  inconsistente; paridade numérica contra a publicação é **não verificável**
+  (a acurácia só existe na Figura 4; Tabela 4 é runtime e Tabela 5 é lista de
+  datasets; o único valor numérico, 79,4% no mirrored Karate do arXiv v1 §6.1,
+  tem instância não especificada e não foi reconstruído por adivinhação);
+  inputs supervisionados declarados (mapa verdadeiro só para pontuar, com
+  convenção de índice local do grafo 2) e variante com atributos dispensada
+  para trilho separado; fontes/versões: LIT-0030 (DOI 10.1145/3269206.3271788),
+  arXiv v3 (sha256 `f0057edc…`) e arXiv v1 (sha256 `5146b029…`), L03/L06,
+  Python 3.12.2, sem GPU; comandos e testes: `python3 tools/regal_repro.py
+  run --report artifacts/reports/B08-REGAL.json` (executa o oficial em 2–4 s;
+  pico de RSS dos filhos ~200 MiB) e `check` (valida vendor, ambiente,
+  contagens e critérios), `.venv/bin/python -m pytest tests/ -q` (207 testes),
+  nova checagem B08 no `validate_research.py` com smoke negativo (status de
+  paridade corrompido reprova como esperado), `python3 tools/validate_plan.py`,
+  `check_data_hygiene.py` e `firewall.py scan`; resultado: baseline publicado
+  reproduzido e auditável, com paridade de artefato e limitações de paridade
+  publicadas registradas; recursos medidos: CPU apenas, sem GPU; download
+  externo restrito ao tarball MIT (~6 MB) e dois PDFs públicos, com hashes;
+  decisão/limitação: REGAL é transdutivo e **não comparável zero-shot** (como
+  B06/B07); a paridade é de artefato do repositório, não da figura da
+  publicação; commit e70219cb0bae0b27708ab9bbd756b0d8680c4e56.
 
 - [ ] **B09 — Executar controles nulos e congelar pacote de baselines.**
   - Objetivo: provar que o harness detecta atalhos e que todos os comparadores
