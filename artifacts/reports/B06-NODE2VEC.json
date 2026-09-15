@@ -65,7 +65,7 @@
   },
   "nodes_total": 23188,
   "nodes_used": 14847,
-  "peak_rss_mib": 3437.4,
+  "peak_rss_mib": 3551.6,
   "predictions": [
     {
       "config": "deepwalk",
@@ -112,31 +112,31 @@
         {
           "macro_recall@1": 0.163047,
           "micro_recall@1": 0.131173,
-          "pair_seconds": 0.5,
+          "pair_seconds": 1.2,
           "pairs": 19786692,
           "seed_index": 0,
-          "train_seconds": 195.3,
-          "walk_seconds": 5.6,
+          "train_seconds": 189.5,
+          "walk_seconds": 6.0,
           "walk_tokens": 2256121
         },
         {
           "macro_recall@1": 0.170178,
           "micro_recall@1": 0.138723,
-          "pair_seconds": 0.8,
+          "pair_seconds": 1.0,
           "pairs": 19775606,
           "seed_index": 1,
-          "train_seconds": 162.6,
-          "walk_seconds": 6.7,
+          "train_seconds": 171.1,
+          "walk_seconds": 6.4,
           "walk_tokens": 2254997
         },
         {
           "macro_recall@1": 0.168601,
           "micro_recall@1": 0.140296,
-          "pair_seconds": 0.5,
+          "pair_seconds": 0.6,
           "pairs": 19773740,
           "seed_index": 2,
-          "train_seconds": 130.0,
-          "walk_seconds": 7.0,
+          "train_seconds": 155.1,
+          "walk_seconds": 6.2,
           "walk_tokens": 2254835
         }
       ],
@@ -155,31 +155,31 @@
         {
           "macro_recall@1": 0.158941,
           "micro_recall@1": 0.127399,
-          "pair_seconds": 0.6,
+          "pair_seconds": 0.5,
           "pairs": 19785120,
           "seed_index": 0,
-          "train_seconds": 143.1,
-          "walk_seconds": 173.9,
+          "train_seconds": 136.2,
+          "walk_seconds": 156.1,
           "walk_tokens": 2255946
         },
         {
           "macro_recall@1": 0.156781,
           "micro_recall@1": 0.134319,
-          "pair_seconds": 1.1,
+          "pair_seconds": 0.5,
           "pairs": 19780914,
           "seed_index": 1,
-          "train_seconds": 132.5,
-          "walk_seconds": 150.7,
+          "train_seconds": 127.9,
+          "walk_seconds": 131.7,
           "walk_tokens": 2255534
         },
         {
           "macro_recall@1": 0.163043,
           "micro_recall@1": 0.132432,
-          "pair_seconds": 0.6,
+          "pair_seconds": 0.5,
           "pairs": 19787096,
           "seed_index": 2,
-          "train_seconds": 134.5,
-          "walk_seconds": 154.9,
+          "train_seconds": 151.7,
+          "walk_seconds": 121.9,
           "walk_tokens": 2256200
         }
       ],
@@ -193,7 +193,7 @@
     }
   },
   "schema": "b06-node2vec",
-  "seconds": 1434.655,
+  "seconds": 1396.493,
   "seeds": [
     297979363399525401,
     1699981902186354598,
