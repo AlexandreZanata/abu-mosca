@@ -1,0 +1,329 @@
+{
+  "blocking_issue": {
+    "decision_required_from": "revisor humano do G5 (condição 6)",
+    "evidence": {
+      "grid_max": 101760,
+      "grid_min": 13824,
+      "smallest_in_range": [
+        {
+          "dim": 576,
+          "layers": 2,
+          "parameters": 1009152
+        },
+        {
+          "dim": 408,
+          "layers": 3,
+          "parameters": 1009800
+        }
+      ]
+    },
+    "options": [
+      "emendar o grid do pré-registro (changelog + nova revisão do G5, condição 6) para incluir dim ≥ 408 (3 camadas) ou ≥ 576 (2 camadas)",
+      "aceitar encoder abaixo do intervalo declarado e atualizar README/ESCOPO/PROT com o desvio registrado",
+      "outra decisão humana documentada"
+    ],
+    "present": true,
+    "summary": "o grid congelado do R07 (dim 64/128; 2–3 camadas) produz no máximo 101760 parâmetros, abaixo do intervalo de 1000000–3000000 declarado para o MVP"
+  },
+  "config": {
+    "activation": "relu",
+    "aggregator": "mean",
+    "features": [
+      "in_degree",
+      "out_degree",
+      "weighted_in",
+      "weighted_out",
+      "reciprocity",
+      "self_loop_weight"
+    ],
+    "input_dim": 6,
+    "max_source_nodes": null,
+    "per_node_parameters": 0,
+    "weight_mode": "raw"
+  },
+  "cuda_probe": {
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "dtype": "float32",
+    "parameters": 1009152,
+    "peak_vram_mib": 68.4
+  },
+  "fanout_convention": "o grid do R07 lista dois fanouts para trials de três camadas; a convenção adotada repete o último valor nas camadas mais profundas (não altera o número de parâmetros)",
+  "fixture_smoke": {
+    "deterministic_same_seed": true,
+    "encoder_parameters": 1152,
+    "gradients_finite": true,
+    "graph_edges": 110,
+    "loss_first": 2.040574,
+    "loss_last": 0.058172,
+    "nodes": 40,
+    "overfit_train_auc": 0.984117,
+    "parameters_formula": 1152,
+    "reloaded_config_matches": true,
+    "serialization_bytes": 9907,
+    "serialization_max_abs_diff": 0.0,
+    "validation_auc": 0.989669,
+    "validation_edges": 22
+  },
+  "parameter_budget": {
+    "capacity_rows": [
+      {
+        "dim": 384,
+        "layers": 2,
+        "meets_mvp_range": false,
+        "parameters": 451584
+      },
+      {
+        "dim": 384,
+        "layers": 3,
+        "meets_mvp_range": false,
+        "parameters": 895104
+      },
+      {
+        "dim": 408,
+        "layers": 2,
+        "meets_mvp_range": false,
+        "parameters": 509184
+      },
+      {
+        "dim": 408,
+        "layers": 3,
+        "meets_mvp_range": true,
+        "parameters": 1009800
+      },
+      {
+        "dim": 512,
+        "layers": 2,
+        "meets_mvp_range": false,
+        "parameters": 798720
+      },
+      {
+        "dim": 512,
+        "layers": 3,
+        "meets_mvp_range": true,
+        "parameters": 1586688
+      },
+      {
+        "dim": 576,
+        "layers": 2,
+        "meets_mvp_range": true,
+        "parameters": 1009152
+      },
+      {
+        "dim": 576,
+        "layers": 3,
+        "meets_mvp_range": true,
+        "parameters": 2006208
+      },
+      {
+        "dim": 768,
+        "layers": 2,
+        "meets_mvp_range": true,
+        "parameters": 1787904
+      },
+      {
+        "dim": 768,
+        "layers": 3,
+        "meets_mvp_range": false,
+        "parameters": 3559680
+      },
+      {
+        "dim": 1024,
+        "layers": 2,
+        "meets_mvp_range": false,
+        "parameters": 3170304
+      },
+      {
+        "dim": 1024,
+        "layers": 3,
+        "meets_mvp_range": false,
+        "parameters": 6319104
+      }
+    ],
+    "grid_max": 101760,
+    "grid_meets_mvp_range": false,
+    "grid_min": 13824,
+    "grid_rows": [
+      {
+        "dim": 64,
+        "fanout": [
+          10,
+          10
+        ],
+        "layers": 2,
+        "parameters": 13824,
+        "parameters_two_projections": 9216,
+        "trial": "T01"
+      },
+      {
+        "dim": 64,
+        "fanout": [
+          10,
+          10
+        ],
+        "layers": 2,
+        "parameters": 13824,
+        "parameters_two_projections": 9216,
+        "trial": "T02"
+      },
+      {
+        "dim": 64,
+        "fanout": [
+          15,
+          10
+        ],
+        "layers": 3,
+        "parameters": 26304,
+        "parameters_two_projections": 17536,
+        "trial": "T03"
+      },
+      {
+        "dim": 64,
+        "fanout": [
+          15,
+          10
+        ],
+        "layers": 3,
+        "parameters": 26304,
+        "parameters_two_projections": 17536,
+        "trial": "T04"
+      },
+      {
+        "dim": 128,
+        "fanout": [
+          10,
+          10
+        ],
+        "layers": 2,
+        "parameters": 52224,
+        "parameters_two_projections": 34816,
+        "trial": "T05"
+      },
+      {
+        "dim": 128,
+        "fanout": [
+          10,
+          10
+        ],
+        "layers": 2,
+        "parameters": 52224,
+        "parameters_two_projections": 34816,
+        "trial": "T06"
+      },
+      {
+        "dim": 128,
+        "fanout": [
+          15,
+          10
+        ],
+        "layers": 3,
+        "parameters": 101760,
+        "parameters_two_projections": 67840,
+        "trial": "T07"
+      },
+      {
+        "dim": 128,
+        "fanout": [
+          15,
+          10
+        ],
+        "layers": 3,
+        "parameters": 101760,
+        "parameters_two_projections": 67840,
+        "trial": "T08"
+      },
+      {
+        "dim": 64,
+        "fanout": [
+          15,
+          10
+        ],
+        "layers": 2,
+        "parameters": 13824,
+        "parameters_two_projections": 9216,
+        "trial": "T09"
+      },
+      {
+        "dim": 64,
+        "fanout": [
+          10,
+          10
+        ],
+        "layers": 3,
+        "parameters": 26304,
+        "parameters_two_projections": 17536,
+        "trial": "T10"
+      },
+      {
+        "dim": 128,
+        "fanout": [
+          15,
+          10
+        ],
+        "layers": 2,
+        "parameters": 52224,
+        "parameters_two_projections": 34816,
+        "trial": "T11"
+      },
+      {
+        "dim": 128,
+        "fanout": [
+          10,
+          10
+        ],
+        "layers": 3,
+        "parameters": 101760,
+        "parameters_two_projections": 67840,
+        "trial": "T12"
+      }
+    ],
+    "meets_mvp_range": true,
+    "mvp_range": [
+      1000000,
+      3000000
+    ],
+    "smallest_in_range": [
+      {
+        "dim": 576,
+        "layers": 2,
+        "parameters": 1009152
+      },
+      {
+        "dim": 408,
+        "layers": 3,
+        "parameters": 1009800
+      }
+    ]
+  },
+  "real_graph_smoke": {
+    "batch": 64,
+    "cuda_available": true,
+    "dense_equivalent_bytes": 8602933504,
+    "device": "cpu",
+    "edges_per_layer": [
+      1910,
+      34260,
+      293687
+    ],
+    "encoder_parameters": 101760,
+    "fanout": [
+      15,
+      10,
+      10
+    ],
+    "loss_first": 4.774472,
+    "loss_last": 0.981928,
+    "sampled_nodes": 22933,
+    "seconds": 19.883,
+    "sparse_bytes": 117916048,
+    "sparse_ratio": 0.013706,
+    "steps": 20,
+    "train_edges": 4905439,
+    "vram_peak_mib": null
+  },
+  "resources": {
+    "peak_rss_mib": 2484.8,
+    "seconds": 35.648
+  },
+  "schema": "m02-graphsage",
+  "status": "exploratory-only; somente fonte; sem nenhum dado do alvo"
+}

@@ -2064,6 +2064,22 @@ compra de serviço, contato com autores ou uso de dados não públicos.
   - Proibições: sem camada específica para número fixo de nós da fonte.
   - Dependências: M01, R04, H05.
   - Orçamento: IA baixa; GPU smoke.
+  - Bloqueio (2026-09-15, executor): encoder implementado e verificado
+    (`tools/gnn_graphsage.py`, `tests/test_graphsage.py` com 13 casos,
+    `artifacts/reports/M02-GRAPHSAGE.md` + `.json` e checagem M02 no
+    `validate_research.py`): overfit controlado com AUC de treino 0,984117,
+    gradientes finitos, determinismo, serialização com diferença 0,0,
+    inferência em grafo novo com equivalência sob permutação, fanout respeitado,
+    `forward_sampled` igual ao `forward_full` com fanout completo, nenhuma
+    tabela por node ID e representação esparsa (razão 0,013706; sonda CUDA com
+    68,4 MiB de VRAM em dim 576/2 camadas); a fase fica `[ ]` porque o grid
+    congelado do R07 (dim 64/128; 2–3 camadas) rende 13.824–101.760 parâmetros,
+    abaixo do intervalo de 1–3M declarado para o MVP, e alterar o grid exige
+    changelog e nova revisão do G5 (condição 6); opções registradas: (a)
+    emendar o grid para incluir dim ≥ 408 (3 camadas) ou ≥ 576 (2 camadas);
+    (b) aceitar o encoder abaixo do intervalo e registrar o desvio em
+    README/ESCOPO/PROT; (c) outra decisão documentada; próxima ação humana:
+    decidir o orçamento de parâmetros; commit 6caec0166445c96dcc22c2963d30771a50175da5.
 
 - [ ] **M03 — Implementar GIN como candidato comparável.**
   - Objetivo: testar agregação alternativa sob o mesmo orçamento e harness.

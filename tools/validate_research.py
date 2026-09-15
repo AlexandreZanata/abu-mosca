@@ -584,6 +584,23 @@ B09_PACKAGE = ROOT / "data" / "manifests" / "baselines-b09.json"
 M01_TOOL = ROOT / "tools" / "ssl_task.py"
 M01_REPORT = ROOT / "artifacts" / "reports" / "M01-SSL-TASK.md"
 M01_METRICS = ROOT / "artifacts" / "reports" / "M01-SSL-TASK.json"
+M02_TOOL = ROOT / "tools" / "gnn_graphsage.py"
+M02_REPORT = ROOT / "artifacts" / "reports" / "M02-GRAPHSAGE.md"
+M02_METRICS = ROOT / "artifacts" / "reports" / "M02-GRAPHSAGE.json"
+M02_TOKENS = (
+    "graphsage",
+    "indutivo",
+    "parâmetros",
+    "neighbor sampling",
+    "dirigido",
+    "ponderada",
+    "serialização",
+    "determinismo",
+    "overfit",
+    "exploratório",
+    "sem nenhum dado do alvo",
+    "bloqueio",
+)
 M01_TOKENS = (
     "máscara",
     "holdout",
@@ -2761,6 +2778,47 @@ def check_m01_ssl_task() -> tuple[list[str], int]:
     return failures, len(M01_TOKENS)
 
 
+def check_m02_graphsage() -> tuple[list[str], int]:
+    label = "M02"
+    failures: list[str] = []
+    for path in (M02_TOOL, M02_REPORT, M02_METRICS, ROOT / "tests" / "test_graphsage.py"):
+        if not path.exists():
+            failures.append(f"{label}: arquivo ausente '{path.relative_to(ROOT)}'")
+    if failures:
+        return failures, 0
+    report = M02_REPORT.read_text(encoding="utf-8")
+    flat = " ".join(report.split()).lower()
+    for token in M02_TOKENS:
+        if token.lower() not in flat:
+            failures.append(f"{label}: relatório sem token '{token}'")
+    leak = PUBLIC_ID_RE.search(report)
+    if leak:
+        failures.append(f"{label}: relatório com possível ID cru ('{leak.group(0)}')")
+    source = M02_TOOL.read_text(encoding="utf-8")
+    for token in ("male-cns", "data/sealed", "target_labels", "crosswalk"):  # firewall-allow
+        if token in source:
+            failures.append(f"{label}: encoder não pode referenciar o alvo ('{token}')")
+    spec = importlib.util.spec_from_file_location("gnn_graphsage", ROOT / "tools" / "gnn_graphsage.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    for failure in module.check_report(M02_METRICS):
+        failures.append(f"{label}: {failure}")
+    metrics = json.loads(M02_METRICS.read_text(encoding="utf-8"))
+    blocking = bool(metrics.get("blocking_issue", {}).get("present"))
+    plan_lines = PLAN.read_text(encoding="utf-8").splitlines()
+    m02_line = next((line for line in plan_lines if "**M02 —" in line), None)
+    if m02_line is None:
+        failures.append(f"{label}: item M02 não encontrado no plano")
+    elif blocking and not m02_line.startswith("- [ ]"):
+        failures.append(f"{label}: M02 marcado concluído com bloqueio de orçamento aberto")
+    elif not blocking and m02_line.startswith("- [ ]"):
+        failures.append(f"{label}: sem bloqueio registrado, M02 deveria estar concluído")
+    known = {item_id for _, item_id in parse_items(plan_lines)}
+    for ref in sorted(ref for ref in phase_refs(report) if ref not in known):
+        failures.append(f"{label}: referência de fase inexistente '{ref}'")
+    return failures, len(M02_TOKENS)
+
+
 def check_b03_source_baselines() -> tuple[list[str], int]:
     label = "B03"
     failures: list[str] = []
@@ -4560,6 +4618,7 @@ def main() -> int:
     b08_failures, b08_tokens = check_b08_regal()
     b09_failures, b09_tokens = check_b09_controls()
     m01_failures, m01_tokens = check_m01_ssl_task()
+    m02_failures, m02_tokens = check_m02_graphsage()
     failures += (
         ref_failures
         + path_failures
@@ -4612,6 +4671,7 @@ def main() -> int:
         + b08_failures
         + b09_failures
         + m01_failures
+        + m02_failures
     )
 
     if failures:
@@ -4813,6 +4873,10 @@ def main() -> int:
     print(
         f"OK: tarefa SSL M01 com {m01_tokens} tokens, máscara/reverso, negativos "
         f"pareados e atalho de grau auditado"
+    )
+    print(
+        f"OK: encoder GraphSAGE M02 com {m02_tokens} tokens, verificado "
+        f"(bloqueio de orçamento registrado aguardando decisão humana)"
     )
     print(f"OK: {refs} referências de fase resolvidas contra o plano")
     print(f"OK: {paths} caminhos de arquivo citados e existentes")
